@@ -1,10 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
-{
-   public Character characterData=new Character();  
+{/*
+    //TODO:初始化敌人数据Day3
+    public Character characterData=new Character();  
     void Start()
     {
         characterData.Name = "Goblin";
@@ -14,7 +15,8 @@ public class EnemyController : MonoBehaviour
         characterData.ActionValue = 0.0f;
 
         Debug.Log("EnemyController has rasing "  );
-    }
+    }*/
 
+  
   
 }
