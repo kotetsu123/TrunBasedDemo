@@ -1,30 +1,40 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BatteleManager : MonoBehaviour
 {
+    public static BatteleManager Instance;
+
     public List<Character> characters = new List<Character>();
     public bool isActing = false;
+
+    public PlayerController player;
+    public EnemyController enemy;
 
 
     private int tick=0;//时间刻度
 
 
-    void Start()
+    void Awake()
     {
-        //初始化角色
-        //名字，hp，攻击力，速度，行动值
-        characters.Add(new Character("Player", 200, 50, 90, 200f));
-        characters.Add(new Character("Enemy", 150, 55, 10, 200f));
-        Debug.Log("Battle Start!");
+       
+        Instance = this;
+        
+    }
+    
+    private void Start()
+    {
+        //StartCoroutine(RigisterDone());
     }
 
-    
     void Update()
     {
+        
         if (isActing) return;//正在行动中，跳过本次更新
+       
         tick++;
 
         //每隔10个时间刻度，所有角色增加行动值
@@ -34,6 +44,11 @@ public class BatteleManager : MonoBehaviour
         }
     }
 
+    public void RigisterCharacter(Character c)
+    {
+        characters.Add(c);
+        Debug.Log($"[BattleManager] Rigister Charcter:{c.Name}");
+    }
     void updateActionValues()
     {
         if (isActing) return;
@@ -57,11 +72,18 @@ public class BatteleManager : MonoBehaviour
             if (nextActor.ActionValue <= 0 && !isActing)
             {
                 StartCoroutine(PerformTrun(nextActor));
+                break;
             }
             //上面两个逻辑都是为了防止多个角色同时行动
         }
     }
-   IEnumerator PerformTrun(Character actor)
+   /* IEnumerator RigisterDone()
+    {
+        yield return new WaitUntil(() => characters.Count >= 2);
+        Debug.Log("[BattleManager] Rigister Done!");
+        
+    }*/
+    IEnumerator PerformTrun(Character actor)
     {
         isActing = true;
         actor.isActing = true;
@@ -72,6 +94,8 @@ public class BatteleManager : MonoBehaviour
         //行动完成后恢复行动值
         actor.ActionValue = 200f;
         isActing = false;
+
+        Debug.Log($"{actor.Name}结束行动！");
 
         //TODO: 这里可以添加具体的行动逻辑，比如攻击、使用技能等
         /*Debug.Log($"{actor.Name}开始行动！");

@@ -26,4 +26,18 @@ public class Character
         isActing = false;
         isDead = false;
     }
+    public void AttackTarget(Character target)
+    {
+        target.Hp -= Attack;
+        if (target.Hp <= 0)
+        {
+            target.Hp = 0;
+            target.isDead = true;
+            Debug.Log(target.Name + " is dead!");
+        }
+        else
+        {
+                       Debug.Log($"{Name} attacks {target.Name}, make {Attack} damege!");
+        }
+    }
 }
