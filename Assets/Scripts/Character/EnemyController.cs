@@ -15,6 +15,8 @@ public class EnemyController : MonoBehaviour
         if (data == null)
         {
             data = new Character("Enemy", 150, 55, 10, 200f);
+            data.Team = Character.TeamType.Enemy;
+            data.isPlayer = false;
             BatteleManager.Instance.RigisterCharacter(data);
             Debug.Log($"[EnemyController]Awake over:{data != null}");
         }

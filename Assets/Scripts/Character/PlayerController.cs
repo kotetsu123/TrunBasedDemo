@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
         if (data == null)
         {
             data = new Character("Player", 200, 50, 90, 200f);
+            data.Team = Character.TeamType.Player;
+            data.isPlayer = true;
             BatteleManager.Instance.RigisterCharacter(data);
             Debug.Log($"[PlayerController]Awake over:{data != null}");
         }

@@ -15,16 +15,16 @@ public class BatteleManager : MonoBehaviour
     public EnemyController enemy;
 
 
-    private int tick=0;//时间刻度
+    private int tick = 0;//时间刻度
 
 
     void Awake()
     {
-       
+
         Instance = this;
-        
+
     }
-    
+
     private void Start()
     {
         //StartCoroutine(RigisterDone());
@@ -32,9 +32,9 @@ public class BatteleManager : MonoBehaviour
 
     void Update()
     {
-        
+
         if (isActing) return;//正在行动中，跳过本次更新
-       
+
         tick++;
 
         //每隔10个时间刻度，所有角色增加行动值
@@ -48,6 +48,7 @@ public class BatteleManager : MonoBehaviour
     {
         characters.Add(c);
         Debug.Log($"[BattleManager] Rigister Charcter:{c.Name}");
+        
     }
     void updateActionValues()
     {
@@ -55,13 +56,13 @@ public class BatteleManager : MonoBehaviour
         //减少行动值，当行动值到达0或这者低于0时，触发行动
         foreach (var c in characters)
         {
-            if (c.isDead) //没死继续
+            if (c.isDead) //死亡角色不行动
                 continue;
             //速度越快，行动值减少越快
             c.ActionValue -= c.Speed / 0.75f;
 
-            Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
-            
+           // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
+
 
             //找出行动值最小的角色(谁最接近0)
             var nextActor = characters
@@ -77,12 +78,12 @@ public class BatteleManager : MonoBehaviour
             //上面两个逻辑都是为了防止多个角色同时行动
         }
     }
-   /* IEnumerator RigisterDone()
-    {
-        yield return new WaitUntil(() => characters.Count >= 2);
-        Debug.Log("[BattleManager] Rigister Done!");
-        
-    }*/
+    /* IEnumerator RigisterDone()
+     {
+         yield return new WaitUntil(() => characters.Count >= 2);
+         Debug.Log("[BattleManager] Rigister Done!");
+
+     }*/
     IEnumerator PerformTrun(Character actor)
     {
         isActing = true;
@@ -90,37 +91,52 @@ public class BatteleManager : MonoBehaviour
         Debug.Log($"{actor.Name}开始行动！");
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
-
+                                               //
+        if (actor.isPlayer)
+        {
+            //等待玩家输入
+            Debug.Log("等待玩家输入指令...");
+            yield return StartCoroutine(WaitForPlayerAction(actor));
+        }
+        else
+        {
+            //敌人自动行动
+            yield return new WaitForSeconds(0.5f);
+            var target = characters.FirstOrDefault(c => c.Team != actor.Team && !c.isDead);
+            if (target != null)
+            {
+                target.TakeDamage(actor.Attack);
+            }
+            yield return new WaitForSeconds(1f);
+        }
         //行动完成后恢复行动值
         actor.ActionValue = 200f;
         isActing = false;
 
         Debug.Log($"{actor.Name}结束行动！");
 
-        //TODO: 这里可以添加具体的行动逻辑，比如攻击、使用技能等
-        /*Debug.Log($"{actor.Name}开始行动！");
-        //简单的攻击逻辑，随机选择一个目标进行攻击
-        var targets = characters.Where(c => c != actor && !c.isDead).ToList();
-        if (targets.Count > 0)
-        {
-            var target = targets[Random.Range(0, targets.Count)];
-            Debug.Log($"{actor.Name}攻击了{target.Name}，造成了{actor.Attack}点伤害！");
-            target.Hp -= actor.Attack;
-            if (target.Hp <= 0)
-            {
-                target.isDead = true;
-                Debug.Log($"{target.Name}被击败了！");
-            }
-            else
-            {
-                Debug.Log($"{target.Name}剩余HP：{target.Hp}");
-            }*/
     }
-    /*//行动结束，重置行动值
-    actor.ActionValue = 200f;
-    actor.isActing = false;
-    isActing = false;
-    yield return null;*/
+    IEnumerator WaitForPlayerAction(Character actor)
+    {
+        bool actionChosen = false;
+        Debug.Log("press the space key attack the enemy");
+        while (!actionChosen)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                var target = characters.FirstOrDefault(c => c.Team != actor.Team && !c.isDead);
+                if (target != null)
+                {
+                    target.TakeDamage(actor.Attack);
+                    Debug.Log($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
+                }
+                actionChosen = true;
+            }
+
+            yield return null;
+        }
+    }
 }
+
 
 

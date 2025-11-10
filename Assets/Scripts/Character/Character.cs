@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +7,14 @@ using UnityEngine;
 [Serializable]
 public class Character 
 {//第一天，纯数据结构
-    
+    public enum TeamType
+    {
+        Player,
+        Enemy
+    }
+    public TeamType Team;
+
+
     public string Name;
     public int Hp;
     public int Attack;
@@ -14,6 +22,7 @@ public class Character
     public float ActionValue;//行动值
     public bool isActing;
     public bool isDead;
+    public bool isPlayer;
 
     public Character(string name,int hp,int attack,float speed,float startValue=200f)
     {
@@ -25,8 +34,10 @@ public class Character
 
         isActing = false;
         isDead = false;
+        
     }
-    public void AttackTarget(Character target)
+    //TODO：选中入口
+    public void AttackTarget(Character target)//之后特效，音效等 选中入口 伤害判定由TakeDamage处理
     {
         target.Hp -= Attack;
         if (target.Hp <= 0)
@@ -37,7 +48,22 @@ public class Character
         }
         else
         {
-                       Debug.Log($"{Name} attacks {target.Name}, make {Attack} damege!");
+             Debug.Log($"{Name} attacks {target.Name}, make {Attack} damege!");
+        }      
+    }
+    public void TakeDamage(int damage)
+    {
+               Hp -= damage;
+        if (Hp <= 0)
+        {
+            Hp = 0;
+            isDead = true;
+            Debug.Log($"{this.Name} +  is dead!");
+            
+        }
+        else
+        {
+            Debug.Log($"{this.Name} takes {damage} damage, remaining HP: {Hp}");
         }
     }
 }
