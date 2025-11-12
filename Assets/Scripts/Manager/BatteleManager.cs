@@ -10,6 +10,7 @@ public class BatteleManager : MonoBehaviour
 
     public List<Character> characters = new List<Character>();
     public bool isActing = false;
+    public bool battleEnded = false;
 
     public PlayerController player;
     public EnemyController enemy;
@@ -17,12 +18,9 @@ public class BatteleManager : MonoBehaviour
 
     private int tick = 0;//时间刻度
 
-
     void Awake()
     {
-
         Instance = this;
-
     }
 
     private void Start()
@@ -32,16 +30,18 @@ public class BatteleManager : MonoBehaviour
 
     void Update()
     {
-
         if (isActing) return;//正在行动中，跳过本次更新
 
         tick++;
-
         //每隔10个时间刻度，所有角色增加行动值
         if (tick % 10 == 0)
         {
             updateActionValues();
         }
+        if (battleEnded)
+        {
+            return;
+        }         
     }
 
     public void RigisterCharacter(Character c)
@@ -86,6 +86,10 @@ public class BatteleManager : MonoBehaviour
      }*/
     IEnumerator PerformTrun(Character actor)
     {
+        //战斗结束终止行动
+        if (battleEnded)
+            yield break;
+
         isActing = true;
         actor.isActing = true;
         Debug.Log($"{actor.Name}开始行动！");
@@ -106,6 +110,7 @@ public class BatteleManager : MonoBehaviour
             if (target != null)
             {
                 target.TakeDamage(actor.Attack);
+                CheckBattleEnd(actor, target);
             }
             yield return new WaitForSeconds(1f);
         }
@@ -128,12 +133,22 @@ public class BatteleManager : MonoBehaviour
                 if (target != null)
                 {
                     target.TakeDamage(actor.Attack);
+                    //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
                     Debug.Log($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
+                    CheckBattleEnd(actor, target);
                 }
                 actionChosen = true;
             }
 
             yield return null;
+        }
+    }
+    void CheckBattleEnd(Character attacker, Character target)
+    {
+        if (target.Hp <= 0)
+        {
+            battleEnded = true;
+            Debug.Log($"Battle Finish!");
         }
     }
 }
