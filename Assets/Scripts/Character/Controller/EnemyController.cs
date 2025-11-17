@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : BaseController
 {
     
-    //[Header("角色数据")]
-    [HideInInspector]
-    private Character data;
-    public Character Data => data;
+   
+    public override bool isPlayer => false;
+    public override bool isDead =>data.isDead;
 
     public HpBar hpbarPrefab;
     private HpBar hpBarInstance;
@@ -17,45 +16,40 @@ public class EnemyController : MonoBehaviour
     private Canvas worldUICanvas;
     private void Start()
     {
+        BatteleManager.Instance.RigisterCharacter(this);
         InitialzeHpBar();
-
-        if (data == null)
-        {
-            data = new Character("Enemy", 150, 55, 10, 200f);
-            data.Team = Character.TeamType.Enemy;
-            data.isPlayer = false;
-            BatteleManager.Instance.RigisterCharacter(data);
-            Debug.Log($"[EnemyController]Awake over:{data != null}");
-        }
-
-        //Debug.Log("EnemyController has rasing ");
-      
     }
     private void InitialzeHpBar()
     {
         if (hpbarPrefab != null)
-        {
-            /* hpBarInstance = Instantiate(hpbarPrefab, transform.position + Vector3.up * 2.0f, Quaternion.identity);
-             hpbarPrefab.Bind(data);
-             hpBarInstance.transform.SetParent(worldUICanvas.transform, true);
-            */
-
+        {         
             hpBarInstance = Instantiate(hpbarPrefab, Vector3.zero, Quaternion.identity);
-            hpbarPrefab.Bind(data);
             hpBarInstance.transform.SetParent(worldUICanvas.transform, false);
+            hpBarInstance.Bind(this); 
             hpBarInstance.transform.position = transform.position + Vector3.up * 1.5f;
+            hpBarInstance.UpdateHp();
         }
     }
-    public void TakeDamage(int dmg)
+
+
+    public override void TakeDamage(int damage)
     {
-        data.Hp -= dmg;
-        hpBarInstance?.UpdateHp();
-        if (data.Hp <= 0)
+        Debug.Log($"[Enemy] 受伤前hp={data.Hp}");
+        data.Hp -= damage;
+        Debug.Log($"[Enemy] 受伤后hp={data.Hp}");
+        if (data.Hp < 0)
+        {
+            data.Hp = 0;
+        }
+        if (hpBarInstance == null)
+        {
+            Debug.Log($"[hpbarInstance] 是null , 无法更新血条！");
+        }
+        hpBarInstance.UpdateHp();
+        if (data.Hp == 0)
         {
             data.isDead = true;
-            hpBarInstance?.Hide();
+            hpBarInstance.Hide();
         }
     }
-
-
 }

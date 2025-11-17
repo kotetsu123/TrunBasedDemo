@@ -388,6 +388,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3404e6fe825e27c449d68e4a9b91918d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data:
+    Team: 1
+    Name: goblet
+    maxHp: 0
+    Hp: 120
+    Attack: 40
+    Speed: 90
+    ActionValue: 0
+    isActing: 0
+    isDead: 0
+    isPlayer: 0
+    battleEnded: 0
   hpbarPrefab: {fileID: 6195515682201255695, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 364944995}
 --- !u!1 &489926877
@@ -988,7 +1000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7771aab4414b8ad48832a1eb10afe681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  characters: []
+  controllers: []
   isActing: 0
   battleEnded: 0
   player: {fileID: 0}
@@ -1111,6 +1123,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b8c09e4c39efc2459584cfa6539f021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data:
+    Team: 0
+    Name: Player
+    maxHp: 0
+    Hp: 200
+    Attack: 100
+    Speed: 100
+    ActionValue: 0
+    isActing: 0
+    isDead: 0
+    isPlayer: 1
+    battleEnded: 0
+  hpbar: {fileID: 0}
 --- !u!1 &1807893307
 GameObject:
   m_ObjectHideFlags: 0

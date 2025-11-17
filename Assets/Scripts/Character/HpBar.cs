@@ -12,12 +12,13 @@ public class HpBar : MonoBehaviour
     public bool alwaysFaceCamera = true;
     
     private Camera mainCam;
-    private Character owner;
+    private BaseController owner;
 
 
     private void Start()
     {
         mainCam = Camera.main;
+        
     }
     private void LateUpdate()
     {
@@ -26,10 +27,14 @@ public class HpBar : MonoBehaviour
            transform.forward=mainCam.transform.forward;
         }
     }
-    public void Bind(Character character)
+    public void Bind(BaseController character)
     {
         owner = character;
         UpdateHp();
+        if (owner != null)
+        {
+            Debug.Log($"{owner.data.Name} 捆绑的owener的名字");
+        }
     }
     public void UpdateHp()
     {
@@ -37,7 +42,7 @@ public class HpBar : MonoBehaviour
         {
             return;
         }
-        float ratio = (float)owner.Hp / owner.maxHp;
+        float ratio = (float)owner.data.Hp / owner.data.maxHp;
         //该函数是unity提供的安全函数，用来把数值限制在0~1之间，
         fill.fillAmount = Mathf.Clamp01(ratio);
     }
