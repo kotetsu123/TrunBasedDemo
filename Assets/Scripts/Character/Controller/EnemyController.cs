@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class EnemyController : BaseController
 {
-    
-   
     public override bool isPlayer => false;
     public override bool isDead =>data.isDead;
 
@@ -30,8 +28,6 @@ public class EnemyController : BaseController
             hpBarInstance.UpdateHp();
         }
     }
-
-
     public override void TakeDamage(int damage)
     {
         Debug.Log($"[Enemy] 受伤前hp={data.Hp}");

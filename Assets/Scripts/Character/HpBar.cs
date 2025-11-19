@@ -10,6 +10,8 @@ public class HpBar : MonoBehaviour
     public Image fill;
     [Header("是否跟随摄像机旋转")]
     public bool alwaysFaceCamera = true;
+
+    public bool isWorldSpace = true;
     
     private Camera mainCam;
     private BaseController owner;
@@ -22,7 +24,7 @@ public class HpBar : MonoBehaviour
     }
     private void LateUpdate()
     {
-        if (alwaysFaceCamera&&mainCam != null) 
+        if (alwaysFaceCamera&&mainCam != null&&isWorldSpace==true) 
         {//物体正面朝向的世界方向。
            transform.forward=mainCam.transform.forward;
         }
