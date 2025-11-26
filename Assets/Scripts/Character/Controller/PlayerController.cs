@@ -6,7 +6,11 @@ using UnityEngine;
 public class PlayerController : BaseController
 {
 
-    public HpBar hpbar;
+    //public HpBar hpbar;
+    public PlayerHpHud playerHud;
+   
+
+    
 
     public override bool isPlayer => true;
     public override bool isDead => data.isDead;
@@ -14,6 +18,7 @@ public class PlayerController : BaseController
     public override void TakeDamage(int damage)
     {
         data.Hp -= damage;
+        playerHud.UpdateHp();
         if (data.Hp < 0)
         {
             data.Hp = 0;
@@ -23,6 +28,7 @@ public class PlayerController : BaseController
         if (data.Hp == 0)
         {
             data.isDead = true;
+            playerHud.Isdead();
         }
 
 
@@ -45,8 +51,14 @@ public class PlayerController : BaseController
             BatteleManager.Instance.RigisterCharacter(data);
             Debug.Log($"[PlayerController]Awake over:{data != null}");
         }*/
-
         BatteleManager.Instance.RigisterCharacter(this);
+
+        playerHud.gameObject.SetActive(true);
+        playerHud.Bind(this);
+        playerHud.UpdateHp();
+
+
+      
         //Debug.Log("PlayerController has rasing "  );
     }
 }
