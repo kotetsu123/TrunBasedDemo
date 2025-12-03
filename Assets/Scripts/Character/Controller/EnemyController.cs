@@ -15,6 +15,7 @@ public class EnemyController : BaseController
     private void Start()
     {
         BatteleManager.Instance.RigisterCharacter(this);
+        BatteleManager.Instance.RegisterTimeLineIcon(this);
         InitialzeHpBar();
     }
     private void InitialzeHpBar()

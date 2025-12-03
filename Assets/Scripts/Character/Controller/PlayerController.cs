@@ -52,6 +52,7 @@ public class PlayerController : BaseController
             Debug.Log($"[PlayerController]Awake over:{data != null}");
         }*/
         BatteleManager.Instance.RigisterCharacter(this);
+        BatteleManager.Instance.RegisterTimeLineIcon(this);
 
         playerHud.gameObject.SetActive(true);
         playerHud.Bind(this);

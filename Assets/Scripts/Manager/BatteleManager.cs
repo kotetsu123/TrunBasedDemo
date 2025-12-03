@@ -13,11 +13,15 @@ public class BatteleManager : MonoBehaviour
 
     public bool isActing = false;
     public bool battleEnded = false;
+    public bool isBattle = true;
 
     public PlayerController player;
     public EnemyController enemy;
+    public GameObject timeLineIconPrefab;
+    public RectTransform actionBarPanel;
 
 
+    private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
     private int tick = 0;//时间刻度
 
     void Awake()
@@ -51,6 +55,14 @@ public class BatteleManager : MonoBehaviour
         controllers.Add(c);
         Debug.Log($"[BattleManager] Rigister Charcter:{c.data.Name}");
         
+    }
+    public void RegisterTimeLineIcon(BaseController character)
+    {
+        var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
+        var icon=iconobj.GetComponent<TimeLineIcon>();
+        icon.Bind(character);
+
+        timeLineIcons.Add(character, icon);
     }
     void updateActionValues()
     {
@@ -153,6 +165,7 @@ public class BatteleManager : MonoBehaviour
             Debug.Log($"Battle Finish!");
         }
     }
+    
 }
 
 
