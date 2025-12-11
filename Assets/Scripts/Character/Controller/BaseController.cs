@@ -6,6 +6,7 @@ public abstract class BaseController : MonoBehaviour
 {
     public  Character data;
 
+    public TimeLineIcon timeLineIcon;
     public abstract void TakeDamage(int damage);
     public abstract bool isPlayer { get; }
     public abstract bool isDead { get; }

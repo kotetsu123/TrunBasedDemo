@@ -60,36 +60,81 @@ public class BatteleManager : MonoBehaviour
     {
         var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
         var icon=iconobj.GetComponent<TimeLineIcon>();
-        icon.Bind(character);
+        icon.Bind(character,actionBarPanel);
 
         timeLineIcons.Add(character, icon);
     }
     void updateActionValues()
     {
+        /* if (isActing) return;
+         //减少行动值，当行动值到达0或这者低于0时，触发行动
+         foreach (var c in controllers)
+         {
+             if (c.isDead) //死亡角色不行动
+                 continue;
+             // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");         
+             //找出行动值最小的角色(谁最接近0)
+             var nextActor = controllers
+                 .Where(c => !c.isDead)
+                 .OrderBy(c => c.data.ActionValue)
+                 .First();
+             //行动值到达0或低于0，且当前没有角色在行动，触发行动
+             if (nextActor.data.ActionValue <= 0 && !isActing)
+             {
+                 StartCoroutine(PerformTrun(nextActor));
+                 break;
+             }
+             //上面两个逻辑都是为了防止多个角色同时行动
+             //速度越快，行动值减少越快
+             c.data.ActionValue -= c.data.Speed / 0.75f;
+            // 从角色身上拿到icon，然后更新位置。
+             if (timeLineIcons.ContainsKey(c))
+             {
+                 timeLineIcons[c].UpdatePosition();
+             }
+             if (c.data.ActionValue < 0)
+             {
+                 c.data.ActionValue = 0;
+                 timeLineIcons [c].UpdatePosition();
+
+             }
+             //增加更新ui位置
+             //  c.controller?.timeLineIcon?.UpdatePosition();
+            *//* //从角色身上拿到icon，然后更新位置。
+             if (timeLineIcons.ContainsKey(c))
+             {
+                 timeLineIcons[c].UpdatePosition();
+             }
+
+         }*/
         if (isActing) return;
-        //减少行动值，当行动值到达0或这者低于0时，触发行动
         foreach (var c in controllers)
         {
             if (c.isDead) //死亡角色不行动
                 continue;
-            //速度越快，行动值减少越快
+            //先减少数值，
             c.data.ActionValue -= c.data.Speed / 0.75f;
-
-           // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
-
-
+            //限制范围，避免负值
+            if (c.data.ActionValue<0)
+            {
+                c.data.ActionValue = 0;   
+            }
+            // UI 同步 从角色身上拿到icon，然后更新位置。
+            if (timeLineIcons.ContainsKey(c))
+            {
+                timeLineIcons[c].UpdatePosition();
+            }
             //找出行动值最小的角色(谁最接近0)
             var nextActor = controllers
                 .Where(c => !c.isDead)
                 .OrderBy(c => c.data.ActionValue)
                 .First();
-            //行动值到达0或低于0，且当前没有角色在行动，触发行动
+            //判断是否触发行动
             if (nextActor.data.ActionValue <= 0 && !isActing)
             {
                 StartCoroutine(PerformTrun(nextActor));
-                break;
+                
             }
-            //上面两个逻辑都是为了防止多个角色同时行动
         }
     }
     /* IEnumerator RigisterDone()
@@ -112,9 +157,13 @@ public class BatteleManager : MonoBehaviour
                                                //
         if (actor.isPlayer)
         {
+            isActing = true;
+            actor.data.isActing = true;
             //等待玩家输入
             Debug.Log("等待玩家输入指令...");
             yield return StartCoroutine(WaitForPlayerAction(actor));
+            isActing = false;
+            actor.data.isActing = false;
         }
         else
         {
@@ -130,8 +179,15 @@ public class BatteleManager : MonoBehaviour
         }
         //行动完成后恢复行动值
         actor.data.ActionValue = 200f;
+        //isActing = false;
+        //actor.data.ActionValue = actor.data.startValue;      
+       // actor.data.isActing = false;
+       // timeLineIcons[actor].UpdatePosition();
+       foreach (var kv in timeLineIcons)
+        {
+            kv.Value.UpdatePosition();
+        }
         isActing = false;
-
         Debug.Log($"{actor.data.Name}结束行动！");
 
     }
@@ -167,6 +223,3 @@ public class BatteleManager : MonoBehaviour
     }
     
 }
-
-
-
