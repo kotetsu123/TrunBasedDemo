@@ -22,8 +22,10 @@ public class Character
     public int Attack;
     public float Speed;
     public float ActionValue;//行动值
-    public float startValue=200f;//角色行动操的初始容量
-    public float maxActionValue = 200f;
+ // public float startValue=200f;//角色行动操的初始容量//改前
+    public float startValue = 0f;//改后
+
+    public float maxActionValue = 200f;//行动阈值
     public bool isActing;
     public bool isDead;
     public bool isPlayer;

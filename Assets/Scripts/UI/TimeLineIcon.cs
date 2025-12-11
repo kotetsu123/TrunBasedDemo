@@ -84,20 +84,30 @@ public class TimeLineIcon : MonoBehaviour
 
          // 设置位置
          rectIcon.anchoredPosition = new Vector2(rectIcon.anchoredPosition.x, yPos);*/
-        if (owner == null) return;
+        if (owner == null || panelRect == null || rectIcon == null) return;
 
-        float av = Mathf.Clamp(owner.data.ActionValue, 0f, owner.data.maxActionValue);
-        float t = 1f - (av / owner.data.maxActionValue);
+        // 确保有合理的maxActionValue
+        float maxValue = owner.data.maxActionValue > 0 ? owner.data.maxActionValue : 200f;
 
-        // 注意 barHeight 要减去图标高度
-        float maxY = barHeight - rectIcon.rect.height;
-        float yPos = Mathf.Lerp(0f, maxY, t);
+        // 限制行动值范围
+        float actionValue = Mathf.Clamp(owner.data.ActionValue, 0f, maxValue);
+
+        // 计算位置比例 (0在底部，1在顶部)
+        // 注意：这里应该是ActionValue越高（即将行动），图标应该在顶部
+        float t = actionValue / maxValue;
+
+        // 反转：即将行动的（值小）在顶部，值大的在底部
+        t = 1f - t;
+
+        // 计算Y位置 (面板底部到顶部)
+        float minY = -barHeight / 2f + rectIcon.rect.height / 2f;
+        float maxY = barHeight / 2f - rectIcon.rect.height / 2f;
+
+        float yPos = Mathf.Lerp(minY, maxY, t);
 
         rectIcon.anchoredPosition = new Vector2(rectIcon.anchoredPosition.x, yPos);
-        Debug.Log($"bar={barHeight}");
-        Debug.Log($"value={owner.data.ActionValue}，{owner.data.Name}");
-        Debug.Log($"pos={yPos}");
 
+        Debug.Log($"{owner.data.Name}: AV={owner.data.ActionValue}, t={t}, yPos={yPos}");
 
     }
 }

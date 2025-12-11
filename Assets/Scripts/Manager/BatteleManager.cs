@@ -19,7 +19,7 @@ public class BatteleManager : MonoBehaviour
     public EnemyController enemy;
     public GameObject timeLineIconPrefab;
     public RectTransform actionBarPanel;
-
+    public List<RectTransform> slots;
 
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
     private int tick = 0;//时间刻度
@@ -66,74 +66,44 @@ public class BatteleManager : MonoBehaviour
     }
     void updateActionValues()
     {
-        /* if (isActing) return;
-         //减少行动值，当行动值到达0或这者低于0时，触发行动
-         foreach (var c in controllers)
-         {
-             if (c.isDead) //死亡角色不行动
-                 continue;
-             // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");         
-             //找出行动值最小的角色(谁最接近0)
-             var nextActor = controllers
-                 .Where(c => !c.isDead)
-                 .OrderBy(c => c.data.ActionValue)
-                 .First();
-             //行动值到达0或低于0，且当前没有角色在行动，触发行动
-             if (nextActor.data.ActionValue <= 0 && !isActing)
-             {
-                 StartCoroutine(PerformTrun(nextActor));
-                 break;
-             }
-             //上面两个逻辑都是为了防止多个角色同时行动
-             //速度越快，行动值减少越快
-             c.data.ActionValue -= c.data.Speed / 0.75f;
-            // 从角色身上拿到icon，然后更新位置。
-             if (timeLineIcons.ContainsKey(c))
-             {
-                 timeLineIcons[c].UpdatePosition();
-             }
-             if (c.data.ActionValue < 0)
-             {
-                 c.data.ActionValue = 0;
-                 timeLineIcons [c].UpdatePosition();
-
-             }
-             //增加更新ui位置
-             //  c.controller?.timeLineIcon?.UpdatePosition();
-            *//* //从角色身上拿到icon，然后更新位置。
-             if (timeLineIcons.ContainsKey(c))
-             {
-                 timeLineIcons[c].UpdatePosition();
-             }
-
-         }*/
         if (isActing) return;
+
+        bool shouldCheckForTurn = false;
+
         foreach (var c in controllers)
         {
-            if (c.isDead) //死亡角色不行动
-                continue;
-            //先减少数值，
-            c.data.ActionValue -= c.data.Speed / 0.75f;
-            //限制范围，避免负值
-            if (c.data.ActionValue<0)
+            if (c.isDead) continue;
+
+            // 增加行动值，而不是减少（这样更符合时间轴逻辑）
+            c.data.ActionValue += c.data.Speed * Time.deltaTime * 10f; // 调整系数
+
+            // 如果超过阈值，标记需要检查回合
+            if (c.data.ActionValue >= c.data.maxActionValue)
             {
-                c.data.ActionValue = 0;   
+                c.data.ActionValue = c.data.maxActionValue;
+                shouldCheckForTurn = true;
             }
-            // UI 同步 从角色身上拿到icon，然后更新位置。
+
+            // 更新UI位置
             if (timeLineIcons.ContainsKey(c))
             {
                 timeLineIcons[c].UpdatePosition();
             }
-            //找出行动值最小的角色(谁最接近0)
+        }
+
+        // 只在有角色到达阈值时检查回合
+        if (shouldCheckForTurn && !isActing)
+        {
+            // 找出行动值最高的角色（谁先到达阈值）
             var nextActor = controllers
-                .Where(c => !c.isDead)
-                .OrderBy(c => c.data.ActionValue)
-                .First();
-            //判断是否触发行动
-            if (nextActor.data.ActionValue <= 0 && !isActing)
+                .Where(c => !c.isDead && c.data.ActionValue >= c.data.maxActionValue)
+                .OrderByDescending(c => c.data.Speed) // 速度快的优先
+                .ThenByDescending(c => c.data.ActionValue) // 行动值高的优先
+                .FirstOrDefault();
+
+            if (nextActor != null)
             {
-                StartCoroutine(PerformTrun(nextActor));
-                
+                StartCoroutine(PerformTurn(nextActor));
             }
         }
     }
@@ -143,7 +113,7 @@ public class BatteleManager : MonoBehaviour
          Debug.Log("[BattleManager] Rigister Done!");
 
      }*/
-    IEnumerator PerformTrun(BaseController actor)
+    IEnumerator PerformTurn(BaseController actor)
     {
         //战斗结束终止行动
         if (battleEnded)
@@ -152,18 +122,20 @@ public class BatteleManager : MonoBehaviour
         isActing = true;
         actor.data.isActing = true;
         Debug.Log($"{actor.data.Name}开始行动！");
+        //新增立即重置行动值，避免多次触发
+        actor.data.ActionValue = 0f;
+        timeLineIcons[actor].UpdatePosition();
+
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
                                                //
         if (actor.isPlayer)
         {
-            isActing = true;
-            actor.data.isActing = true;
+            
             //等待玩家输入
             Debug.Log("等待玩家输入指令...");
             yield return StartCoroutine(WaitForPlayerAction(actor));
-            isActing = false;
-            actor.data.isActing = false;
+           
         }
         else
         {
@@ -183,10 +155,8 @@ public class BatteleManager : MonoBehaviour
         //actor.data.ActionValue = actor.data.startValue;      
        // actor.data.isActing = false;
        // timeLineIcons[actor].UpdatePosition();
-       foreach (var kv in timeLineIcons)
-        {
-            kv.Value.UpdatePosition();
-        }
+      
+        actor.data.isActing = false;
         isActing = false;
         Debug.Log($"{actor.data.Name}结束行动！");
 
