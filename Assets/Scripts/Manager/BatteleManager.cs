@@ -20,6 +20,7 @@ public class BatteleManager : MonoBehaviour
     public GameObject timeLineIconPrefab;
     public RectTransform actionBarPanel;
 
+    public List<RectTransform> slots;
 
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
     private int tick = 0;//时间刻度
@@ -79,10 +80,11 @@ public class BatteleManager : MonoBehaviour
 
 
             //找出行动值最小的角色(谁最接近0)
-            var nextActor = controllers
+            var ordered = controllers
                 .Where(c => !c.isDead)
                 .OrderBy(c => c.data.ActionValue)
-                .First();
+                .ToList();
+            var nextActor = ordered.First();
             //行动值到达0或低于0，且当前没有角色在行动，触发行动
             if (nextActor.data.ActionValue <= 0 && !isActing)
             {
