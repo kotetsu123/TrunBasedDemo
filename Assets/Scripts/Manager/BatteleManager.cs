@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -14,6 +15,7 @@ public class BatteleManager : MonoBehaviour
     public bool isActing = false;
     public bool battleEnded = false;
     public bool isBattle = true;
+    public bool isBattleReady = false;
 
     public PlayerController player;
     public EnemyController enemy;
@@ -38,6 +40,7 @@ public class BatteleManager : MonoBehaviour
     void Update()
     {
         if (isActing) return;//正在行动中，跳过本次更新
+        if (!isBattleReady) return;//战斗未准备好，跳过本次更新
 
         tick++;
         //每隔10个时间刻度，所有角色增加行动值
@@ -51,20 +54,37 @@ public class BatteleManager : MonoBehaviour
         }         
     }
 
-    public void RigisterCharacter(BaseController c)
+    public void RigisterCharacter(BaseController character)
     {
-        controllers.Add(c);
-        Debug.Log($"[BattleManager] Rigister Charcter:{c.data.Name}");
-        
-    }
-    public void RegisterTimeLineIcon(BaseController character)
-    {
+        controllers.Add(character);
+        Debug.Log($"[BattleManager] Rigister Charcter:{character.data.Name}");
+        if (controllers.Count >= 2)
+        {
+            InitializeBattle();
+        }
         var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
-        var icon=iconobj.GetComponent<TimeLineIcon>();
+        var icon = iconobj.GetComponent<TimeLineIcon>();
         icon.Bind(character);
 
+
         timeLineIcons.Add(character, icon);
+        //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
     }
+
+    void InitializeBattle()
+    {
+        foreach (var character in controllers)
+        {
+            character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
+        }
+        isBattleReady = true;
+        Debug.Log("[BattleManager] Battle Ready!");
+    }
+
+    /*public void RegisterTimeLineIcon(BaseController character)
+{
+
+}*/
     void updateActionValues()
     {
         if (isActing) return;
@@ -75,25 +95,30 @@ public class BatteleManager : MonoBehaviour
                 continue;
             //速度越快，行动值减少越快
             c.data.ActionValue -= c.data.Speed / 0.75f;
+            // c.data.ActionValue = Mathf.Max(0, c.data.ActionValue);
+            // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
+        }
 
-           // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
-
-
-            //找出行动值最小的角色(谁最接近0)
-            var ordered = controllers
-                .Where(c => !c.isDead)
-                .OrderBy(c => c.data.ActionValue)
-                .ToList();
+        //找出行动值最小的角色(谁最接近0)
+        var ordered = controllers
+            .Where(c => !c.isDead)
+            .OrderBy(c => c.data.ActionValue)
+            .ToList();
+        //更新ui
+        foreach (var c in controllers)
+        {
+            UpdateTimeLineUI(ordered);
             var nextActor = ordered.First();
             //行动值到达0或低于0，且当前没有角色在行动，触发行动
             if (nextActor.data.ActionValue <= 0 && !isActing)
             {
                 StartCoroutine(PerformTrun(nextActor));
-                break;
+
             }
-            //上面两个逻辑都是为了防止多个角色同时行动
         }
+        //上面两个逻辑都是为了防止多个角色同时行动
     }
+
     /* IEnumerator RigisterDone()
      {
          yield return new WaitUntil(() => characters.Count >= 2);
@@ -130,8 +155,8 @@ public class BatteleManager : MonoBehaviour
             }
             yield return new WaitForSeconds(1f);
         }
-        //行动完成后恢复行动值
-        actor.data.ActionValue = 200f;
+        //行动完成后恢复行动值      
+        actor.data.ActionValue = actor.data.MaxActionValue;
         isActing = false;
 
         Debug.Log($"{actor.data.Name}结束行动！");
@@ -165,9 +190,26 @@ public class BatteleManager : MonoBehaviour
         {
             battleEnded = true;
             Debug.Log($"Battle Finish!");
+            if (attacker.isPlayer)
+            {
+                Debug.Log($"You Win!");
+            }
+            else
+            {
+                Debug.Log($"You Lose!");
+            }
         }
     }
-    
+    void UpdateTimeLineUI(List<BaseController> ordered)
+    {
+        for (int i = 0; i < ordered.Count&&i<slots.Count; i++)
+        {
+            var c = ordered[i];
+            var icons = timeLineIcons[c];
+
+            icons.transform.position=slots[i].position;
+        }
+    }
 }
 
 

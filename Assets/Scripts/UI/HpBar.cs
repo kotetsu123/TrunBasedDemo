@@ -33,10 +33,10 @@ public class HpBar : MonoBehaviour
     {
         owner = character;
         UpdateHp();
-        if (owner != null)
+       /* if (owner != null)
         {
             Debug.Log($"{owner.data.Name} 捆绑的owener的名字");
-        }
+        }*/
     }
     public void UpdateHp()
     {

@@ -470,6 +470,7 @@ MonoBehaviour:
     Attack: 40
     Speed: 90
     ActionValue: 0
+    MaxActionValue: 200
     isActing: 0
     isDead: 0
     isPlayer: 0
@@ -1327,10 +1328,12 @@ MonoBehaviour:
   controllers: []
   isActing: 0
   battleEnded: 0
+  isBattle: 1
   player: {fileID: 0}
   enemy: {fileID: 0}
   timeLineIconPrefab: {fileID: 6619320484278535804, guid: c875f9274cabc314d864029b86b4554e, type: 3}
   actionBarPanel: {fileID: 775316975}
+  slots: []
 --- !u!1 &1612442387
 GameObject:
   m_ObjectHideFlags: 0
@@ -1457,6 +1460,7 @@ MonoBehaviour:
     Attack: 100
     Speed: 100
     ActionValue: 0
+    MaxActionValue: 200
     isActing: 0
     isDead: 0
     isPlayer: 1
