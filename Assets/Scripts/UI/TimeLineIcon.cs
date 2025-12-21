@@ -9,7 +9,10 @@ public class TimeLineIcon : MonoBehaviour
 {
     /* public Image protrait;//头像
      public Image actionFIll;//数条fill*/
-   // public RectTransform iconRect;
+    // public RectTransform iconRect;
+    [Header("UI")]
+    [SerializeField]
+    private Image portImage;//头像
 
     private RectTransform rect;
     private BaseController owner;//对应角色
@@ -24,6 +27,10 @@ public class TimeLineIcon : MonoBehaviour
     public void Bind(BaseController character)
     {
         owner = character;
+        if (portImage!=null)
+        {
+            portImage.sprite = owner.portait;
+        }
     }
    
 
