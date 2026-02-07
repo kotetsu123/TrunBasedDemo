@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BatteleManager : MonoBehaviour
 {
@@ -78,7 +79,14 @@ public class BatteleManager : MonoBehaviour
             character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         }
         isBattleReady = true;
+        //开局就刷新一次 UI 排列
+        UpdateTimeLineUI(controllers
+            .Where(c => !c.isDead)
+            .OrderBy(c => c.data.ActionValue)
+            .ToList());
+
         Debug.Log("[BattleManager] Battle Ready!");
+       
     }
 
     /*public void RegisterTimeLineIcon(BaseController character)
@@ -104,8 +112,16 @@ public class BatteleManager : MonoBehaviour
             .Where(c => !c.isDead)
             .OrderBy(c => c.data.ActionValue)
             .ToList();
+        Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
         //更新ui
-        foreach (var c in controllers)
+        UpdateTimeLineUI(ordered);
+        //更新ui
+        var nextActor= ordered.FirstOrDefault();
+        if(nextActor != null && nextActor.data.ActionValue <= 0 && !isActing)
+        {
+            StartCoroutine(PerformTrun(nextActor));
+        }
+       /* foreach (var c in controllers)
         {
             UpdateTimeLineUI(ordered);
             var nextActor = ordered.First();
@@ -115,7 +131,7 @@ public class BatteleManager : MonoBehaviour
                 StartCoroutine(PerformTrun(nextActor));
 
             }
-        }
+        }*/
         //上面两个逻辑都是为了防止多个角色同时行动
     }
 
@@ -202,12 +218,35 @@ public class BatteleManager : MonoBehaviour
     }
     void UpdateTimeLineUI(List<BaseController> ordered)
     {
-        for (int i = 0; i < ordered.Count&&i<slots.Count; i++)
+        /*for (int i = 0; i < ordered.Count&&i<slots.Count; i++)
         {
             var c = ordered[i];
             var icons = timeLineIcons[c];
+            var iconRect = icons.GetComponent<RectTransform>();
 
-            icons.transform.position=slots[i].position;
+            iconRect.SetParent(slots[i], false);
+            iconRect.anchoredPosition = Vector2.zero;//居中/归零
+            iconRect.localScale = Vector3.one;
+
+            //RectTransform slotRect = slots[i];
+            //iconRect.position = slotRect.position;
+            //icons.transform.position=slots[i].position;
+        }*/
+        for(int i = 0; i < ordered.Count; i++)
+        {
+            var c = ordered[i];
+            if (!timeLineIcons.TryGetValue(c, out var icon)) continue;
+
+            //直接把prefab 变成actionbarpanel 的子物体
+
+            icon.transform.SetParent(actionBarPanel, false);
+
+            //改兄弟顺序。让layoutGroup 自动重排
+            icon.transform.SetSiblingIndex(i); 
+
+            //强制刷新布局
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
         }
     }
 }
