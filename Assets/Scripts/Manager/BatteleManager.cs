@@ -88,11 +88,6 @@ public class BatteleManager : MonoBehaviour
         Debug.Log("[BattleManager] Battle Ready!");
        
     }
-
-    /*public void RegisterTimeLineIcon(BaseController character)
-{
-
-}*/
     void updateActionValues()
     {
         if (isActing) return;
@@ -121,26 +116,8 @@ public class BatteleManager : MonoBehaviour
         {
             StartCoroutine(PerformTrun(nextActor));
         }
-       /* foreach (var c in controllers)
-        {
-            UpdateTimeLineUI(ordered);
-            var nextActor = ordered.First();
-            //行动值到达0或低于0，且当前没有角色在行动，触发行动
-            if (nextActor.data.ActionValue <= 0 && !isActing)
-            {
-                StartCoroutine(PerformTrun(nextActor));
-
-            }
-        }*/
-        //上面两个逻辑都是为了防止多个角色同时行动
     }
-
-    /* IEnumerator RigisterDone()
-     {
-         yield return new WaitUntil(() => characters.Count >= 2);
-         Debug.Log("[BattleManager] Rigister Done!");
-
-     }*/
+   
     IEnumerator PerformTrun(BaseController actor)
     {
         //战斗结束终止行动
@@ -218,20 +195,7 @@ public class BatteleManager : MonoBehaviour
     }
     void UpdateTimeLineUI(List<BaseController> ordered)
     {
-        /*for (int i = 0; i < ordered.Count&&i<slots.Count; i++)
-        {
-            var c = ordered[i];
-            var icons = timeLineIcons[c];
-            var iconRect = icons.GetComponent<RectTransform>();
-
-            iconRect.SetParent(slots[i], false);
-            iconRect.anchoredPosition = Vector2.zero;//居中/归零
-            iconRect.localScale = Vector3.one;
-
-            //RectTransform slotRect = slots[i];
-            //iconRect.position = slotRect.position;
-            //icons.transform.position=slots[i].position;
-        }*/
+        
         for(int i = 0; i < ordered.Count; i++)
         {
             var c = ordered[i];
@@ -248,6 +212,45 @@ public class BatteleManager : MonoBehaviour
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
         }
+    }
+    public void NotifyDeath(BaseController dead)
+    {
+        StartCoroutine(HandleDeathCoroutine(dead));
+    }
+
+    private IEnumerator HandleDeathCoroutine(BaseController dead)
+    {
+        if (dead == null) yield break;
+
+        //先标记为死亡&禁用，避免参与其他逻辑
+        dead.data.isDead = true;
+        dead.enabled = false;
+
+        //让它这帧就看不见
+        //TODO： 让它播放死亡动画
+        dead.gameObject.SetActive(false);
+
+        //ui和列表移除，避免后续tick/行动中被访问到
+        //1.移除时间轴图标
+        if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
+        {
+            Destroy(icon.gameObject);
+        }
+        timeLineIcons.Remove(dead);
+        //2.从队列移除
+        controllers.Remove(dead);
+        //3.让角色本体消失
+        Destroy(dead.gameObject);
+        //4.刷新时间轴(避免ui 还显示旧顺序)
+        UpdateTimeLineUI(controllers
+            .Where(c => c != null && !c.data.isDead)
+            .OrderBy(c => c.data.ActionValue)
+            .ToList());
+
+        //等待一帧真正销毁（防协程美剧中途爆炸）
+        yield return null;
+        
+        Destroy(dead.gameObject);
     }
 }
 

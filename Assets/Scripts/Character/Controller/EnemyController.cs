@@ -46,7 +46,14 @@ public class EnemyController : BaseController
         if (data.Hp == 0)
         {
             data.isDead = true;
-            hpBarInstance.Hide();
+            //hpBarInstance.Hide();
+            OnDeath();
         }
+    }
+    protected override void OnDeath()
+    {
+        if(hpBarInstance!=null)
+        Destroy(hpBarInstance.gameObject); 
+        base.OnDeath();
     }
 }

@@ -40,6 +40,12 @@ public class PlayerController : BaseController
         }*/
 
     }
+    protected override void OnDeath()
+    {
+        if(playerHud!=null)
+            playerHud.Isdead();
+        base.OnDeath();
+    }
 
     private void Start()
     {
