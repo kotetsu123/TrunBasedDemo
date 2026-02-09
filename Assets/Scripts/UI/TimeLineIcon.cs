@@ -13,6 +13,9 @@ public class TimeLineIcon : MonoBehaviour
     [Header("UI")]
     [SerializeField]
     private Image portImage;//头像
+    [SerializeField]
+    private GameObject highlight;
+
 
     private RectTransform rect;
     private BaseController owner;//对应角色
@@ -32,7 +35,13 @@ public class TimeLineIcon : MonoBehaviour
             portImage.sprite = owner.portait;
         }
     }
-   
+   public void SetHighLight(bool on)
+    {
+        if(highlight != null)
+        {
+            highlight.SetActive(on);
+        }
+    }
 
     // Update is called once per frame
     void Update()

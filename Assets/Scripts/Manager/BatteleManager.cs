@@ -90,6 +90,7 @@ public class BatteleManager : MonoBehaviour
     }
     void updateActionValues()
     {
+        controllers.RemoveAll(c => c == null); //移除已销毁的角色//清掉Destroy后留下的空位，防止空引用
         if (isActing) return;
         //减少行动值，当行动值到达0或这者低于0时，触发行动
         foreach (var c in controllers)
@@ -120,6 +121,8 @@ public class BatteleManager : MonoBehaviour
    
     IEnumerator PerformTrun(BaseController actor)
     {
+        
+
         //战斗结束终止行动
         if (battleEnded)
             yield break;
@@ -127,14 +130,27 @@ public class BatteleManager : MonoBehaviour
         isActing = true;
         actor.data.isActing = true;
         Debug.Log($"{actor.data.Name}开始行动！");
+        if(timeLineIcons.TryGetValue(actor,out var icon)){
+            icon.SetHighLight(true);
+        }
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
-                                               //
+        if (actor == null || actor.data == null || actor.data.isDead)
+        {
+            isActing = false;
+            yield break;
+        }
+        //
         if (actor.isPlayer)
         {
             //等待玩家输入
             Debug.Log("等待玩家输入指令...");
             yield return StartCoroutine(WaitForPlayerAction(actor));
+            if (actor == null || actor.data == null || actor.data.isDead)
+            {
+                isActing = false;
+                yield break;
+            }
         }
         else
         {
@@ -151,7 +167,9 @@ public class BatteleManager : MonoBehaviour
         //行动完成后恢复行动值      
         actor.data.ActionValue = actor.data.MaxActionValue;
         isActing = false;
-
+        if(timeLineIcons.TryGetValue(actor,out  icon)){
+            icon.SetHighLight(false);
+        }
         Debug.Log($"{actor.data.Name}结束行动！");
 
     }
@@ -199,7 +217,7 @@ public class BatteleManager : MonoBehaviour
         for(int i = 0; i < ordered.Count; i++)
         {
             var c = ordered[i];
-            if (!timeLineIcons.TryGetValue(c, out var icon)) continue;
+            if (!timeLineIcons.TryGetValue(c, out var icon)||icon==null) continue;
 
             //直接把prefab 变成actionbarpanel 的子物体
 
@@ -208,10 +226,11 @@ public class BatteleManager : MonoBehaviour
             //改兄弟顺序。让layoutGroup 自动重排
             icon.transform.SetSiblingIndex(i); 
 
-            //强制刷新布局
-            Canvas.ForceUpdateCanvases();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
+            
         }
+        //强制刷新布局
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
     }
     public void NotifyDeath(BaseController dead)
     {
@@ -249,8 +268,13 @@ public class BatteleManager : MonoBehaviour
 
         //等待一帧真正销毁（防协程美剧中途爆炸）
         yield return null;
+
+        if (dead != null)
+        {
+            Destroy(dead.gameObject);
+        }
         
-        Destroy(dead.gameObject);
+        yield break;
     }
 }
 
