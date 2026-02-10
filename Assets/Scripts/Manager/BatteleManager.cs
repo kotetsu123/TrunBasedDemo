@@ -8,7 +8,9 @@ using UnityEngine.UI;
 
 public class BatteleManager : MonoBehaviour
 {
-    public static BatteleManager Instance;
+    public static BatteleManager Instance{ get; private set; }
+    //c#event 广播，当行动者改变时触发
+    public event Action<BaseController, BaseController> OnActionChanged;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
@@ -26,7 +28,12 @@ public class BatteleManager : MonoBehaviour
     public List<RectTransform> slots;
 
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
+    public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
     private int tick = 0;//时间刻度
+
+    //当前行动者
+    private BaseController _currentActor;
+    public BaseController CurrentActor=>_currentActor;
 
     void Awake()
     {
@@ -70,6 +77,7 @@ public class BatteleManager : MonoBehaviour
 
         timeLineIcons.Add(character, icon);
         //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
+        FindObjectOfType<TimeLineUI>()?.BuildCache(); 
     }
 
     void InitializeBattle()
@@ -108,7 +116,7 @@ public class BatteleManager : MonoBehaviour
             .Where(c => !c.isDead)
             .OrderBy(c => c.data.ActionValue)
             .ToList();
-        Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
+       // Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
         //更新ui
         UpdateTimeLineUI(ordered);
         //更新ui
@@ -121,7 +129,7 @@ public class BatteleManager : MonoBehaviour
    
     IEnumerator PerformTrun(BaseController actor)
     {
-        
+        SetCurrentActor(actor);
 
         //战斗结束终止行动
         if (battleEnded)
@@ -130,9 +138,7 @@ public class BatteleManager : MonoBehaviour
         isActing = true;
         actor.data.isActing = true;
         Debug.Log($"{actor.data.Name}开始行动！");
-        if(timeLineIcons.TryGetValue(actor,out var icon)){
-            icon.SetHighLight(true);
-        }
+        
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
         if (actor == null || actor.data == null || actor.data.isDead)
@@ -167,9 +173,7 @@ public class BatteleManager : MonoBehaviour
         //行动完成后恢复行动值      
         actor.data.ActionValue = actor.data.MaxActionValue;
         isActing = false;
-        if(timeLineIcons.TryGetValue(actor,out  icon)){
-            icon.SetHighLight(false);
-        }
+        
         Debug.Log($"{actor.data.Name}结束行动！");
 
     }
@@ -239,42 +243,59 @@ public class BatteleManager : MonoBehaviour
 
     private IEnumerator HandleDeathCoroutine(BaseController dead)
     {
+        //等今天过去再删除 用来debug DOTween 用的
+        Debug.Log($"[Death]{dead.data.Name} removed from battle");
+
         if (dead == null) yield break;
 
         //先标记为死亡&禁用，避免参与其他逻辑
         dead.data.isDead = true;
         dead.enabled = false;
+        //如果当前行动者是死亡角色，清除当前行动者
+        if (CurrentActor == dead)
+        {
+            SetCurrentActor(null);
+        }
 
-        //让它这帧就看不见
-        //TODO： 让它播放死亡动画
-        dead.gameObject.SetActive(false);
+        //从所有逻辑入口中移除（最关键）
+        controllers.Remove(dead);
+
+       
 
         //ui和列表移除，避免后续tick/行动中被访问到
-        //1.移除时间轴图标
+        //ui层.移除时间轴图标
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
         {
             Destroy(icon.gameObject);
         }
         timeLineIcons.Remove(dead);
-        //2.从队列移除
-        controllers.Remove(dead);
-        //3.让角色本体消失
-        Destroy(dead.gameObject);
-        //4.刷新时间轴(避免ui 还显示旧顺序)
+      
+        //刷新时间轴(避免ui 还显示旧顺序)
         UpdateTimeLineUI(controllers
             .Where(c => c != null && !c.data.isDead)
             .OrderBy(c => c.data.ActionValue)
             .ToList());
 
+        //表现层，隐藏冰摧毁角色本体
+        dead.gameObject.SetActive(false);
+
         //等待一帧真正销毁（防协程美剧中途爆炸）
         yield return null;
 
-        if (dead != null)
-        {
-            Destroy(dead.gameObject);
-        }
+        Destroy(dead.gameObject);
         
-        yield break;
+        
+      
+    }
+    //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
+    private void SetCurrentActor(BaseController next)
+    {
+        if (_currentActor == next) return;
+        var prev = _currentActor;
+        _currentActor = next;
+
+        Debug.Log($"[Battle] Invoke OnActionChanged: {(prev ? prev.name : "null")} -> {(next ? next.name : "null")}");
+        OnActionChanged?.Invoke(prev,_currentActor);
     }
 }
 

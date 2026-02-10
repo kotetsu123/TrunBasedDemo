@@ -161,13 +161,14 @@ GameObject:
   - component: {fileID: 7795511081485333854}
   - component: {fileID: 8089317431442435103}
   - component: {fileID: 6735839135715863541}
+  - component: {fileID: 7761458954789111128}
   m_Layer: 5
   m_Name: HighLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7795511081485333854
 RectTransform:
   m_ObjectHideFlags: 0
@@ -225,6 +226,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &7761458954789111128
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3111341636866082369}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6619320484278535804
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,6 +250,7 @@ GameObject:
   - component: {fileID: 2344853825038400042}
   - component: {fileID: 1333902593759600319}
   - component: {fileID: 5626556892956727117}
+  - component: {fileID: 8947453340624195652}
   m_Layer: 5
   m_Name: TimeLineicon_Template
   m_TagString: Untagged
@@ -319,6 +333,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portImage: {fileID: 1525174375830810959}
   highlight: {fileID: 3111341636866082369}
+--- !u!114 &8947453340624195652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6619320484278535804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ce3d3d57b9e3f34481cde97e0410520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rect: {fileID: 0}
+  glow: {fileID: 7761458954789111128}
+  actionScale: 1.12
+  animTime: 0.12
 --- !u!1 &8405780510951715593
 GameObject:
   m_ObjectHideFlags: 0
