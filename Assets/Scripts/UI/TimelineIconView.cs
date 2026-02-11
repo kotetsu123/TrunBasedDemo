@@ -13,12 +13,22 @@ public class TimelineIconView : MonoBehaviour
     [SerializeField] private float actionScale = 1.12f;
     [SerializeField] private float animTime = 0.12f;
 
+    [Header("Glow")]
+    [SerializeField] private float nextAlpha = 0.35f;
+    [SerializeField] private float activeAlpha = 0.65f;
+
+    [SerializeField] private Image glowImage;
+
+    public enum TimeLineState {Normal,Next,Active }
+
+
     private Tween _tween;
     private bool _active;
+    private TimeLineState _state= TimeLineState.Normal;
 
     private void Awake()
     {
-        ForceInactive();
+        ForceInactive(TimeLineState.Normal);
     }
     private void Reset()
     {
@@ -61,17 +71,45 @@ public class TimelineIconView : MonoBehaviour
         }
         _tween = seq;
     }
-    public void ForceInactive()
+    public void ForceInactive(TimeLineState state)
     {
         _tween?.Kill();
         _tween = null;
+        _state = state;
 
         _active = false;
-        if (visualRoot != null)
+        if (visualRoot)
             visualRoot.localScale = Vector3.one;
 
-        if (glow != null)
-            glow.alpha = 0f;
-
+        if (glow)
+            glow.alpha=(state==TimeLineState.Next)?nextAlpha:0f;
     }
+    public void SetState(TimeLineState state,Color nextGlowColor)
+    {
+        if (_state == state) return;
+        _state = state;
+
+        _tween?.Kill();
+        if (!isActiveAndEnabled || visualRoot == null) return;
+
+        //颜色只对next状态有意义（active 保留原来黄色高光）
+        
+        if(state==TimeLineState.Next||glowImage!=null)
+        {
+            glowImage.color = nextGlowColor;
+        }
+        float targetScale=(state==TimeLineState.Active)? actionScale:1f;
+        float tarrgetAlpha =
+            (state == TimeLineState.Active) ? activeAlpha :
+            (state == TimeLineState.Next) ? nextAlpha :
+            0f;
+
+        var seq= DOTween.Sequence().SetLink(gameObject).SetUpdate(true);
+        seq.Append(visualRoot.DOScale(targetScale, animTime).SetEase(state == TimeLineState.Active ? Ease.OutBack : Ease.OutQuint));
+        if(glow)seq.Join(glow.DOFade(tarrgetAlpha, animTime));
+
+
+        _tween = seq;
+    }
+
 }

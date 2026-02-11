@@ -5,6 +5,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
+
+public enum ActionIntent
+{
+    Normal,
+    SkillDanerous
+}
 [Serializable]
 public class Character
 
@@ -14,8 +20,11 @@ public class Character
         Player,
         Enemy
     }
+    
+
     public TeamType Team;
 
+    
     public string Name;
     public int maxHp;
     public int Hp;
@@ -27,6 +36,7 @@ public class Character
     public bool isDead;
     public bool isPlayer;
     public bool battleEnded;
+    public ActionIntent intent=ActionIntent.Normal;
 
-   
+
 }
