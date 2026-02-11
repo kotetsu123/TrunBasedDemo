@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class TimelineIconView : MonoBehaviour
 {
     [Header("Refs")]
-    [SerializeField] private RectTransform rect;
+    [SerializeField] private RectTransform visualRoot;
     [SerializeField] private CanvasGroup glow;
 
     [Header("Anim")]
@@ -22,7 +22,7 @@ public class TimelineIconView : MonoBehaviour
     }
     private void Reset()
     {
-        rect = GetComponent<RectTransform>();
+        visualRoot = GetComponent<RectTransform>();
     }
     private void OnDisable()
     {
@@ -31,7 +31,7 @@ public class TimelineIconView : MonoBehaviour
         _active = false;
 
         //保底：避免对象disable后保持放大
-        if(rect)rect.localScale = Vector3.one;
+        if(visualRoot)visualRoot.localScale = Vector3.one;
         if(glow)glow.alpha = 0;
     }
     public void SetActive(bool active)
@@ -42,7 +42,7 @@ public class TimelineIconView : MonoBehaviour
         _tween?.Kill();
 
         //如果对象已被销毁/禁用，直接退出
-        if (!isActiveAndEnabled || rect == null) return;
+        if (!isActiveAndEnabled || visualRoot == null) return;
         var seq = DOTween.Sequence()
             .SetLink(gameObject)//绑定生命周期 物体销毁时自动kill
             .SetUpdate(true); //忽略TimeScale
@@ -50,13 +50,13 @@ public class TimelineIconView : MonoBehaviour
         if (active)
         {
             //放大+发光
-            seq.Append(rect.DOScale(actionScale, animTime).SetEase(Ease.OutBack));
+            seq.Append(visualRoot.DOScale(actionScale, animTime).SetEase(Ease.OutBack));
             if (glow) seq.Join(glow.DOFade(1f, animTime));
         }
         else
         {
             //缩回+熄灭
-            seq.Append(rect.DOScale(1, animTime).SetEase(Ease.OutBack));
+            seq.Append(visualRoot.DOScale(1, animTime).SetEase(Ease.OutBack));
               if(glow)  seq.Join(glow.DOFade(0, animTime));
         }
         _tween = seq;
@@ -67,8 +67,8 @@ public class TimelineIconView : MonoBehaviour
         _tween = null;
 
         _active = false;
-        if (rect != null)
-            rect.localScale = Vector3.one;
+        if (visualRoot != null)
+            visualRoot.localScale = Vector3.one;
 
         if (glow != null)
             glow.alpha = 0f;
