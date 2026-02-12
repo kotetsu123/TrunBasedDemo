@@ -86,6 +86,7 @@ public class TimelineIconView : MonoBehaviour
     }
     public void SetState(TimeLineState state,Color nextGlowColor)
     {
+        Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
         if (_state == state) return;
         _state = state;
 

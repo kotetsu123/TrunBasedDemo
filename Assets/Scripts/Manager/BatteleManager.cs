@@ -11,6 +11,7 @@ public class BatteleManager : MonoBehaviour
     public static BatteleManager Instance{ get; private set; }
     //c#event 广播，当行动者改变时触发
     public event Action<BaseController, BaseController> OnActionChanged;
+    public event Action<List<BaseController>> OnTimeLineOrdered;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
@@ -117,19 +118,31 @@ public class BatteleManager : MonoBehaviour
             .OrderBy(c => c.data.ActionValue)
             .ToList();
        // Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
-        //更新ui
-        UpdateTimeLineUI(ordered);
+       
         //更新ui
         var nextActor= ordered.FirstOrDefault();
         if(nextActor != null && nextActor.data.ActionValue <= 0 && !isActing)
         {
+            //先确定当前行动者（让ui有事实源）
+            SetCurrentActor(nextActor);
+
+            //用当前ordered 推一次nextActor 之后的顺序，通知ui刷新
+            UpdateTimeLineUI(ordered);
+            OnTimeLineOrdered?.Invoke(ordered);
+
             StartCoroutine(PerformTrun(nextActor));
+        }
+        else
+        {
+            //更新ui//普通 排序更新
+            UpdateTimeLineUI(ordered);
+            OnTimeLineOrdered?.Invoke(ordered);
         }
     }
    
     IEnumerator PerformTrun(BaseController actor)
     {
-        SetCurrentActor(actor);
+        //SetCurrentActor(actor);
 
         //战斗结束终止行动
         if (battleEnded)
@@ -295,7 +308,11 @@ public class BatteleManager : MonoBehaviour
         _currentActor = next;
 
         Debug.Log($"[Battle] Invoke OnActionChanged: {(prev ? prev.name : "null")} -> {(next ? next.name : "null")}");
-        OnActionChanged?.Invoke(prev,_currentActor);
+        
+
+        /*var del = OnActionChanged;
+        Debug.Log($"[Battle] OnActionChanged subs={(del == null ? 0 : del.GetInvocationList().Length) }");*/
+        OnActionChanged?.Invoke(prev, _currentActor);
     }
 }
 

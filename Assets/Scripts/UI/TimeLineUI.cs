@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static TimelineIconView;
 
 public class TimeLineUI : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class TimeLineUI : MonoBehaviour
         if (battle == null) battle = BatteleManager.Instance;
         BuildCache();
         Debug.Log($"[TimelineUI] Awake battle={(battle ? battle.name : "null")} id={(battle ? battle.GetInstanceID() : -1)}");
+        //Debug.Log($"[TimelineUI] instance{name} id={GetInstanceID()}");
     }
     private void OnEnable()
     {
@@ -68,37 +70,39 @@ public class TimeLineUI : MonoBehaviour
     }
     private void HandleActionChanged(BaseController prev, BaseController cur)
     {
+
         //1）关掉上一个Active
         if (_lastActive != null && _map.TryGetValue(_lastActive, out var prevView) && prevView != null)
             prevView.SetState(TimelineIconView.TimeLineState.Normal, Color.white);
 
-        //2）关掉上一个Next
+        /*//2）关掉上一个Next
         if(_lastNext != null && _map.TryGetValue(_lastNext, out var nextViewOld) && nextViewOld != null)
-            nextViewOld.SetState(TimelineIconView.TimeLineState.Normal, Color.white);
+            nextViewOld.SetState(TimelineIconView.TimeLineState.Normal, Color.white);*/
 
         //3）当前行动者设置为Active
         if(cur!=null&&_map.TryGetValue(cur,out var curView)&&curView!=null)
             curView.SetState(TimelineIconView.TimeLineState.Active, Color.white);
 
-        //4）计算next 从battle.controllers 排序拿第二个
+       /* //4）计算next 从battle.controllers 排序拿第二个
         var next=GetNextActor(cur);
 
         if(next!=null&&_map.TryGetValue(next,out var nextView)&&nextView!=null)
-            nextView.SetState(TimelineIconView.TimeLineState.Next, GetNextGlowColor(next));
+            nextView.SetState(TimelineIconView.TimeLineState.Next, GetNextGlowColor(next));*/
+       _lastActive = cur;
 
         Debug.Log($"[TimelineUI] ActiveChanged prev={(prev ? prev.name : "null")} cur={(cur ? cur.name : "null")} mapCount={_map.Count}");
-        //prev off
-        if (prev!=null&&_map.TryGetValue(prev,out var preview) && preview != null)
+       /* //prev off
+        if (prev != null && _map.TryGetValue(prev, out var preview) && preview != null)
         {
             preview.SetActive(false);
         }
         //cur on
-        if(cur!=null&&_map.TryGetValue(cur,out var curview) && curview != null)
+        if (cur != null && _map.TryGetValue(cur, out var curview) && curview != null)
         {
             curview.SetActive(true);
         }
         else if (cur != null)
-            Debug.LogWarning($"[TimelineUI] cur not in map: {cur.name}");
+            Debug.LogWarning($"[TimelineUI] cur not in map: {cur.name}");*/
     }
 
     private BaseController GetNextActor(BaseController current)
@@ -117,6 +121,7 @@ public class TimeLineUI : MonoBehaviour
 
     private Color GetNextGlowColor(BaseController next)
     {
+        /*
         //TODO: 以后根据放技能/危险程度等调整颜色（有点太大了）
         //平A和危险技能改色
         //先阵营区分：敌人红，友军蓝
@@ -124,7 +129,7 @@ public class TimeLineUI : MonoBehaviour
 
         //危险技能：敌人更红，友军更蓝
         if(next.data.intent==ActionIntent.SkillDanerous)
-            return next.isPlayer ? new Color(0.2f, 0.6f, 1f) : new Color(1f, 0.2f, 0.2f);
+            return next.isPlayer ? new Color(0.2f, 0.6f, 1f) : new Color(1f, 0.2f, 0.2f);*/
 
         //普通情况，按照阵营提示
         return next.isPlayer ?Color.cyan: Color.red;
@@ -138,8 +143,35 @@ public class TimeLineUI : MonoBehaviour
         {
             battle.OnActionChanged -= HandleActionChanged;
             battle.OnActionChanged += HandleActionChanged;
+
+            battle.OnTimeLineOrdered -= HandleTimeLineOrdered;
+            battle.OnTimeLineOrdered += HandleTimeLineOrdered;
+
         }
     }
+
+    private void HandleTimeLineOrdered(List<BaseController> ordered)
+    {
+        if (ordered == null || ordered.Count == 0) return;
+        if (_map.Count == 0) BuildCache();
+
+        var active = battle.CurrentActor; // 当前行动者（可能为 null）
+        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active);
+
+        // 清旧 next
+        if (_lastNext != null && _lastNext!=next &&_map.TryGetValue(_lastNext, out var oldNextView) && oldNextView != null)
+            oldNextView.SetState(TimeLineState.Normal, Color.white);
+
+        // 设新 next（只要不是 active）
+        if (next != null && _map.TryGetValue(next, out var nextView) && nextView != null)
+            //nextView.SetState(TimeLineState.Next, next.isPlayer ? Color.blue : Color.red);
+            nextView.SetState(TimeLineState.Next, GetNextGlowColor(next));
+
+
+        _lastNext = next;
+        
+    }
+
     private void UnBindBattle()
     {
         if (battle != null)
