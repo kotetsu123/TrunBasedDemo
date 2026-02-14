@@ -383,8 +383,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visualRoot: {fileID: 2265304465990914292}
   glow: {fileID: 7761458954789111128}
-  actionScale: 1.12
-  animTime: 0.12
+  actionScale: 1.6
+  animTime: 0.25
   nextAlpha: 0.35
   activeAlpha: 0.65
   glowImage: {fileID: 6735839135715863541}

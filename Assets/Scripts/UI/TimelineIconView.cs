@@ -11,7 +11,7 @@ public class TimelineIconView : MonoBehaviour
 
     [Header("Anim")]
     [SerializeField] private float actionScale = 1.12f;
-    [SerializeField] private float animTime = 0.12f;
+    [SerializeField] private float animTime = 0.25f;
 
     [Header("Glow")]
     [SerializeField] private float nextAlpha = 0.35f;
@@ -86,31 +86,63 @@ public class TimelineIconView : MonoBehaviour
     }
     public void SetState(TimeLineState state,Color nextGlowColor)
     {
-        Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
-        if (_state == state) return;
-        _state = state;
+        Debug.Log($"[SetState] f={Time.frameCount} t={Time.time:F3} id={GetInstanceID()} state={state}");
 
-        _tween?.Kill();
+        //Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
+        //if (_state == state) return;
+        if (_state == state)
+        {
+            Debug.Log($"[SetState] SKIP same state id={GetInstanceID()} state={state}");
+            return;
+        }
+       /* _state = state;
+
+        _tween?.Kill();*/
+       _tween ?.Kill();
+        _state = state;
         if (!isActiveAndEnabled || visualRoot == null) return;
 
-        //颜色只对next状态有意义（active 保留原来黄色高光）
+       
         
-        if(state==TimeLineState.Next||glowImage!=null)
-        {
-            glowImage.color = nextGlowColor;
-        }
-        float targetScale=(state==TimeLineState.Active)? actionScale:1f;
+        //=====目标值=====
+        float targetScale=(state==TimeLineState.Active)? 1.6f:1f;
+
         float tarrgetAlpha =
             (state == TimeLineState.Active) ? activeAlpha :
             (state == TimeLineState.Next) ? nextAlpha :
             0f;
+        //Next的颜色
+        if (state == TimeLineState.Next && glowImage!=null)
+            glowImage.color= nextGlowColor;
 
-        var seq= DOTween.Sequence().SetLink(gameObject).SetUpdate(true);
+        var seq = DOTween.Sequence().SetLink(gameObject);//.SetUpdate(true);
+        Debug.Log($"[SetState] f={Time.frameCount} created tween id={GetInstanceID()} state={state} targetScale={targetScale}");
+
+
+        //scaled 动画
+
         seq.Append(visualRoot.DOScale(targetScale, animTime).SetEase(state == TimeLineState.Active ? Ease.OutBack : Ease.OutQuint));
-        if(glow)seq.Join(glow.DOFade(tarrgetAlpha, animTime));
+
+        seq.OnUpdate(() =>
+        {
+            if (state == TimeLineState.Active)
+                Debug.Log($"[TweenUpdate] id={GetInstanceID()} scale  = {visualRoot.localScale}");
+        });
+        seq.OnComplete(() => 
+        { 
+            Debug.Log($"[TweenDone] id={GetInstanceID()} finalScale={visualRoot.localScale}"); 
+        });
+
+        //glow 淡入淡出
+        if(glow!=null)
+            seq.Join(glow.DOFade(tarrgetAlpha, animTime));
 
 
         _tween = seq;
+        Debug.Log($"[ScaleTest] visualRoot={visualRoot.name} parent={visualRoot.parent?.name} startScale={visualRoot.localScale}");
+        Debug.Log($"[ScaleParam] actionScale={actionScale} animTime={animTime}");
+
+
     }
 
 }

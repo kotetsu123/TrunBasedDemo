@@ -128,7 +128,7 @@ public class BatteleManager : MonoBehaviour
 
             //用当前ordered 推一次nextActor 之后的顺序，通知ui刷新
             UpdateTimeLineUI(ordered);
-            OnTimeLineOrdered?.Invoke(ordered);
+            //OnTimeLineOrdered?.Invoke(ordered);
 
             StartCoroutine(PerformTrun(nextActor));
         }
@@ -312,7 +312,9 @@ public class BatteleManager : MonoBehaviour
 
         /*var del = OnActionChanged;
         Debug.Log($"[Battle] OnActionChanged subs={(del == null ? 0 : del.GetInvocationList().Length) }");*/
+        Debug.Log($"[Battle] OnActionChanged subs={(OnActionChanged == null ? 0 : OnActionChanged.GetInvocationList().Length)} prev={prev?.data?.Name} cur={_currentActor?.data?.Name}");
         OnActionChanged?.Invoke(prev, _currentActor);
+        
     }
 }
 

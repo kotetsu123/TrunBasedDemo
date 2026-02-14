@@ -60,12 +60,15 @@ public class TimeLineUI : MonoBehaviour
             }
             _map[controller] = view;
 
-            view.ForceInactive(TimelineIconView.TimeLineState.Normal);
+            view.ForceInactive(TimeLineState.Normal);
         }
         //战斗开始，同步当前状态
         var cur = battle.CurrentActor;
-        if(cur!=null&&_map.TryGetValue(cur,out var curView)&&curView!=null)
-            curView.SetActive(true);
+        if (cur != null && _map.TryGetValue(cur, out var curView) && curView != null)
+            curView.SetState(TimeLineState.Active, Color.white);
+
+        foreach (var kv in _map)
+            Debug.Log($"[Map] controller={kv.Key.data.Name}-> viewID={kv.Value.GetInstanceID()}");
 
     }
     private void HandleActionChanged(BaseController prev, BaseController cur)
@@ -73,7 +76,7 @@ public class TimeLineUI : MonoBehaviour
 
         //1）关掉上一个Active
         if (_lastActive != null && _map.TryGetValue(_lastActive, out var prevView) && prevView != null)
-            prevView.SetState(TimelineIconView.TimeLineState.Normal, Color.white);
+            prevView.SetState(TimeLineState.Normal, Color.white);
 
         /*//2）关掉上一个Next
         if(_lastNext != null && _map.TryGetValue(_lastNext, out var nextViewOld) && nextViewOld != null)
@@ -81,7 +84,7 @@ public class TimeLineUI : MonoBehaviour
 
         //3）当前行动者设置为Active
         if(cur!=null&&_map.TryGetValue(cur,out var curView)&&curView!=null)
-            curView.SetState(TimelineIconView.TimeLineState.Active, Color.white);
+            curView.SetState(TimeLineState.Active, Color.white);
 
        /* //4）计算next 从battle.controllers 排序拿第二个
         var next=GetNextActor(cur);
@@ -91,18 +94,19 @@ public class TimeLineUI : MonoBehaviour
        _lastActive = cur;
 
         Debug.Log($"[TimelineUI] ActiveChanged prev={(prev ? prev.name : "null")} cur={(cur ? cur.name : "null")} mapCount={_map.Count}");
-       /* //prev off
-        if (prev != null && _map.TryGetValue(prev, out var preview) && preview != null)
-        {
-            preview.SetActive(false);
-        }
-        //cur on
-        if (cur != null && _map.TryGetValue(cur, out var curview) && curview != null)
-        {
-            curview.SetActive(true);
-        }
-        else if (cur != null)
-            Debug.LogWarning($"[TimelineUI] cur not in map: {cur.name}");*/
+        /* //prev off
+         if (prev != null && _map.TryGetValue(prev, out var preview) && preview != null)
+         {
+             preview.SetActive(false);
+         }
+         //cur on
+         if (cur != null && _map.TryGetValue(cur, out var curview) && curview != null)
+         {
+             curview.SetActive(true);
+         }
+         else if (cur != null)
+             Debug.LogWarning($"[TimelineUI] cur not in map: {cur.name}");*/
+        Debug.Log($"[ActiveHandler] cur={(cur ? cur.data.Name : "null")}hasView= {cur != null&&_map.ContainsKey(cur)}");
     }
 
     private BaseController GetNextActor(BaseController current)
@@ -169,7 +173,7 @@ public class TimeLineUI : MonoBehaviour
 
 
         _lastNext = next;
-        
+        Debug.Log($"[NextHandler] active={(active ? active.data.Name : "null")} next={(next ? next.data.Name :"null")}");
     }
 
     private void UnBindBattle()
