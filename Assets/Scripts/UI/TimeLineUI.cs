@@ -11,6 +11,7 @@ public class TimeLineUI : MonoBehaviour
 
     private BaseController _lastActive;
     private BaseController _lastNext;
+    private List<BaseController> _lastOrdered;
 
     //cache: baseController->TimelineIconView
     private readonly Dictionary<BaseController, TimelineIconView> _map = new();
@@ -86,26 +87,14 @@ public class TimeLineUI : MonoBehaviour
         if(cur!=null&&_map.TryGetValue(cur,out var curView)&&curView!=null)
             curView.SetState(TimeLineState.Active, Color.white);
 
-       /* //4）计算next 从battle.controllers 排序拿第二个
-        var next=GetNextActor(cur);
-
-        if(next!=null&&_map.TryGetValue(next,out var nextView)&&nextView!=null)
-            nextView.SetState(TimelineIconView.TimeLineState.Next, GetNextGlowColor(next));*/
+       
        _lastActive = cur;
 
+        if(_lastOrdered!=null)
+        RefreshNext(_lastOrdered);
+
         Debug.Log($"[TimelineUI] ActiveChanged prev={(prev ? prev.name : "null")} cur={(cur ? cur.name : "null")} mapCount={_map.Count}");
-        /* //prev off
-         if (prev != null && _map.TryGetValue(prev, out var preview) && preview != null)
-         {
-             preview.SetActive(false);
-         }
-         //cur on
-         if (cur != null && _map.TryGetValue(cur, out var curview) && curview != null)
-         {
-             curview.SetActive(true);
-         }
-         else if (cur != null)
-             Debug.LogWarning($"[TimelineUI] cur not in map: {cur.name}");*/
+        
         Debug.Log($"[ActiveHandler] cur={(cur ? cur.data.Name : "null")}hasView= {cur != null&&_map.ContainsKey(cur)}");
     }
 
@@ -159,20 +148,13 @@ public class TimeLineUI : MonoBehaviour
         if (ordered == null || ordered.Count == 0) return;
         if (_map.Count == 0) BuildCache();
 
-        var active = battle.CurrentActor; // 当前行动者（可能为 null）
-        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active);
+        _lastOrdered = ordered;
 
-        // 清旧 next
-        if (_lastNext != null && _lastNext!=next &&_map.TryGetValue(_lastNext, out var oldNextView) && oldNextView != null)
-            oldNextView.SetState(TimeLineState.Normal, Color.white);
+        RefreshNext(ordered);
 
-        // 设新 next（只要不是 active）
-        if (next != null && _map.TryGetValue(next, out var nextView) && nextView != null)
-            //nextView.SetState(TimeLineState.Next, next.isPlayer ? Color.blue : Color.red);
-            nextView.SetState(TimeLineState.Next, GetNextGlowColor(next));
+        var active= battle.CurrentActor; // 当前行动者（可能为 null） 
+        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active); 
 
-
-        _lastNext = next;
         Debug.Log($"[NextHandler] active={(active ? active.data.Name : "null")} next={(next ? next.data.Name :"null")}");
     }
 
@@ -183,5 +165,26 @@ public class TimeLineUI : MonoBehaviour
             battle.OnActionChanged -= HandleActionChanged;
         }
     }
+    private void RefreshNext(List<BaseController> ordered)
+    {
+        if (ordered == null || ordered.Count == 0) return;
+        if (_map.Count == 0)
+            BuildCache();
 
+        var active = battle.CurrentActor; // 当前行动者（可能为 null）
+
+        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active);
+
+        //清旧 next  (只要不是 active)
+        if (_lastNext!=null&&_lastNext!=next&&_lastNext!=active&&_map.TryGetValue(_lastNext,out var oldNextView))
+        {
+            oldNextView.SetState(TimeLineState.Normal, Color.white);
+        }
+        //设新 next（只要不是 active）
+        if (next!=null&&next!=active&&_map.TryGetValue(next,out var nextView)&&nextView!=null)
+        {
+            nextView.SetState(TimeLineState.Next, GetNextGlowColor(next));
+        }
+        _lastNext = next;
+    }
 }

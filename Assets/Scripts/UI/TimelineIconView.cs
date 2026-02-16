@@ -105,7 +105,7 @@ public class TimelineIconView : MonoBehaviour
        
         
         //=====Ä¿±êÖµ=====
-        float targetScale=(state==TimeLineState.Active)? 1.6f:1f;
+        float targetScale=(state==TimeLineState.Active)? actionScale:1f;
 
         float tarrgetAlpha =
             (state == TimeLineState.Active) ? activeAlpha :
