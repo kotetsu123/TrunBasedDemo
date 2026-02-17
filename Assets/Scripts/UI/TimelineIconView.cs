@@ -18,6 +18,7 @@ public class TimelineIconView : MonoBehaviour
     [SerializeField] private float activeAlpha = 0.65f;
 
     [SerializeField] private Image glowImage;
+    private Color _defalutGlowColor;
 
     public enum TimeLineState {Normal,Next,Active }
 
@@ -29,6 +30,8 @@ public class TimelineIconView : MonoBehaviour
     private void Awake()
     {
         ForceInactive(TimeLineState.Normal);
+            if (glowImage != null)
+                _defalutGlowColor = glowImage.color;
     }
     private void Reset()
     {
@@ -95,9 +98,7 @@ public class TimelineIconView : MonoBehaviour
             Debug.Log($"[SetState] SKIP same state id={GetInstanceID()} state={state}");
             return;
         }
-       /* _state = state;
-
-        _tween?.Kill();*/
+    
        _tween ?.Kill();
         _state = state;
         if (!isActiveAndEnabled || visualRoot == null) return;
@@ -111,6 +112,12 @@ public class TimelineIconView : MonoBehaviour
             (state == TimeLineState.Active) ? activeAlpha :
             (state == TimeLineState.Next) ? nextAlpha :
             0f;
+        //颜色：next状态可能需要特殊颜色，active和normal使用默认颜色
+        if (glowImage != null)
+        {
+            glowImage.color= (state == TimeLineState.Next) ? nextGlowColor :  _defalutGlowColor;
+        }
+
         //Next的颜色
         if (state == TimeLineState.Next && glowImage!=null)
             glowImage.color= nextGlowColor;

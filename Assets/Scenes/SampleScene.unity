@@ -467,7 +467,7 @@ MonoBehaviour:
     Name: goblet
     maxHp: 120
     Hp: 120
-    Attack: 40
+    Attack: 50
     Speed: 90
     ActionValue: 0
     MaxActionValue: 200
@@ -475,6 +475,7 @@ MonoBehaviour:
     isDead: 0
     isPlayer: 0
     battleEnded: 0
+    intent: 0
   portait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
   hpbarPrefab: {fileID: 1878811498021360621, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 364944995}
@@ -1350,6 +1351,8 @@ MonoBehaviour:
   timeLineIconPrefab: {fileID: 6619320484278535804, guid: c875f9274cabc314d864029b86b4554e, type: 3}
   actionBarPanel: {fileID: 775316975}
   slots: []
+  actionBarLayout: {fileID: 775316978}
+  timelineMoveTime: 0.25
 --- !u!1 &1612442387
 GameObject:
   m_ObjectHideFlags: 0
@@ -1473,7 +1476,7 @@ MonoBehaviour:
     Name: Player
     maxHp: 200
     Hp: 200
-    Attack: 100
+    Attack: 50
     Speed: 100
     ActionValue: 0
     MaxActionValue: 200
@@ -1481,6 +1484,7 @@ MonoBehaviour:
     isDead: 0
     isPlayer: 1
     battleEnded: 0
+    intent: 0
   portait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
   playerHud: {fileID: 1141103220}
 --- !u!1 &2018218463

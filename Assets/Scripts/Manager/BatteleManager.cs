@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +30,18 @@ public class BatteleManager : MonoBehaviour
     public List<RectTransform> slots;
 
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
+    
     public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
     private int tick = 0;//时间刻度
 
     //当前行动者
     private BaseController _currentActor;
+
+    [SerializeField] private VerticalLayoutGroup actionBarLayout;
+    [SerializeField] private float timelineMoveTime= 0.25f;
+    private bool _timelineInitialized = false;
+    private Tween _moveTween;//防止重入
+
     public BaseController CurrentActor=>_currentActor;
 
     void Awake()
@@ -89,13 +97,21 @@ public class BatteleManager : MonoBehaviour
         }
         isBattleReady = true;
         //开局就刷新一次 UI 排列
-        UpdateTimeLineUI(controllers
+       var ordered=controllers
             .Where(c => !c.isDead)
             .OrderBy(c => c.data.ActionValue)
-            .ToList());
+            .ToList();
+        PublishOrdered(ordered);
 
         Debug.Log("[BattleManager] Battle Ready!");
        
+    }
+
+    //每次算出ordered，都统一走一个函数
+    private void PublishOrdered(List<BaseController> ordered)
+    {
+        UpdateTimeLineUI(ordered);
+        OnTimeLineOrdered?.Invoke(ordered);
     }
     void updateActionValues()
     {
@@ -127,16 +143,17 @@ public class BatteleManager : MonoBehaviour
             SetCurrentActor(nextActor);
 
             //用当前ordered 推一次nextActor 之后的顺序，通知ui刷新
-            UpdateTimeLineUI(ordered);
+            //UpdateTimeLineUI(ordered);
             //OnTimeLineOrdered?.Invoke(ordered);
+            //统一发布一次（位置和next都更新）
+                PublishOrdered(ordered);
 
             StartCoroutine(PerformTrun(nextActor));
         }
         else
         {
-            //更新ui//普通 排序更新
-            UpdateTimeLineUI(ordered);
-            OnTimeLineOrdered?.Invoke(ordered);
+            //更新ui//普通 排序更新//平时也统一发布
+            PublishOrdered(ordered);
         }
     }
    
@@ -230,24 +247,98 @@ public class BatteleManager : MonoBehaviour
     }
     void UpdateTimeLineUI(List<BaseController> ordered)
     {
-        
-        for(int i = 0; i < ordered.Count; i++)
+        if (ordered == null || ordered.Count == 0) return;
+        Debug.Log($"[UpdateTimeLineUI] updateTimeLineUI called");
+
+
+        //0)第一个，只让layout 把位置摆正，防止初次乱飞
+        if(!_timelineInitialized)
+        {
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var c = ordered[i];
+                if (!timeLineIcons.TryGetValue(c, out var icon) || icon == null) continue;
+                //icon.transform.SetParent(actionBarPanel, false);
+                icon.transform.SetSiblingIndex(i);
+            }
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
+            _timelineInitialized = true;
+            return;
+        }
+        //如果上一次还在移动，先杀掉（避免重入）
+        _moveTween?.Kill();
+        _moveTween = null;
+
+        //1）记录旧位置(排序前)
+        var oldPositions = new Dictionary<RectTransform, Vector2>(timeLineIcons.Count);
+
+        foreach (var kv in timeLineIcons)
+        {
+            if (kv.Value == null) continue;
+
+            var rt=kv.Value.GetComponent<RectTransform>();
+            if (rt != null)
+                oldPositions[rt] = rt.anchoredPosition;
+        }
+        //2)重新排序（layout 重新计算位置）
+        for (int i = 0; i < ordered.Count; i++)
         {
             var c = ordered[i];
             if (!timeLineIcons.TryGetValue(c, out var icon)||icon==null) continue;
 
             //直接把prefab 变成actionbarpanel 的子物体
-
             icon.transform.SetParent(actionBarPanel, false);
 
             //改兄弟顺序。让layoutGroup 自动重排
-            icon.transform.SetSiblingIndex(i); 
-
-            
+            icon.transform.SetSiblingIndex(i);  
         }
-        //强制刷新布局
+        //3)强制刷新布局-此时每个icon的anchoredPosition 已经变成“目标”位置了
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
+
+        //4）缓存目标位置，（排序后，被拉回就位置以前）
+        var targetPos = new Dictionary<RectTransform, Vector2>(oldPositions.Count);
+        foreach(var kv in oldPositions)
+        {
+            var rt= kv.Key;
+            if (rt == null) continue;
+            targetPos[rt] = rt.anchoredPosition;
+        }
+
+        //5)Added! 关掉layoutGroup，避免tween动画时 layoutGroup干扰位置
+        if(actionBarLayout !=null)actionBarLayout.enabled = false;
+
+        //6)把icon位置拉回旧位置（排序后，先都拉回原来位置）
+        foreach (var kv in oldPositions)
+        { 
+            if(kv.Key!=null)
+                kv.Key.anchoredPosition = kv.Value;
+        }
+
+        //7)tween 到新位置(用一个sequence管理)
+        var seq=DOTween.Sequence();
+        foreach (var kv in targetPos)
+        {
+            var rt=kv.Key;
+            var pos = kv.Value;
+            if (rt == null) continue;
+
+            //避免同一个rt重复挂多个移动tween
+            rt.DOKill(false);//只杀掉rt的位移tween
+
+            seq.Join(rt.DOAnchorPos(pos, timelineMoveTime).SetEase(Ease.OutCubic));
+        }
+        //8） 动画结束后，重新打开layoutGroup（如果有的话），让布局恢复正常
+        seq.OnComplete(() =>
+        {
+            if (actionBarLayout != null) actionBarLayout.enabled = true;
+           //重新让layout对其一次
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
+        });
+
+        _moveTween = seq;
     }
     public void NotifyDeath(BaseController dead)
     {
