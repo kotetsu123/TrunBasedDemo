@@ -32,4 +32,10 @@ public abstract class BaseController : MonoBehaviour
     {
         BatteleManager.Instance.NotifyDeath(this);
     }
+    public virtual  void Init(Character data)
+    {
+        this.data = data;
+        this.data.isDead = false;
+        this.data.ActionValue = this.data.MaxActionValue;
+    }
 }

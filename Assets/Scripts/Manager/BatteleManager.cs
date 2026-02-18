@@ -34,6 +34,8 @@ public class BatteleManager : MonoBehaviour
     public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
     private int tick = 0;//时间刻度
 
+    private bool _reorderRequested;
+    private readonly List<BaseController> _lastPublishedOrdered = new();
     //当前行动者
     private BaseController _currentActor;
 
@@ -71,11 +73,32 @@ public class BatteleManager : MonoBehaviour
         }         
     }
 
+    private void LateUpdate()
+    {
+        if (!_reorderRequested) return;
+        _reorderRequested = false;
+
+        //统一计算本帧最终顺序
+        var ordered = controllers
+            .Where(c => c != null && !c.isDead && c.data != null && !c.data.isDead)
+            .OrderBy(c => c.data.ActionValue)
+            .ToList();
+
+        //顺序完全没变：不发布，不做重排/动画（解决每个回合卡一下）
+        if (isSameOrder(ordered, _lastPublishedOrdered))
+            return;
+
+        _lastPublishedOrdered.Clear();
+        _lastPublishedOrdered.AddRange(ordered);
+
+        PublishOrdered(ordered);
+    }
+
     public void RigisterCharacter(BaseController character)
     {
         controllers.Add(character);
         Debug.Log($"[BattleManager] Rigister Charcter:{character.data.Name}");
-        if (controllers.Count >= 2)
+        if (!isBattleReady&&controllers.Count >= 2)
         {
             InitializeBattle();
         }
@@ -86,22 +109,26 @@ public class BatteleManager : MonoBehaviour
 
         timeLineIcons.Add(character, icon);
         //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
-        FindObjectOfType<TimeLineUI>()?.BuildCache(); 
+        FindObjectOfType<TimeLineUI>()?.BuildCache();
+
+        RequestReorder();//最后一帧搞一下
     }
 
     void InitializeBattle()
     {
+        if (isBattleReady) return;
         foreach (var character in controllers)
         {
             character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         }
         isBattleReady = true;
         //开局就刷新一次 UI 排列
-       var ordered=controllers
-            .Where(c => !c.isDead)
-            .OrderBy(c => c.data.ActionValue)
-            .ToList();
-        PublishOrdered(ordered);
+        /*var ordered=controllers
+             .Where(c => !c.isDead)
+             .OrderBy(c => c.data.ActionValue)
+             .ToList();
+         PublishOrdered(ordered);*/
+        RequestReorder();
 
         Debug.Log("[BattleManager] Battle Ready!");
        
@@ -146,14 +173,14 @@ public class BatteleManager : MonoBehaviour
             //UpdateTimeLineUI(ordered);
             //OnTimeLineOrdered?.Invoke(ordered);
             //统一发布一次（位置和next都更新）
-                PublishOrdered(ordered);
+              RequestReorder();//只请求刷新一次
 
             StartCoroutine(PerformTrun(nextActor));
         }
         else
         {
             //更新ui//普通 排序更新//平时也统一发布
-            PublishOrdered(ordered);
+           RequestReorder();
         }
     }
    
@@ -202,6 +229,7 @@ public class BatteleManager : MonoBehaviour
         }
         //行动完成后恢复行动值      
         actor.data.ActionValue = actor.data.MaxActionValue;
+        RequestReorder();
         isActing = false;
         
         Debug.Log($"{actor.data.Name}结束行动！");
@@ -364,8 +392,6 @@ public class BatteleManager : MonoBehaviour
         //从所有逻辑入口中移除（最关键）
         controllers.Remove(dead);
 
-       
-
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
@@ -373,23 +399,18 @@ public class BatteleManager : MonoBehaviour
             Destroy(icon.gameObject);
         }
         timeLineIcons.Remove(dead);
-      
-        //刷新时间轴(避免ui 还显示旧顺序)
-        UpdateTimeLineUI(controllers
-            .Where(c => c != null && !c.data.isDead)
-            .OrderBy(c => c.data.ActionValue)
-            .ToList());
 
-        //表现层，隐藏冰摧毁角色本体
+        //刷新时间轴(避免ui 还显示旧顺序)
+        RequestReorder();
+
+        //表现层，隐藏并摧毁角色本体
         dead.gameObject.SetActive(false);
 
         //等待一帧真正销毁（防协程美剧中途爆炸）
         yield return null;
 
         Destroy(dead.gameObject);
-        
-        
-      
+
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
     private void SetCurrentActor(BaseController next)
@@ -407,6 +428,43 @@ public class BatteleManager : MonoBehaviour
         OnActionChanged?.Invoke(prev, _currentActor);
         
     }
+  private void RequestReorder()
+    {
+        _reorderRequested = true;
+    }
+   
+   public void RigisterController(BaseController ctrl)
+    {
+        if (ctrl == null) return;
+        if (controllers.Contains(ctrl)) return;//防止重复注册
+
+
+        RigisterCharacter(ctrl);
+    }
+    private static bool isSameOrder(List<BaseController> a, List<BaseController> b)
+    {
+        if (a == null || b == null) return false;
+        if(a.Count!=b.Count) return false;
+        for(int i = 0; i < a.Count; i++)
+        {
+            if (!ReferenceEquals(a[i], b[i]))
+                return false;
+        }
+        return true;
+    }
+  /*  public void UnregisterContoller(BaseController ctrl)
+    {
+        bool wasAcive = (ctrl == _currentActor);
+        controllers.Remove(ctrl);
+
+        if (wasAcive) {
+            //选一个新的active（通常是当前排序当中最靠前的）
+            //触发On Action Changed（prev,cur）
+           SetCurrentActor(null);
+        }
+
+        RequestReorder();
+    }*/
 }
 
 
