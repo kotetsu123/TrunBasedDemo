@@ -11,18 +11,19 @@ public enum ActionIntent
     Normal,
     SkillDanerous
 }
+public enum Team
+{
+    Player,
+    Enemy
+}
 [Serializable]
 public class Character
 
 {//第一天，纯数据结构
-    public enum TeamType
-    {
-        Player,
-        Enemy
-    }
+   
     
 
-    public TeamType Team;
+    public Team Team;
 
     
     public string Name;

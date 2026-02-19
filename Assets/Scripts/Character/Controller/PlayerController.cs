@@ -57,7 +57,7 @@ public class PlayerController : BaseController
             BatteleManager.Instance.RigisterCharacter(data);
             Debug.Log($"[PlayerController]Awake over:{data != null}");
         }*/
-        BatteleManager.Instance.RigisterCharacter(this);
+        BattleManager.Instance.RegisterCharacter(this);
         
         playerHud.gameObject.SetActive(true);
         playerHud.Bind(this);

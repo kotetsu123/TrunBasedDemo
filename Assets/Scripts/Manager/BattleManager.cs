@@ -7,9 +7,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BatteleManager : MonoBehaviour
+public class BattleManager : MonoBehaviour
 {
-    public static BatteleManager Instance{ get; private set; }
+    public static BattleManager Instance{ get; private set; }
     //c#event 广播，当行动者改变时触发
     public event Action<BaseController, BaseController> OnActionChanged;
     public event Action<List<BaseController>> OnTimeLineOrdered;
@@ -32,6 +32,7 @@ public class BatteleManager : MonoBehaviour
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
     
     public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
+
     private int tick = 0;//时间刻度
 
     private bool _reorderRequested;
@@ -41,6 +42,7 @@ public class BatteleManager : MonoBehaviour
 
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
     [SerializeField] private float timelineMoveTime= 0.25f;
+    [SerializeField] private BattleFormation formation;
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
 
@@ -53,7 +55,7 @@ public class BatteleManager : MonoBehaviour
 
     private void Start()
     {
-        //StartCoroutine(RigisterDone());
+        
     }
 
     void Update()
@@ -72,7 +74,6 @@ public class BatteleManager : MonoBehaviour
             return;
         }         
     }
-
     private void LateUpdate()
     {
         if (!_reorderRequested) return;
@@ -94,10 +95,10 @@ public class BatteleManager : MonoBehaviour
         PublishOrdered(ordered);
     }
 
-    public void RigisterCharacter(BaseController character)
+    public void RegisterCharacter(BaseController character)
     {
         controllers.Add(character);
-        Debug.Log($"[BattleManager] Rigister Charcter:{character.data.Name}");
+        Debug.Log($"[BattleManager] Register Charcter:{character.data.Name}");
         if (!isBattleReady&&controllers.Count >= 2)
         {
             InitializeBattle();
@@ -121,13 +122,11 @@ public class BatteleManager : MonoBehaviour
         {
             character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         }
+
+        PlaceAllExistingControllersIntoFormation();
+
         isBattleReady = true;
         //开局就刷新一次 UI 排列
-        /*var ordered=controllers
-             .Where(c => !c.isDead)
-             .OrderBy(c => c.data.ActionValue)
-             .ToList();
-         PublishOrdered(ordered);*/
         RequestReorder();
 
         Debug.Log("[BattleManager] Battle Ready!");
@@ -150,9 +149,7 @@ public class BatteleManager : MonoBehaviour
             if (c.isDead) //死亡角色不行动
                 continue;
             //速度越快，行动值减少越快
-            c.data.ActionValue -= c.data.Speed / 0.75f;
-            // c.data.ActionValue = Mathf.Max(0, c.data.ActionValue);
-            // Debug.Log($"{c.Name}的ActionValue={c.ActionValue:F2}");
+            c.data.ActionValue -= c.data.Speed / 0.75f;           
         }
 
         //找出行动值最小的角色(谁最接近0)
@@ -170,8 +167,6 @@ public class BatteleManager : MonoBehaviour
             SetCurrentActor(nextActor);
 
             //用当前ordered 推一次nextActor 之后的顺序，通知ui刷新
-            //UpdateTimeLineUI(ordered);
-            //OnTimeLineOrdered?.Invoke(ordered);
             //统一发布一次（位置和next都更新）
               RequestReorder();//只请求刷新一次
 
@@ -183,7 +178,6 @@ public class BatteleManager : MonoBehaviour
            RequestReorder();
         }
     }
-   
     IEnumerator PerformTrun(BaseController actor)
     {
         //SetCurrentActor(actor);
@@ -391,6 +385,8 @@ public class BatteleManager : MonoBehaviour
 
         //从所有逻辑入口中移除（最关键）
         controllers.Remove(dead);
+        //从站位中释放
+        formation.Release(dead, out _);
 
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
@@ -433,13 +429,13 @@ public class BatteleManager : MonoBehaviour
         _reorderRequested = true;
     }
    
-   public void RigisterController(BaseController ctrl)
+   public void RegisterController(BaseController ctrl)
     {
         if (ctrl == null) return;
         if (controllers.Contains(ctrl)) return;//防止重复注册
 
 
-        RigisterCharacter(ctrl);
+        RegisterCharacter(ctrl);
     }
     private static bool isSameOrder(List<BaseController> a, List<BaseController> b)
     {
@@ -465,6 +461,34 @@ public class BatteleManager : MonoBehaviour
 
         RequestReorder();
     }*/
+  //最小占槽并且对齐
+  public bool TryPlaceIntoFormation(BaseController ctrl)
+    {
+        if (ctrl == null || ctrl.data == null || formation == null) return false;
+
+        var team = ctrl.data.Team;//根据队伍找对应槽位
+        int slotIndex = formation.FindFirstEmpty(team);
+        if (slotIndex < 0) return false;
+
+        if (!formation.TryOccupy(team, slotIndex, ctrl)) return false;
+
+        var anchor = formation.GetAnchor(team, slotIndex);
+        ctrl.transform.position = anchor.position; //直接放到目标位置，后续可以加个动画
+        return true;
+    }
+    public void PlaceAllExistingControllersIntoFormation()
+    {
+        if(formation==null) return;
+
+        foreach(var c in controllers)
+        {
+            if (c == null || c.data == null) continue;
+            if (c.data.isDead || c.isDead) continue;
+
+            //直接尝试占槽（不成功就算了，先占了再说，后续可以加个提示或者自动分配）又或者是contains判断
+            TryPlaceIntoFormation(c);
+        }
+    }
 }
 
 

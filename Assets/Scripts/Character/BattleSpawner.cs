@@ -14,7 +14,7 @@ public struct SpawnRequest
 public class BattleSpawner : MonoBehaviour
 {
     [SerializeField] private BattleFormation formation;
-    [SerializeField] private BatteleManager battle;
+    [SerializeField] private BattleManager battle;
 
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
 
@@ -75,7 +75,7 @@ public class BattleSpawner : MonoBehaviour
         var anchor = formation.GetAnchor(req.team, slotIndex);
         ctrl.transform.position = anchor.position;
 
-        battle.RigisterController(ctrl);
+        battle.RegisterController(ctrl);
     }
 
    

@@ -2,11 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Team
-{
-       Player,
-    Enemy
-}
+
 [System.Serializable]
 public class FormationSlot
 {
@@ -20,13 +16,27 @@ public class FormationSlot
 public class BattleFormation : MonoBehaviour
 {
     [SerializeField] private FormationSlot[] playerSlots = new FormationSlot[4];
-    [SerializeField] private FormationSlot[] enemySlots = new FormationSlot[6];
+    [SerializeField] private FormationSlot[] enemySlots = new FormationSlot[5];
 
     public event System.Action<Team,int,BaseController,BaseController> OnSlotChanged;
+
+    private static readonly int[] EnemyPreferredOrder = { 2, 3, 1, 4, 0 };
 
     public int FindFirstEmpty(Team team)
     {
         var arr = team == Team.Player ? playerSlots : enemySlots;
+
+        if (team == Team.Enemy)
+        {
+            for(int i = 0; i < EnemyPreferredOrder.Length; i++)
+            {
+                int idx = EnemyPreferredOrder[i];
+                if (idx < 0 || idx >= arr.Length) continue;
+                if (arr[idx].occupant == null) return idx;
+            }
+            return -1;
+        }
+
         for (int i = 0; i < arr.Length;i++)
         {
             if (arr[i].isEmpty) return i;

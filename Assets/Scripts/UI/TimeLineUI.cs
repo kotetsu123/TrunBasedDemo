@@ -7,7 +7,7 @@ using static TimelineIconView;
 
 public class TimeLineUI : MonoBehaviour
 {
-    [SerializeField] private BatteleManager battle;
+    [SerializeField] private BattleManager battle;
 
     private BaseController _lastActive;
     private BaseController _lastNext;
@@ -19,7 +19,7 @@ public class TimeLineUI : MonoBehaviour
     private void Awake()
     {
         Debug.Log($"[TimelineUI] Awake activeInHierarchy={gameObject.activeInHierarchy} enabled={enabled}");
-        if (battle == null) battle = BatteleManager.Instance;
+        if (battle == null) battle = BattleManager.Instance;
         BuildCache();
         Debug.Log($"[TimelineUI] Awake battle={(battle ? battle.name : "null")} id={(battle ? battle.GetInstanceID() : -1)}");
         //Debug.Log($"[TimelineUI] instance{name} id={GetInstanceID()}");
@@ -130,7 +130,7 @@ public class TimeLineUI : MonoBehaviour
     private void TryBindBattle()
     {
         if (battle == null)
-            battle = BatteleManager.Instance;
+            battle = BattleManager.Instance;
 
         if (battle != null)
         {

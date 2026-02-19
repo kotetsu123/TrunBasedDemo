@@ -14,7 +14,7 @@ public class EnemyController : BaseController
     private Canvas worldUICanvas;
     private void Start()
     {
-        BatteleManager.Instance.RigisterCharacter(this);
+        BattleManager.Instance.RegisterCharacter(this);
        
         InitialzeHpBar();
     }

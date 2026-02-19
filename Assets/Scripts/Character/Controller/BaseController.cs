@@ -30,7 +30,7 @@ public abstract class BaseController : MonoBehaviour
     //给子类"拓展"的钩子
     protected virtual void OnDeath()
     {
-        BatteleManager.Instance.NotifyDeath(this);
+        BattleManager.Instance.NotifyDeath(this);
     }
     public virtual  void Init(Character data)
     {
