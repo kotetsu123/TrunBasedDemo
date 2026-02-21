@@ -73,7 +73,6 @@ public class BattleFormation : MonoBehaviour
                 return true;
             }
         }
-
         //Enmey
         for(int i = 0; i < enemySlots.Length; i++)
         {
@@ -87,7 +86,23 @@ public class BattleFormation : MonoBehaviour
         }
         released = default;
         return false;
+    }
+    public List<BaseController> GetAliveEnemiesInPreferredOrder()
+    {
+        var result=new List<BaseController>(5);
 
+        //用已有的优先级数组来排序敌人
+        int[] order = { 2, 3, 1, 4, 0 };
+
+        for(int i = 0; i < order.Length; i++)
+        {
+            int idx= order[i];
+            var occ=enemySlots[idx].occupant;
+            if (occ!=null&&occ.data!=null&&!occ.data.isDead&&!occ.isDead)
+                result.Add(occ);        
+        }
+
+        return result;
     }
 
 }

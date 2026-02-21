@@ -89,7 +89,7 @@ public class TimelineIconView : MonoBehaviour
     }
     public void SetState(TimeLineState state,Color nextGlowColor)
     {
-        Debug.Log($"[SetState] f={Time.frameCount} t={Time.time:F3} id={GetInstanceID()} state={state}");
+        //Debug.Log($"[SetState] f={Time.frameCount} t={Time.time:F3} id={GetInstanceID()} state={state}");
 
         //Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
         //if (_state == state) return;
@@ -130,7 +130,7 @@ public class TimelineIconView : MonoBehaviour
 
         seq.Append(visualRoot.DOScale(targetScale, animTime).SetEase(state == TimeLineState.Active ? Ease.OutBack : Ease.OutQuint));
 
-        seq.OnUpdate(() =>
+        /*seq.OnUpdate(() =>
         {
             if (state == TimeLineState.Active)
                 Debug.Log($"[TweenUpdate] id={GetInstanceID()} scale  = {visualRoot.localScale}");
@@ -138,7 +138,7 @@ public class TimelineIconView : MonoBehaviour
         seq.OnComplete(() => 
         { 
             Debug.Log($"[TweenDone] id={GetInstanceID()} finalScale={visualRoot.localScale}"); 
-        });
+        });*/
 
         //glow µ­Èëµ­³ö
         if(glow!=null)

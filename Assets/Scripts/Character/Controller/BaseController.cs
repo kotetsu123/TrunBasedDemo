@@ -38,4 +38,9 @@ public abstract class BaseController : MonoBehaviour
         this.data.isDead = false;
         this.data.ActionValue = this.data.MaxActionValue;
     }
+
+    public virtual void SetTargeted(bool targetd)
+    {
+        Debug.Log($"{data.Name}targeted={targetd}");
+    }
 }

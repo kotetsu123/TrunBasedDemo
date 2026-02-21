@@ -39,10 +39,19 @@ public class BattleManager : MonoBehaviour
     private readonly List<BaseController> _lastPublishedOrdered = new();
     //当前行动者
     private BaseController _currentActor;
+    //当前目标
+    private BaseController _currentTarget;
 
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
     [SerializeField] private float timelineMoveTime= 0.25f;
     [SerializeField] private BattleFormation formation;
+    //点击检测相关
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private LayerMask enemyClickMask;//敌人点击层
+    [SerializeField] private float clickMaxDistance = 200f;//点击检测最大距离
+
+    
+
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
 
@@ -51,6 +60,8 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        if(mainCamera==null)
+            mainCamera = Camera.main;
     }
 
     private void Start()
@@ -242,12 +253,23 @@ public class BattleManager : MonoBehaviour
     {
         bool actionChosen = false;
         Debug.Log("press the space key attack the enemy");
+        //回合开始先自动选一个目标（如果当前目标无效的话）
+        AutoPickTargetIfNeeded(actor);
+
         while (!actionChosen)
         {
+            //鼠标点击选目标
+            HandleMouseClickSelect(actor);
+            //Tab键切换目标
+            CycleEnemyTarget(actor);
+            //如果目标死了/无效了，自动选一个目标
+            AutoPickTargetIfNeeded(actor);
+
+            //按空格攻击
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                var target = controllers.FirstOrDefault(c => c.data.Team != actor.data.Team && !c.isDead);
-                if (target != null)
+                var target =_currentTarget;
+                if (IsValidEnemyTarget(actor,target))
                 {
                     target.TakeDamage(actor.data.Attack);
                     //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
@@ -256,24 +278,24 @@ public class BattleManager : MonoBehaviour
                 }
                 actionChosen = true;
             }
+            
 
-            yield return null;
+                yield return null;
         }
     }
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
-        if (target.data.Hp <= 0)
+        if (target.data.Hp > 0) return;
+        //不要立刻battle Ended=true
+        //判断是否还有任何存在的单位
+        bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team!=attacker.data.Team);
+        bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==attacker.data.Team);
+
+        if (!enemyAlive||!allyAlive)
         {
             battleEnded = true;
             Debug.Log($"Battle Finish!");
-            if (attacker.isPlayer)
-            {
-                Debug.Log($"You Win!");
-            }
-            else
-            {
-                Debug.Log($"You Lose!");
-            }
+            Debug.Log(!enemyAlive ? "You Win!" : "You Lose!");
         }
     }
     void UpdateTimeLineUI(List<BaseController> ordered)
@@ -373,13 +395,13 @@ public class BattleManager : MonoBehaviour
     }
     public void NotifyDeath(BaseController dead)
     {
+        if(_currentTarget==dead)
+            SetCurrentTarget(null);
         StartCoroutine(HandleDeathCoroutine(dead));
     }
-
     private IEnumerator HandleDeathCoroutine(BaseController dead)
     {
-        //等今天过去再删除 用来debug DOTween 用的
-        Debug.Log($"[Death]{dead.data.Name} removed from battle");
+        if(_currentTarget==dead)SetCurrentTarget(null);
 
         if (dead == null) yield break;
 
@@ -498,6 +520,65 @@ public class BattleManager : MonoBehaviour
             TryPlaceIntoFormation(c);
         }
     }
+    //Tab键切换目标
+    private void CycleEnemyTarget(BaseController attcker)
+    {
+        if (!Input.GetKeyDown(KeyCode.Tab)) return;
+
+        var list = formation.GetAliveEnemiesInPreferredOrder();
+        if (list.Count == 0)
+        {
+            SetCurrentTarget(null);
+            return;
+        }
+        int idx = list.IndexOf(_currentTarget);
+        idx = (idx + 1) % list.Count;
+        SetCurrentTarget(list[idx]);
+    }
+    //设置当前目标，并触发事件 也是唯一改变_currentTarget的地方
+    private void SetCurrentTarget(BaseController target)
+    {
+        if (_currentTarget == target) return;
+
+        if(_currentTarget!=null)_currentTarget.SetTargeted(false);
+        _currentTarget = target;
+        if (_currentTarget != null) _currentTarget.SetTargeted(true);
+
+        Debug.Log($"[Target]->{(_currentTarget ? _currentTarget.data.Name : "null")}");
+    }
+    private bool IsValidEnemyTarget(BaseController actor,BaseController target)
+    {
+        if (actor == null || actor.data == null) return false;
+        if (target == null || target.data == null) return false;
+        if (target.data.isDead || target.isDead) return false;
+        return target.data.Team != actor.data.Team;
+    }
+    private void AutoPickTargetIfNeeded(BaseController actor)
+    {
+        if(IsValidEnemyTarget(actor,_currentTarget))return;//当前目标有效，不需要自动选
+        //从formation获取按照槽位优先级排序的存活敌人
+        var list = formation.GetAliveEnemiesInPreferredOrder();
+        SetCurrentTarget(list.Count > 0 ? list[0]:null);
+    }
+    //点击检测，选敌人
+    private void HandleMouseClickSelect(BaseController actor)
+    {
+        if (mainCamera == null) return;
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        Ray ray=mainCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray,out RaycastHit hit,clickMaxDistance,enemyClickMask))
+        {
+            
+            var targetable = hit.collider.GetComponentInParent<Targetable>();
+            if (targetable != null && IsValidEnemyTarget(actor, targetable.controller))
+            {
+                SetCurrentTarget(targetable.controller);
+            }
+        }
+    }
+        
+
 }
 
 
