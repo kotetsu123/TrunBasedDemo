@@ -99,16 +99,25 @@ public class BattleManager : MonoBehaviour
     {
         controllers.Add(character);
         Debug.Log($"[BattleManager] Register Charcter:{character.data.Name}");
-        if (!isBattleReady&&controllers.Count >= 2)
+
+
+       /* if (!isBattleReady&&controllers.Count >= 2)
         {
             InitializeBattle();
-        }
+        }*/
         var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
         var icon = iconobj.GetComponent<TimeLineIcon>();
         icon.Bind(character);
+        if (isBattleReady)
+        {
+            TryPlaceIntoFormation(character);
+        }else if (controllers.Count >= 2)
+        {
+            InitializeBattle();
+        }
 
+            timeLineIcons.Add(character, icon);
 
-        timeLineIcons.Add(character, icon);
         //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         FindObjectOfType<TimeLineUI>()?.BuildCache();
 
