@@ -233,7 +233,7 @@ public class BattleManager : MonoBehaviour
         {
             //敌人自动行动
             yield return new WaitForSeconds(0.5f);
-            var target = controllers.FirstOrDefault(c => c.data.Team != actor.data.Team && !c.isDead);
+            var target = GetRandomEnemyTarget(actor);
             if (target != null)
             {
                 target.TakeDamage(actor.data.Attack);
@@ -576,6 +576,20 @@ public class BattleManager : MonoBehaviour
                 SetCurrentTarget(targetable.controller);
             }
         }
+
+    }
+    private BaseController GetRandomEnemyTarget(BaseController attacker)
+    {
+        if (attacker == null) return null;
+
+        var candidates = controllers
+            .Where(c => c != null && c.data != null && !c.data.isDead && !c.isDead && c.data.Team != attacker.data.Team)
+            .ToList();
+        if (candidates.Count == 0)
+            return null;
+
+        int index = UnityEngine.Random.Range(0, candidates.Count);
+        return candidates[index];
     }
         
 

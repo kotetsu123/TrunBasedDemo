@@ -59,8 +59,8 @@ public class PlayerController : BaseController
         }*/
         BattleManager.Instance.RegisterCharacter(this);
         
-        playerHud.gameObject.SetActive(true);
-        playerHud.Bind(this);
+       // playerHud.gameObject.SetActive(true);
+       // playerHud.Bind(this);
         playerHud.UpdateHp();
 
 
