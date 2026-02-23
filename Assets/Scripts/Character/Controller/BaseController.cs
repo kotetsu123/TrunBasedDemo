@@ -17,9 +17,16 @@ public abstract class BaseController : MonoBehaviour
     //统一的受伤逻辑
     public virtual void TakeDamage(int damage)
     {
-        if (data.isDead) return;
+        Debug.LogError($"[TakeDamage CALLED]{name} dmg={damage}");
+
+        Debug.Log($"[TakeDamage Base] {GetType().Name} {data?.Name} dmg={damage}");
+        if (data==null||data.isDead) return;
+
+        int prev = data.Hp;
         data.Hp = Mathf.Max(0, data.Hp - damage);
-        if (data.Hp == 0)
+
+        data.NotifyHpChange(prev, data.Hp);
+        if (data.Hp <= 0)
         {
             data.isDead = true;
             OnDeath();

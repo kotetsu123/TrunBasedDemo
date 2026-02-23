@@ -24,10 +24,10 @@ public class Character
     
 
     public Team Team;
+    public event Action<int,int> OnHpChanged;//prev ,cur
 
-    
     public string Name;
-    public int maxHp;
+    public int MaxHp;
     public int Hp;
     public int Attack;
     public float Speed;
@@ -39,5 +39,9 @@ public class Character
     public bool battleEnded;
     public ActionIntent intent=ActionIntent.Normal;
 
+    public void NotifyHpChange(int prev, int cur) {
+        Debug.Log($"[HP EVENT]{prev}->{cur} subs={(OnHpChanged == null ? 0 : OnHpChanged.GetInvocationList().Length)}");
+        OnHpChanged?.Invoke( prev, cur );
+    }
 
 }

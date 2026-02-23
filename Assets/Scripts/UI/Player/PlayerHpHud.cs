@@ -10,16 +10,7 @@ public class PlayerHpHud : MonoBehaviour
 
 
     private BaseController owner;
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
     public void Bind(BaseController character)
     {
         owner = character;
@@ -35,7 +26,7 @@ public class PlayerHpHud : MonoBehaviour
         {
             return;
         }
-        float ratio = (float)owner.data.Hp / owner.data.maxHp;
+        float ratio = (float)owner.data.Hp / owner.data.MaxHp;
         fill.fillAmount = Mathf.Clamp01(ratio);
     }
     public void Isdead()

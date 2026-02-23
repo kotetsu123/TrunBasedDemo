@@ -17,19 +17,11 @@ public class PlayerController : BaseController
 
     public override void TakeDamage(int damage)
     {
-        data.Hp -= damage;
-        playerHud.UpdateHp();
-        if (data.Hp < 0)
-        {
-            data.Hp = 0;
-        }
+      
+        base.TakeDamage(damage);   
         //TODO:此处更新playerUHD UI逻辑
 
-        if (data.Hp == 0)
-        {
-            data.isDead = true;
-            playerHud.Isdead();
-        }
+        
 
 
         //TODO:Hp 分离逻辑跟怪物的不一样

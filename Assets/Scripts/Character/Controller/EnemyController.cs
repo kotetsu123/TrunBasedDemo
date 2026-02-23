@@ -31,9 +31,7 @@ public class EnemyController : BaseController
     }
     public override void TakeDamage(int damage)
     {
-        Debug.Log($"[Enemy] 受伤前hp={data.Hp}");
-        data.Hp -= damage;
-        Debug.Log($"[Enemy] 受伤后hp={data.Hp}");
+        base.TakeDamage(damage);   
         if (data.Hp < 0)
         {
             data.Hp = 0;

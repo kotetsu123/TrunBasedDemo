@@ -236,7 +236,9 @@ public class BattleManager : MonoBehaviour
             var target = GetRandomEnemyTarget(actor);
             if (target != null)
             {
+                Debug.LogError($"[ATTACK] attacker={actor.data.Name} target={(target ? target.data.Name : "null")} targetType={target?.GetType().Name}");
                 target.TakeDamage(actor.data.Attack);
+                Debug.LogError("[ATTACK] after TakeDamage");
                 CheckBattleEnd(actor, target);
             }
             yield return new WaitForSeconds(1f);

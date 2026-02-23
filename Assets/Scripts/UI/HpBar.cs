@@ -44,7 +44,7 @@ public class HpBar : MonoBehaviour
         {
             return;
         }
-        float ratio = (float)owner.data.Hp / owner.data.maxHp;
+        float ratio = (float)owner.data.Hp / owner.data.MaxHp;
         //该函数是unity提供的安全函数，用来把数值限制在0~1之间，
         fill.fillAmount = Mathf.Clamp01(ratio);
     }
