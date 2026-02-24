@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UI;
 
 
@@ -9,7 +10,9 @@ public class PlayerHpHudItem : MonoBehaviour
 {
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text hpText;
-    [SerializeField] private Image hpfill;//Fill Image
+    [SerializeField] private Image hpFill;//Fill Image
+
+    private bool _printedOnce = false;
 
     private BaseController _ctrl;
 
@@ -49,14 +52,20 @@ public class PlayerHpHudItem : MonoBehaviour
         //文字 血条文字
         if(hpText!=null)hpText.text = $" {_ctrl.data.Hp}/{_ctrl.data.MaxHp}";
         //血条Image
-        if (hpfill != null)
+        if (hpFill != null)
         {
-            float t=(_ctrl.data.MaxHp<=0)?0f:(float)_ctrl.data.Hp/_ctrl.data.MaxHp;
+          
+            float t = (_ctrl.data.MaxHp <= 0) ? 0f: Mathf.Clamp01((float)_ctrl.data.Hp / _ctrl.data.MaxHp);
+
+            hpFill.fillAmount = t;
+
+            //Debug.Log($"[FILL SET] {hpFill.name} now={hpFill.fillAmount}");
         }
+        
     }
     private void HandleHpChanged(int prev,int cur)
     {
-       // Debug.LogError($"[HUD EVT] {_ctrl?.data?.Name} {prev}->{cur} hpNow={_ctrl?.data?.Hp}");
+        Debug.Log($"[HUD EVT] {_ctrl.data.Name} {prev}->{cur} hash={_ctrl.data.GetHashCode()}");
         Refresh();
     }
     private void OnDestroy()

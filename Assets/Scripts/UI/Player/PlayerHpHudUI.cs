@@ -7,7 +7,11 @@ public class PlayerHpHudUI : MonoBehaviour
     [SerializeField] private BattleFormation formation;
     [SerializeField] private PlayerHpHudItem[] slots;//4个
 
-    private void Update()
+    private void Start()
+    {
+        ReBuild();
+    }
+    /*private void Update()
     {
         if (formation == null) return;
 
@@ -26,5 +30,23 @@ public class PlayerHpHudUI : MonoBehaviour
                 slots[i].gameObject.SetActive(false);
             }
         }
+    }*/
+    public void ReBuild()
+    {
+        var players=formation.GetPlayersInSlotOrder();
+        for(int i = 0; i < slots.Length; i++)
+        {
+            if (i < players.Count)
+            {
+                slots[i].gameObject.SetActive(true);
+                slots[i].Bind(players[i]);//Bind内部订阅事件+refresh；
+            }
+            else
+            {
+                slots[i].Bind(null);
+                slots[i].gameObject.SetActive(false);
+            }
+        }
     }
+
 }
