@@ -4,6 +4,7 @@ using TMPro;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 
 public class PlayerHpHudItem : MonoBehaviour
@@ -11,8 +12,11 @@ public class PlayerHpHudItem : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text hpText;
     [SerializeField] private Image hpFill;//Fill Image
+    [SerializeField] private float hpTweenTime = 0.25f;
+    private Tween _hpTween;
 
-    private bool _printedOnce = false;
+    //debug ÓÃµÄ´úÂë
+   // private bool _printedOnce = false;
 
     private BaseController _ctrl;
 
@@ -57,8 +61,9 @@ public class PlayerHpHudItem : MonoBehaviour
           
             float t = (_ctrl.data.MaxHp <= 0) ? 0f: Mathf.Clamp01((float)_ctrl.data.Hp / _ctrl.data.MaxHp);
 
-            hpFill.fillAmount = t;
-
+            //hpFill.fillAmount = t;
+            _hpTween?.Kill();
+            _hpTween = hpFill.DOFillAmount(t, hpTweenTime).SetEase(Ease.OutCubic);
             //Debug.Log($"[FILL SET] {hpFill.name} now={hpFill.fillAmount}");
         }
         
