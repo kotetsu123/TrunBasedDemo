@@ -22,6 +22,22 @@ public class BattleFormation : MonoBehaviour
 
     private static readonly int[] EnemyPreferredOrder = { 2, 3, 1, 4, 0 };
 
+    private void Start()
+    {
+        DebugDumpEnemySlots();
+    }
+    public void DebugDumpEnemySlots()
+    {
+        for (int i = 0; i < enemySlots.Length; i++)
+        {
+            var s = enemySlots[i];
+            var occName = s.occupant ? s.occupant.name : "null";
+            Debug.Log($"[EnemySlots] arrIndex={i}, slot.index={s.index}, " +
+          $"anchor={s.anchor?.name}, " +
+          $"anchorX={(s.anchor ? s.anchor.position.x : 999)}, " +
+          $"occupant={occName}");
+        }
+    }
     public int FindFirstEmpty(Team team)
     {
         var arr = team == Team.Player ? playerSlots : enemySlots;
@@ -59,6 +75,7 @@ public class BattleFormation : MonoBehaviour
         var prev = slot.occupant;
         slot.occupant = ctrl;
         OnSlotChanged?.Invoke(team, slotIndex, prev, ctrl);
+        Debug.Log($"[TryOccupy] team={team} slotIndex={slotIndex} ctrl={ctrl.name}\n{UnityEngine.StackTraceUtility.ExtractStackTrace()}");
         ctrl.data.isOnField = true;
         return true;
     }

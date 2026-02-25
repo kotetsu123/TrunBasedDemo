@@ -452,6 +452,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2108903070}
     - target: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: data.Attack
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       propertyPath: data.isOnField
       value: 1
       objectReference: {fileID: 0}
@@ -982,6 +986,91 @@ MonoBehaviour:
     characterData:
       Team: 1
       Name: e0
+      MaxHp: 120
+      Hp: 120
+      Attack: 30
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e1
+      MaxHp: 120
+      Hp: 120
+      Attack: 40
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e2
+      MaxHp: 120
+      Hp: 120
+      Attack: 30
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e3
+      MaxHp: 120
+      Hp: 120
+      Attack: 30
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e4
+      MaxHp: 120
+      Hp: 120
+      Attack: 30
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e5
       MaxHp: 120
       Hp: 120
       Attack: 30
@@ -2145,29 +2234,29 @@ MonoBehaviour:
   - index: 0
     anchor: {fileID: 817936751}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 1
     anchor: {fileID: 2102953989}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 2
     anchor: {fileID: 880572124}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 3
     anchor: {fileID: 950449962}
     occupant: {fileID: 0}
   enemySlots:
   - index: 0
     anchor: {fileID: 1521200768}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 1
     anchor: {fileID: 1082068478}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 2
     anchor: {fileID: 2107539851}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 3
     anchor: {fileID: 333522409}
     occupant: {fileID: 0}
-  - index: 0
+  - index: 4
     anchor: {fileID: 434411276}
     occupant: {fileID: 0}
 --- !u!4 &1511970246

@@ -485,9 +485,16 @@ public class BattleManager : MonoBehaviour
    public void RegisterController(BaseController ctrl)
     {
         if (ctrl == null) return;
+
         if (controllers.Contains(ctrl)) return;//防止重复注册
         //if (ctrl == null || ctrl.data == null) return;
-        //if (!ctrl.data.isOnField) return;
+        //已上场=已占位 不要调整formation
+        if (!ctrl.data.isOnField)
+        {
+            TryPlaceIntoFormation(ctrl);//仅用于“场景手动摆放但未占位的”旧流程
+            if (!ctrl.data.isOnField) return;//不上场就不注册
+        }
+        
         Debug.Log($"[Register]{ctrl.data.Name} OnFiled={ctrl.data.isOnField} stack={Environment.StackTrace}");
 
         RegisterCharacter(ctrl);
@@ -521,6 +528,8 @@ public class BattleManager : MonoBehaviour
     {
         if (ctrl == null || ctrl.data == null || formation == null) return false;
 
+        if (ctrl.data.isOnField) return true;//已上场就不重复调整formation
+
         var team = ctrl.data.Team;//根据队伍找对应槽位
         int slotIndex = formation.FindFirstEmpty(team);
         if (slotIndex < 0) return false;
@@ -542,6 +551,7 @@ public class BattleManager : MonoBehaviour
             if (c == null || c.data == null) continue;
             if (c.data.isDead || c.isDead) continue;
 
+            //if (c.data.isOnField) continue;
             //直接尝试占槽（不成功就算了，先占了再说，后续可以加个提示或者自动分配）又或者是contains判断
             TryPlaceIntoFormation(c);
         }
