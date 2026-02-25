@@ -53,11 +53,13 @@ public class BattleFormation : MonoBehaviour
     {
         var arr=team==Team.Player? playerSlots : enemySlots;
         var slot = arr[slotIndex];
-        if (!slot.isEmpty) return false;
+        if (!slot.isEmpty)
+            return false;
 
         var prev = slot.occupant;
         slot.occupant = ctrl;
         OnSlotChanged?.Invoke(team, slotIndex, prev, ctrl);
+        ctrl.data.isOnField = true;
         return true;
     }
     public bool Release(BaseController ctrl,out (Team team,int slotIndex) released)

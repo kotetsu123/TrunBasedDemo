@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public class BattleManager : MonoBehaviour
@@ -50,7 +51,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private LayerMask enemyClickMask;//敌人点击层
     [SerializeField] private float clickMaxDistance = 200f;//点击检测最大距离
 
-    
+    [SerializeField] private BattleSpawner spawner;
 
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
@@ -108,14 +109,28 @@ public class BattleManager : MonoBehaviour
 
     public void RegisterCharacter(BaseController character)
     {
+
+        //没上场的不注册
+        if (character == null || character.data == null) return;
+        //重复调用guard 去重guard
+        if (controllers.Contains(character))
+        {          
+            return;
+        }
+        if (timeLineIcons.ContainsKey(character))
+        {
+            return;
+        }
+        if (!character.data.isOnField) return;
+        Debug.Log($"[RegisterCharacter] {character?.data?.Name} go={character?.name}");
         controllers.Add(character);
         Debug.Log($"[BattleManager] Register Charcter:{character.data.Name}");
 
 
-       /* if (!isBattleReady&&controllers.Count >= 2)
-        {
-            InitializeBattle();
-        }*/
+        /* if (!isBattleReady&&controllers.Count >= 2)
+         {
+             InitializeBattle();
+         }*/
         var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
         var icon = iconobj.GetComponent<TimeLineIcon>();
         icon.Bind(character);
@@ -166,15 +181,16 @@ public class BattleManager : MonoBehaviour
         //减少行动值，当行动值到达0或这者低于0时，触发行动
         foreach (var c in controllers)
         {
-            if (c.isDead) //死亡角色不行动
-                continue;
+            if (c == null || c.data == null) continue;
+            if (c.isDead) continue; //死亡角色不行动
+            if (!c.data.isOnField) continue;
             //速度越快，行动值减少越快
             c.data.ActionValue -= c.data.Speed / 0.75f;           
         }
 
         //找出行动值最小的角色(谁最接近0)
         var ordered = controllers
-            .Where(c => !c.isDead)
+            .Where(c => !c.isDead&&c.data!=null&&c!=null&&c.data.isOnField)
             .OrderBy(c => c.data.ActionValue)
             .ToList();
        // Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
@@ -420,7 +436,7 @@ public class BattleManager : MonoBehaviour
         controllers.Remove(dead);
         //从站位中释放
         formation.Release(dead, out _);
-
+        dead.data.isOnField = false;
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
@@ -439,6 +455,10 @@ public class BattleManager : MonoBehaviour
         yield return null;
 
         Destroy(dead.gameObject);
+
+        //释放formation slot
+        //formation.Release(dead.data.Team,deadSlotIndex);
+        spawner?.TryFillOneEnemy();
 
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
@@ -466,7 +486,9 @@ public class BattleManager : MonoBehaviour
     {
         if (ctrl == null) return;
         if (controllers.Contains(ctrl)) return;//防止重复注册
-
+        //if (ctrl == null || ctrl.data == null) return;
+        //if (!ctrl.data.isOnField) return;
+        Debug.Log($"[Register]{ctrl.data.Name} OnFiled={ctrl.data.isOnField} stack={Environment.StackTrace}");
 
         RegisterCharacter(ctrl);
     }
@@ -481,21 +503,21 @@ public class BattleManager : MonoBehaviour
         }
         return true;
     }
-  /*  public void UnregisterContoller(BaseController ctrl)
+    public void UnregisterContoller(BaseController ctrl)
     {
-        bool wasAcive = (ctrl == _currentActor);
-        controllers.Remove(ctrl);
+       if(ctrl == null) return;
 
-        if (wasAcive) {
-            //选一个新的active（通常是当前排序当中最靠前的）
-            //触发On Action Changed（prev,cur）
-           SetCurrentActor(null);
-        }
+       controllers.Remove(ctrl);
 
+        if (timeLineIcons.TryGetValue(ctrl, out var icon) && icon != null)
+            Destroy(icon.gameObject);
+
+        timeLineIcons.Remove(ctrl);
+        
         RequestReorder();
-    }*/
-  //最小占槽并且对齐
-  public bool TryPlaceIntoFormation(BaseController ctrl)
+    }
+    //最小占槽并且对齐
+    public bool TryPlaceIntoFormation(BaseController ctrl)
     {
         if (ctrl == null || ctrl.data == null || formation == null) return false;
 
@@ -504,6 +526,8 @@ public class BattleManager : MonoBehaviour
         if (slotIndex < 0) return false;
 
         if (!formation.TryOccupy(team, slotIndex, ctrl)) return false;
+
+        ctrl.data.isOnField = true;
 
         var anchor = formation.GetAnchor(team, slotIndex);
         ctrl.transform.position = anchor.position; //直接放到目标位置，后续可以加个动画

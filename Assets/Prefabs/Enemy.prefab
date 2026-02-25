@@ -122,12 +122,13 @@ MonoBehaviour:
   data:
     Team: 1
     Name: goblet
-    maxHp: 120
+    MaxHp: 0
     Hp: 120
     Attack: 50
     Speed: 90
     ActionValue: 0
     MaxActionValue: 200
+    isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 0

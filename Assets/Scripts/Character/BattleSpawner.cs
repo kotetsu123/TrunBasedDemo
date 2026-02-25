@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct SpawnRequest
+[System.Serializable]
+public class SpawnRequest
 {
     public Team team;
     public GameObject prefabs;
@@ -15,6 +16,9 @@ public class BattleSpawner : MonoBehaviour
 {
     [SerializeField] private BattleFormation formation;
     [SerializeField] private BattleManager battle;
+    [SerializeField] private List<SpawnRequest> initialEnemies = new();
+    [SerializeField] private bool spawnOnStart = true;
+    [SerializeField] private Canvas worldUICanvas;
 
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
 
@@ -23,7 +27,13 @@ public class BattleSpawner : MonoBehaviour
         //槽位释放后补位：死一个补一个
         formation.OnSlotChanged += HandleSlotChanged;
     }
-
+    private void Start()
+    {
+        if (spawnOnStart)
+        {
+            SpawnInitial();
+        }
+    }
     private void OnDestory()
     {
         formation.OnSlotChanged -= HandleSlotChanged;
@@ -47,7 +57,7 @@ public class BattleSpawner : MonoBehaviour
             //player 通常不会溢出；四人固定，溢出可以直接忽略或者报错
         }
     }
-    private void TryFillOneEnemy()
+    public void TryFillOneEnemy()
     {
         if (_enemyReserve.Count == 0) return;
 
@@ -63,6 +73,12 @@ public class BattleSpawner : MonoBehaviour
         var ctrl = go.GetComponent<BaseController>();
         ctrl.Init(req.characterData);
 
+        //先注入ui依赖（只对需要worldui的控制器做）
+        if(go.TryGetComponent<EnemyController>(out var enemyCtrl))
+        {
+            enemyCtrl.InjectWorldUICanvas(worldUICanvas);
+        }
+        //占位
         bool ok = formation.TryOccupy(req.team, slotIndex, ctrl);
         if (!ok)
         {
@@ -74,9 +90,21 @@ public class BattleSpawner : MonoBehaviour
         //站位
         var anchor = formation.GetAnchor(req.team, slotIndex);
         ctrl.transform.position = anchor.position;
-
+        //站位完成后进行初始化血条
+        if (enemyCtrl != null)
+        {
+            enemyCtrl.EnsureHpBarInitialized();
+        }
+ 
+        //注册进战斗/时间轴
         battle.RegisterController(ctrl);
     }
-
+    public void SpawnInitial()
+    {
+        foreach(var req in initialEnemies)
+        {
+            EnqueueOrSpawn(req);
+        }
+    }
    
 }

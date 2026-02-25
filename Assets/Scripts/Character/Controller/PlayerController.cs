@@ -49,6 +49,8 @@ public class PlayerController : BaseController
             BatteleManager.Instance.RigisterCharacter(data);
             Debug.Log($"[PlayerController]Awake over:{data != null}");
         }*/
+        //TODO:等spawner 逻辑完善后一定要注释掉这条。防止跟battlemanager /或者spawner 产生重复注册
+
         BattleManager.Instance.RegisterCharacter(this);
         
        // playerHud.gameObject.SetActive(true);

@@ -12,11 +12,22 @@ public class EnemyController : BaseController
 
     [SerializeField]
     private Canvas worldUICanvas;
-    private void Start()
+    private bool _uiInitialized;
+
+    //Spawner 后面instantiate 后调用这个
+   public void InjectWorldUICanvas(Canvas canvas)
     {
-        BattleManager.Instance.RegisterCharacter(this);
-       
+        worldUICanvas = canvas;
+    }
+    public void EnsureHpBarInitialized()
+    {
+        if (_uiInitialized) return;
+        if (worldUICanvas == null)
+        {
+            return;
+        }
         InitialzeHpBar();
+        _uiInitialized = true;
     }
     private void InitialzeHpBar()
     {

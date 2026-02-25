@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -176,12 +180,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: data.Name
-      value: txt
+      value: e3
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: worldUICanvas
       value: 
       objectReference: {fileID: 364944995}
+    - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -443,6 +451,10 @@ PrefabInstance:
       propertyPath: playerHud
       value: 
       objectReference: {fileID: 2108903070}
+    - target: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -744,6 +756,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -786,7 +802,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: data.Name
-      value: txt
+      value: e5
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: worldUICanvas
@@ -929,6 +945,72 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 882b0f0291414b0418e1292f2439af63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &629646180
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 629646182}
+  - component: {fileID: 629646181}
+  m_Layer: 0
+  m_Name: BattleSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &629646181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629646180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860b7a819752c4f4babe851ecf44fdab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  formation: {fileID: 1511970245}
+  battle: {fileID: 1454933262}
+  initialEnemies:
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e0
+      MaxHp: 120
+      Hp: 120
+      Attack: 30
+      Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  spawnOnStart: 1
+  worldUICanvas: {fileID: 364944995}
+--- !u!4 &629646182
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629646180}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &640182439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1010,6 +1092,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1058,6 +1144,10 @@ PrefabInstance:
       propertyPath: worldUICanvas
       value: 
       objectReference: {fileID: 364944995}
+    - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1887,6 +1977,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1935,6 +2029,10 @@ PrefabInstance:
       propertyPath: worldUICanvas
       value: 
       objectReference: {fileID: 364944995}
+    - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2002,6 +2100,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   clickMaxDistance: 200
+  spawner: {fileID: 629646181}
 --- !u!114 &1470365098 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7255931381024260564, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
@@ -2129,6 +2228,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2173,6 +2276,10 @@ PrefabInstance:
       propertyPath: worldUICanvas
       value: 
       objectReference: {fileID: 364944995}
+    - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2200,6 +2307,10 @@ PrefabInstance:
     - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_Name
       value: Enemy (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4495699354803280348, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2243,12 +2354,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: data.Name
-      value: txt
+      value: e4
       objectReference: {fileID: 0}
     - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
       propertyPath: worldUICanvas
       value: 
       objectReference: {fileID: 364944995}
+    - target: {fileID: 7958136867823104485, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2745,6 +2860,10 @@ PrefabInstance:
       propertyPath: playerHud
       value: 
       objectReference: {fileID: 612549214}
+    - target: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: data.isOnField
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2758,6 +2877,7 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 1016633237}
   - {fileID: 1511970246}
+  - {fileID: 629646182}
   - {fileID: 1454933260}
   - {fileID: 217643676}
   - {fileID: 364944996}

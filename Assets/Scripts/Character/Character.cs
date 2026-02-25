@@ -33,6 +33,7 @@ public class Character
     public float Speed;
     public float ActionValue;//行动值
     public float MaxActionValue=200f;//最大行动值//初始行动值
+    public bool isOnField;
     public bool isActing;
     public bool isDead;
     public bool isPlayer;
