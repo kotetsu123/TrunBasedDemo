@@ -400,6 +400,10 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
@@ -1075,6 +1079,75 @@ MonoBehaviour:
       Hp: 120
       Attack: 30
       Speed: 90
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  initialPlayers:
+  - team: 0
+    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+    characterData:
+      Team: 0
+      Name: player0
+      MaxHp: 200
+      Hp: 200
+      Attack: 120
+      Speed: 100
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 0
+    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+    characterData:
+      Team: 0
+      Name: player1
+      MaxHp: 200
+      Hp: 200
+      Attack: 120
+      Speed: 100
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 0
+    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+    characterData:
+      Team: 0
+      Name: player2
+      MaxHp: 200
+      Hp: 200
+      Attack: 120
+      Speed: 100
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 0
+    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+    characterData:
+      Team: 0
+      Name: player4
+      MaxHp: 200
+      Hp: 200
+      Attack: 120
+      Speed: 100
       ActionValue: 0
       MaxActionValue: 200
       isOnField: 0
@@ -2761,6 +2834,10 @@ PrefabInstance:
       propertyPath: hpFill
       value: 
       objectReference: {fileID: 1678953072}
+    - target: {fileID: 55217553626997639, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1661667164778343361, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
       propertyPath: m_FillAmount
       value: 1
@@ -2845,8 +2922,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3744409976193670767, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5604651163337925156, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7407618648517605350, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
       propertyPath: m_FillAmount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7880757456773906026, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9074583117423401948, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
@@ -2900,6 +2989,10 @@ PrefabInstance:
     - target: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       propertyPath: m_Name
       value: Player (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6492541482423702865, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       propertyPath: m_LocalPosition.x

@@ -11,6 +11,16 @@ public class PlayerHpHudUI : MonoBehaviour
     {
         ReBuild();
     }
+    private void OnEnable()
+    {
+        if (formation != null)
+            formation.OnSlotChanged += HandleSlotChange;
+    }
+    private void OnDisable()
+    {
+        if(formation!=null)
+            formation.OnSlotChanged -= HandleSlotChange;
+    }
     /*private void Update()
     {
         if (formation == null) return;
@@ -33,6 +43,8 @@ public class PlayerHpHudUI : MonoBehaviour
     }*/
     public void ReBuild()
     {
+        if (formation == null) return;
+
         var players=formation.GetPlayersInSlotOrder();
         for(int i = 0; i < slots.Length; i++)
         {
@@ -48,5 +60,9 @@ public class PlayerHpHudUI : MonoBehaviour
             }
         }
     }
-
+    private void HandleSlotChange(Team team,int slotIndex,BaseController prev,BaseController cur)
+    {
+        if (team != Team.Player) return;
+        ReBuild();
+    }
 }

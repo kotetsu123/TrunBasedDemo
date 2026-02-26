@@ -17,6 +17,7 @@ public class BattleSpawner : MonoBehaviour
     [SerializeField] private BattleFormation formation;
     [SerializeField] private BattleManager battle;
     [SerializeField] private List<SpawnRequest> initialEnemies = new();
+    [SerializeField] private List<SpawnRequest> initialPlayers = new();
     [SerializeField] private bool spawnOnStart = true;
     [SerializeField] private Canvas worldUICanvas;
 
@@ -49,12 +50,18 @@ public class BattleSpawner : MonoBehaviour
     {
         if (req.team != Team.Enemy && req.team != Team.Player) return;
 
-        var empty = formation.FindFirstEmpty(req.team);
-        if (empty >= 0) SpawnInToSlot(req, empty);
+        var slotIndex = formation.FindFirstEmpty(req.team);
+        if (slotIndex >= 0) SpawnInToSlot(req, slotIndex);
         else
         {
             if(req.team==Team.Enemy)_enemyReserve.Enqueue(req);
             //player 通常不会溢出；四人固定，溢出可以直接忽略或者报错
+            return;
+        }
+        bool ok = SpawnInToSlot(req, slotIndex);
+        if (!ok&&req.team==Team.Enemy)
+        {
+            _enemyReserve.Enqueue(req);
         }
     }
     public void TryFillOneEnemy()
@@ -67,7 +74,7 @@ public class BattleSpawner : MonoBehaviour
         var req=_enemyReserve.Dequeue();
         SpawnInToSlot(req, empty);
     }
-    private void SpawnInToSlot(SpawnRequest req, int slotIndex)
+    private bool SpawnInToSlot(SpawnRequest req, int slotIndex)
     {
         var go = Instantiate(req.prefabs);
         var ctrl = go.GetComponent<BaseController>();
@@ -83,9 +90,11 @@ public class BattleSpawner : MonoBehaviour
         if (!ok)
         {
             Destroy(go);
-            //槽位被抢了；极端情况，敌人回队列
+            //下面是敌人逻辑，为了改成通用逻辑进行注释，并且固定在EnqueueOrSpawn方法当中
+            /*//槽位被抢了；极端情况，敌人回队列 
             if (req.team == Team.Enemy) _enemyReserve.Enqueue(req);
-            return;
+            return;*/
+            return false;
         }
         //站位
         var anchor = formation.GetAnchor(req.team, slotIndex);
@@ -98,13 +107,28 @@ public class BattleSpawner : MonoBehaviour
  
         //注册进战斗/时间轴
         battle.RegisterController(ctrl);
+
+        return true;
     }
     public void SpawnInitial()
     {
+        //Player: 按顺序塞（0-3）
+        for(int i=0; i < initialPlayers.Count; i++)
+        {
+            if (i >= 4) break;
+            SpawnInToSlot(initialPlayers[i], i);
+        }
+        //Enemy:
         foreach(var req in initialEnemies)
         {
             EnqueueOrSpawn(req);
         }
     }
-   
+   public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
+    {
+        for(int i = 0; i < playerTeam.Count; i++)
+        {
+            SpawnInToSlot(playerTeam[i], i);
+        }
+    }
 }

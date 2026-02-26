@@ -121,16 +121,17 @@ MonoBehaviour:
   data:
     Team: 0
     Name: Player
-    maxHp: 200
+    MaxHp: 0
     Hp: 200
     Attack: 50
     Speed: 100
     ActionValue: 0
     MaxActionValue: 200
+    isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 1
     battleEnded: 0
     intent: 0
   portait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
-  playerHud: {fileID: 6363130268800702617, guid: 6e50c99f46f6e8e4789568e9f197b90c, type: 3}
+  playerHud: {fileID: 7255931381024260564, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}

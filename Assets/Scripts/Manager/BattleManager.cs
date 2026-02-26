@@ -575,7 +575,7 @@ public class BattleManager : MonoBehaviour
     private void SetCurrentTarget(BaseController target)
     {
         if (_currentTarget == target) return;
-
+        //TODO: 这里重新选当前的敌人会取消选中。然后如果进行攻击的话。伤害不会判定。要么进行防呆处理：必须选中敌人才能攻击要么进行别的处理
         if(_currentTarget!=null)_currentTarget.SetTargeted(false);
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
