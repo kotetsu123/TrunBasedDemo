@@ -50,8 +50,14 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     [SerializeField] private LayerMask enemyClickMask;//敌人点击层
     [SerializeField] private float clickMaxDistance = 200f;//点击检测最大距离
-
+    //生成相关
     [SerializeField] private BattleSpawner spawner;
+    //选中模块相关
+    [SerializeField] private TargetCircle targetCirclePrefab;
+    [SerializeField] private Canvas worldSpaceCanvs;
+
+    private TargetCircle _targetCircle;
+    
 
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
@@ -63,6 +69,12 @@ public class BattleManager : MonoBehaviour
         Instance = this;
         if(mainCamera==null)
             mainCamera = Camera.main;
+
+        if (targetCirclePrefab != null&&worldSpaceCanvs!=null)
+        {
+            _targetCircle=Instantiate(targetCirclePrefab,worldSpaceCanvs.transform);
+            _targetCircle.gameObject.SetActive(false);
+        }
     }
 
     private void Start()
@@ -580,6 +592,9 @@ public class BattleManager : MonoBehaviour
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
 
+        //圈圈跟着当前目标
+        if (_targetCircle != null)
+            _targetCircle.Attach(_currentTarget != null ? _currentTarget.transform : null);
         Debug.Log($"[Target]->{(_currentTarget ? _currentTarget.data.Name : "null")}");
     }
     private bool IsValidEnemyTarget(BaseController actor,BaseController target)

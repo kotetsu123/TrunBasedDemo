@@ -2263,6 +2263,8 @@ MonoBehaviour:
     m_Bits: 64
   clickMaxDistance: 200
   spawner: {fileID: 629646181}
+  targetCirclePrefab: {fileID: 7749736216192224019, guid: be1498ce682a6af449068e9d1022d5d5, type: 3}
+  worldSpaceCanvs: {fileID: 364944995}
 --- !u!114 &1470365098 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7255931381024260564, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
