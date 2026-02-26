@@ -18,10 +18,10 @@ public class TimeLineUI : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log($"[TimelineUI] Awake activeInHierarchy={gameObject.activeInHierarchy} enabled={enabled}");
+        //Debug.Log($"[TimelineUI] Awake activeInHierarchy={gameObject.activeInHierarchy} enabled={enabled}");
         if (battle == null) battle = BattleManager.Instance;
         BuildCache();
-        Debug.Log($"[TimelineUI] Awake battle={(battle ? battle.name : "null")} id={(battle ? battle.GetInstanceID() : -1)}");
+        //Debug.Log($"[TimelineUI] Awake battle={(battle ? battle.name : "null")} id={(battle ? battle.GetInstanceID() : -1)}");
         //Debug.Log($"[TimelineUI] instance{name} id={GetInstanceID()}");
     }
     private void OnEnable()

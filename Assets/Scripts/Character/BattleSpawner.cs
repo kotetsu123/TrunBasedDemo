@@ -21,15 +21,20 @@ public class BattleSpawner : MonoBehaviour
     [SerializeField] private bool spawnOnStart = true;
     [SerializeField] private Canvas worldUICanvas;
 
+    private bool _spawnInitialDone = false;
+
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
 
     private void Awake()
     {
+        Debug.Log($"[BattleSpawner] Awake instanceID={GetInstanceID()} active={gameObject.activeInHierarchy}");
         //槽位释放后补位：死一个补一个
         formation.OnSlotChanged += HandleSlotChanged;
     }
     private void Start()
     {
+       
+
         if (spawnOnStart)
         {
             SpawnInitial();
@@ -48,21 +53,29 @@ public class BattleSpawner : MonoBehaviour
     }
     private void EnqueueOrSpawn(SpawnRequest req)
     {
+        //Debug.Log($"[Reserve ENQ] spawnerId={GetInstanceID()} {req.characterData.Name} queue={_enemyReserve.Count + 1}");
         if (req.team != Team.Enemy && req.team != Team.Player) return;
 
         var slotIndex = formation.FindFirstEmpty(req.team);
-        if (slotIndex >= 0) SpawnInToSlot(req, slotIndex);
-        else
+        if (slotIndex < 0)//他小于0 其实是跟formation.FindFirstEmpty 的返回约定有关 因为在没有空位的情况下返回值是-1
         {
-            if(req.team==Team.Enemy)_enemyReserve.Enqueue(req);
-            //player 通常不会溢出；四人固定，溢出可以直接忽略或者报错
+            if (req.team == Team.Enemy)
+            {
+                Debug.Log($"[Reserve ENQ] {req.characterData.Name} (no slot) queue={_enemyReserve.Count + 1}");
+                _enemyReserve.Enqueue(req);
+            }
+            else
+            {
+                Debug.LogWarning($"[Player Spawn] No slot for {req.characterData.Name}");
+            }
             return;
         }
-        bool ok = SpawnInToSlot(req, slotIndex);
-        if (!ok&&req.team==Team.Enemy)
+         bool ok = SpawnInToSlot(req, slotIndex);
+        if (!ok && req.team == Team.Enemy)
         {
+            Debug.Log($"[Reserve ENQ] {req.characterData.Name} (spawn failed) queue={_enemyReserve.Count + 1}");
             _enemyReserve.Enqueue(req);
-        }
+        } 
     }
     public void TryFillOneEnemy()
     {
@@ -112,8 +125,14 @@ public class BattleSpawner : MonoBehaviour
     }
     public void SpawnInitial()
     {
+        if (_spawnInitialDone) return;
+        _spawnInitialDone = true;
+
+        _enemyReserve.Clear();
+
+        Debug.Log($"[SpawnInitial] called frame={Time.frameCount} queue={_enemyReserve.Count}");
         //Player: 按顺序塞（0-3）
-        for(int i=0; i < initialPlayers.Count; i++)
+        for (int i=0; i < initialPlayers.Count; i++)
         {
             if (i >= 4) break;
             SpawnInToSlot(initialPlayers[i], i);
