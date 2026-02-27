@@ -656,6 +656,12 @@ public class BattleManager : MonoBehaviour
         ctrl.data.Hp =(int) MathF.Max(1f, hpAmount);
         ctrl.enabled = true;
 
+        int prev = ctrl.data.Hp;
+        int cur=(int)Mathf.Max(1f, hpAmount);
+
+        //让hud收到变化
+        ctrl.data.NotifyHpChange(prev, cur);
+
         //重新加入时间轴
         RegisterController(ctrl);
 
