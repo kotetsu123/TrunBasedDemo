@@ -7,7 +7,7 @@ public class PlayerController : BaseController
 {
 
     //public HpBar hpbar;
-    public PlayerHpHud playerHud;
+    public PlayerHpHudItem playerHud;
    
 
     
@@ -34,8 +34,7 @@ public class PlayerController : BaseController
     }
     protected override void OnDeath()
     {
-        if(playerHud!=null)
-            playerHud.Isdead();
+        
         base.OnDeath();
     }
 
@@ -55,7 +54,7 @@ public class PlayerController : BaseController
         
        // playerHud.gameObject.SetActive(true);
        // playerHud.Bind(this);
-        playerHud.UpdateHp();
+       // playerHud.UpdateHp();
 
 
       

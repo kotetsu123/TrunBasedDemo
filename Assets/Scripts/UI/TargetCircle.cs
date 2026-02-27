@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class TargetCircle : MonoBehaviour
 {
     private Transform _target;
     private Renderer _cachedRenderer;
     private Camera _cam;
-
+    private Tween _breathTween;
+    
 
     public void Attach(Transform target)
     {
@@ -17,10 +19,13 @@ public class TargetCircle : MonoBehaviour
             _cachedRenderer = _target.GetComponentInChildren<Renderer>();
             _cam = Camera.main;
             gameObject.SetActive(true);
+
+            StartBreath();
         }
         else
         {
             gameObject.SetActive(false);
+            StopBreath();
         }
     }
     private void LateUpdate()
@@ -39,5 +44,22 @@ public class TargetCircle : MonoBehaviour
             transform.forward=_cam.transform.forward;
 
     }
+    private void StartBreath()
+    {
+        transform.localScale= Vector3.one;
+
+        _breathTween?.Kill();
+
+        _breathTween = transform
+            .DOScale(1.1f, 0.8f)
+            .SetEase(Ease.InOutSine)//控制动画“速度曲线”
+            .SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void StopBreath()
+    {
+        _breathTween?.Kill();
+    }
+
 
 }

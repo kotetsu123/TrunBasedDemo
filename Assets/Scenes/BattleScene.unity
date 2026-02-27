@@ -1009,7 +1009,7 @@ MonoBehaviour:
       Name: e1
       MaxHp: 120
       Hp: 120
-      Attack: 40
+      Attack: 300
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1110,40 +1110,6 @@ MonoBehaviour:
     characterData:
       Team: 0
       Name: player1
-      MaxHp: 200
-      Hp: 200
-      Attack: 120
-      Speed: 100
-      ActionValue: 0
-      MaxActionValue: 200
-      isOnField: 0
-      isActing: 0
-      isDead: 0
-      isPlayer: 0
-      battleEnded: 0
-      intent: 0
-  - team: 0
-    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
-    characterData:
-      Team: 0
-      Name: player2
-      MaxHp: 200
-      Hp: 200
-      Attack: 120
-      Speed: 100
-      ActionValue: 0
-      MaxActionValue: 200
-      isOnField: 0
-      isActing: 0
-      isDead: 0
-      isPlayer: 0
-      battleEnded: 0
-      intent: 0
-  - team: 0
-    prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
-    characterData:
-      Team: 0
-      Name: player4
       MaxHp: 200
       Hp: 200
       Attack: 120

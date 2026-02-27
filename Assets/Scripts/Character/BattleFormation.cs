@@ -123,7 +123,7 @@ public class BattleFormation : MonoBehaviour
 
         return result;
     }
-    public List<BaseController> GetPlayersInSlotOrder()
+   /* public List<BaseController> GetPlayersInSlotOrder()
     {
         var result=new List<BaseController>(4);
 
@@ -135,6 +135,10 @@ public class BattleFormation : MonoBehaviour
                 result.Add(occ);
         }
         return result;
+    }*/
+    public BaseController GetPlaeyrAsSlot(int i)
+    {
+        if (i < 0 || i >= playerSlots.Length) return null;
+        return playerSlots[i].occupant;
     }
-
 }

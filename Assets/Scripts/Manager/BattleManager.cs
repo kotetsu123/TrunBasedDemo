@@ -176,8 +176,7 @@ public class BattleManager : MonoBehaviour
         //开局就刷新一次 UI 排列
         RequestReorder();
 
-        Debug.Log("[BattleManager] Battle Ready!");
-       
+        Debug.Log("[BattleManager] Battle Ready!");      
     }
 
     //每次算出ordered，都统一走一个函数
@@ -277,7 +276,6 @@ public class BattleManager : MonoBehaviour
         isActing = false;
         
         Debug.Log($"{actor.data.Name}结束行动！");
-
     }
     IEnumerator WaitForPlayerAction(BaseController actor)
     {
@@ -308,9 +306,7 @@ public class BattleManager : MonoBehaviour
                 }
                 actionChosen = true;
             }
-            
-
-                yield return null;
+            yield return null;
         }
     }
     void CheckBattleEnd(BaseController attacker, BaseController target)
@@ -431,47 +427,56 @@ public class BattleManager : MonoBehaviour
     }
     private IEnumerator HandleDeathCoroutine(BaseController dead)
     {
-        if(_currentTarget==dead)SetCurrentTarget(null);
-
         if (dead == null) yield break;
+
+        if (_currentTarget == dead)
+            SetCurrentTarget(null);
 
         //先标记为死亡&禁用，避免参与其他逻辑
         dead.data.isDead = true;
+        dead.data.Hp = 0;
         dead.enabled = false;
+
         //如果当前行动者是死亡角色，清除当前行动者
         if (CurrentActor == dead)
-        {
             SetCurrentActor(null);
-        }
-
-        //从所有逻辑入口中移除（最关键）
+  
+        //从所有逻辑入口中移除（最关键）//时间轴
         controllers.Remove(dead);
-        //从站位中释放
-        formation.Release(dead, out _);
-        dead.data.isOnField = false;
+
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
-        {
             Destroy(icon.gameObject);
-        }
-        timeLineIcons.Remove(dead);
 
+        timeLineIcons.Remove(dead);
         //刷新时间轴(避免ui 还显示旧顺序)
         RequestReorder();
 
-        //表现层，隐藏并摧毁角色本体
-        dead.gameObject.SetActive(false);
+        //表现层，隐藏并摧毁角色本体//敌人的情况下
+        if (dead.data.Team == Team.Enemy)
+        {
+            //从站位中释放//只有enmey才会
+            formation.Release(dead, out _);
+            dead.data.isOnField = false;
 
-        //等待一帧真正销毁（防协程美剧中途爆炸）
-        yield return null;
+            dead.gameObject.SetActive(false);
+            //等待一帧真正销毁（防协程美剧中途爆炸）
+            yield return null;
+            Destroy(dead.gameObject);
+            //释放formation slot
+            //formation.Release(dead.data.Team,deadSlotIndex);
+            spawner?.TryFillOneEnemy();
+            yield break;
+        }
+        else
+        {
+            //Player 不销毁
+            //TODO:进入倒地状态，（濒死）状态机
+            Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
+            yield break;
 
-        Destroy(dead.gameObject);
-
-        //释放formation slot
-        //formation.Release(dead.data.Team,deadSlotIndex);
-        spawner?.TryFillOneEnemy();
-
+        }
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
     private void SetCurrentActor(BaseController next)
@@ -642,7 +647,23 @@ public class BattleManager : MonoBehaviour
         int index = UnityEngine.Random.Range(0, candidates.Count);
         return candidates[index];
     }
-        
+    public bool Revive(BaseController ctrl, float hpAmount)
+    {
+        if (ctrl == null || !ctrl.data.isDead)
+            return false;
+
+        ctrl.data.isDead = false;
+        ctrl.data.Hp =(int) MathF.Max(1f, hpAmount);
+        ctrl.enabled = true;
+
+        //重新加入时间轴
+        RegisterController(ctrl);
+
+        RequestReorder();
+        return true;
+
+    }
+
 
 }
 

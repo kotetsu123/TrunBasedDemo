@@ -13,6 +13,8 @@ public class PlayerHpHudItem : MonoBehaviour
     [SerializeField] private TMP_Text hpText;
     [SerializeField] private Image hpFill;//Fill Image
     [SerializeField] private float hpTweenTime = 0.25f;
+    [SerializeField] private Image Portrait;
+    [SerializeField] private Image BG;
     private Tween _hpTween;
 
     //debug 用的代码
@@ -24,7 +26,11 @@ public class PlayerHpHudItem : MonoBehaviour
 
     public void Bind(BaseController ctrl)
     {
-        if (_ctrl == ctrl) { Refresh();return; }//绑定没变就别重复订阅
+        if (_ctrl == ctrl) {
+            if (_ctrl == null)
+            { gameObject.SetActive(false); ; return; }      
+            Refresh();
+            return; }//绑定没变就别重复订阅
         // 解绑之前的事件
         if (_ctrl != null && _ctrl.data != null)
         {
@@ -51,10 +57,20 @@ public class PlayerHpHudItem : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+        bool downed = _ctrl.data.isDead || _ctrl.isDead || _ctrl.data.Hp <= 0;
+        
         gameObject.SetActive(true);
+        float alpha=downed?0.5f:1f;
         //if(nameText!=null)nameText.text = _ctrl.data.Name;
         //文字 血条文字
         if(hpText!=null)hpText.text = $" {_ctrl.data.Hp}/{_ctrl.data.MaxHp}";
+        //灰掉
+        if (Portrait != null)
+        {
+            var c = Portrait.color;
+            c.a = alpha;
+            Portrait.color = c;
+        }
         //血条Image
         if (hpFill != null)
         {
@@ -70,7 +86,7 @@ public class PlayerHpHudItem : MonoBehaviour
     }
     private void HandleHpChanged(int prev,int cur)
     {
-        Debug.Log($"[HUD EVT] {_ctrl.data.Name} {prev}->{cur} hash={_ctrl.data.GetHashCode()}");
+        //Debug.Log($"[HUD EVT] {_ctrl.data.Name} {prev}->{cur} hash={_ctrl.data.GetHashCode()}");
         Refresh();
     }
     private void OnDestroy()

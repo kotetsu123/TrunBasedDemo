@@ -21,37 +21,19 @@ public class PlayerHpHudUI : MonoBehaviour
         if(formation!=null)
             formation.OnSlotChanged -= HandleSlotChange;
     }
-    /*private void Update()
-    {
-        if (formation == null) return;
-
-        var players = formation.GetPlayersInSlotOrder();
-
-        for(int i = 0; i < slots.Length; i++)
-        {
-            if (i < players.Count)
-            {
-                slots[i].gameObject.SetActive(true);
-                slots[i].Bind(players[i]);
-                slots[i].Refresh();
-            }
-            else
-            {
-                slots[i].gameObject.SetActive(false);
-            }
-        }
-    }*/
+   
     public void ReBuild()
     {
         if (formation == null) return;
 
-        var players=formation.GetPlayersInSlotOrder();
-        for(int i = 0; i < slots.Length; i++)
+        for(int i=0;i<slots.Length; i++)
         {
-            if (i < players.Count)
+            var ctrl = formation.GetPlaeyrAsSlot(i);
+
+            if (ctrl != null && ctrl.data != null)
             {
                 slots[i].gameObject.SetActive(true);
-                slots[i].Bind(players[i]);//Bind内部订阅事件+refresh；
+                slots[i].Bind(ctrl);//bind内部订阅OnHpChanged+Refresh
             }
             else
             {
@@ -59,6 +41,7 @@ public class PlayerHpHudUI : MonoBehaviour
                 slots[i].gameObject.SetActive(false);
             }
         }
+        
     }
     private void HandleSlotChange(Team team,int slotIndex,BaseController prev,BaseController cur)
     {
