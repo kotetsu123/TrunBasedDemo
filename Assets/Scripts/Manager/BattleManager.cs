@@ -16,6 +16,7 @@ public class BattleManager : MonoBehaviour
     public event Action<List<BaseController>> OnTimeLineOrdered;
     //目标锁定TargetCircle 用event
     public event Action<BaseController> OnTargetChanged;
+    public event Action<bool> OnInputStateChanged;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
@@ -494,7 +495,11 @@ public class BattleManager : MonoBehaviour
         Debug.Log($"[Battle] OnActionChanged subs={(OnActionChanged == null ? 0 : OnActionChanged.GetInvocationList().Length)} prev={prev?.data?.Name} cur={_currentActor?.data?.Name}");
         OnActionChanged?.Invoke(prev, _currentActor);
 
-        UpdataTargetIndicatorVisibility();
+        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
+        OnInputStateChanged?.Invoke(playerTurn);
+
+
+       // UpdataTargetIndicatorVisibility();
     }
   private void RequestReorder()
     {
@@ -600,12 +605,11 @@ public class BattleManager : MonoBehaviour
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
 
         OnTargetChanged?.Invoke(_currentTarget);
-        //圈圈跟着当前目标
-        if (_targetCircle != null)
-            _targetCircle.Attach(_currentTarget != null ? _currentTarget.transform : null);
-        Debug.Log($"[Target]->{(_currentTarget ? _currentTarget.data.Name : "null")}");
-        //判断圈圈是否在player回合
-        UpdataTargetIndicatorVisibility();
+      
+        //判断圈圈是否在player回合 并且发送广播
+        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
+        OnInputStateChanged?.Invoke(playerTurn);
+      
     }
     private bool IsValidEnemyTarget(BaseController actor,BaseController target)
     {
@@ -674,13 +678,7 @@ public class BattleManager : MonoBehaviour
         return true;
 
     }
-    private void UpdataTargetIndicatorVisibility()
-    {
-        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
-
-        if (_targetCircle != null)
-            _targetCircle.gameObject.SetActive(playerTurn && _currentTarget != null);
-    }
+   
 
 }
 
