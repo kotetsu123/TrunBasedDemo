@@ -15,10 +15,19 @@ public class PlayerHpHudItem : MonoBehaviour
     [SerializeField] private float hpTweenTime = 0.25f;
     [SerializeField] private Image Portrait;
     [SerializeField] private Image BG;
+    [SerializeField] private Color _hpFillDefaultColor;
     private Tween _hpTween;
 
     //debug 用的代码
-   // private bool _printedOnce = false;
+    // private bool _printedOnce = false;
+
+    private void Awake()
+    {
+        if (hpFill != null)
+        {
+            _hpFillDefaultColor= hpFill.color;
+        }
+    }
 
     private BaseController _ctrl;
 
@@ -57,8 +66,11 @@ public class PlayerHpHudItem : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+        float ratio = (_ctrl.data.MaxHp <= 0) ? 0f:(float)_ctrl.data.Hp/_ctrl.data.MaxHp;
+
         bool downed = _ctrl.data.isDead || _ctrl.isDead || _ctrl.data.Hp <= 0;
-        
+        bool lowHP = ratio > 0f && ratio <= 0.3f;
+
         gameObject.SetActive(true);
         float alpha=downed?0.5f:1f;
         //if(nameText!=null)nameText.text = _ctrl.data.Name;
@@ -73,14 +85,27 @@ public class PlayerHpHudItem : MonoBehaviour
         }
         //血条Image
         if (hpFill != null)
-        {
-          
+        {         
             float t = (_ctrl.data.MaxHp <= 0) ? 0f: Mathf.Clamp01((float)_ctrl.data.Hp / _ctrl.data.MaxHp);
 
             //hpFill.fillAmount = t;
             _hpTween?.Kill();
             _hpTween = hpFill.DOFillAmount(t, hpTweenTime).SetEase(Ease.OutCubic);
             //Debug.Log($"[FILL SET] {hpFill.name} now={hpFill.fillAmount}");
+            if (downed)
+            {
+                var c=hpFill.color;
+                c.a = 0.5f;
+                hpFill.color = c;
+            }
+            else if (lowHP)
+            {
+                hpFill.color = new Color(1f, 0.3f, 0.3f, 1f);//柔和的红色
+            }
+            else
+            {
+                hpFill.color = _hpFillDefaultColor;
+            }
         }
         
     }

@@ -14,6 +14,8 @@ public class BattleManager : MonoBehaviour
     //c#event 广播，当行动者改变时触发
     public event Action<BaseController, BaseController> OnActionChanged;
     public event Action<List<BaseController>> OnTimeLineOrdered;
+    //目标锁定TargetCircle 用event
+    public event Action<BaseController> OnTargetChanged;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
@@ -314,8 +316,8 @@ public class BattleManager : MonoBehaviour
         if (target.data.Hp > 0) return;
         //不要立刻battle Ended=true
         //判断是否还有任何存在的单位
-        bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team!=attacker.data.Team);
-        bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==attacker.data.Team);
+        bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Enemy);
+        bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Player);
 
         if (!enemyAlive||!allyAlive)
         {
@@ -487,12 +489,12 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log($"[Battle] Invoke OnActionChanged: {(prev ? prev.name : "null")} -> {(next ? next.name : "null")}");
         
-
         /*var del = OnActionChanged;
         Debug.Log($"[Battle] OnActionChanged subs={(del == null ? 0 : del.GetInvocationList().Length) }");*/
         Debug.Log($"[Battle] OnActionChanged subs={(OnActionChanged == null ? 0 : OnActionChanged.GetInvocationList().Length)} prev={prev?.data?.Name} cur={_currentActor?.data?.Name}");
         OnActionChanged?.Invoke(prev, _currentActor);
-        
+
+        UpdataTargetIndicatorVisibility();
     }
   private void RequestReorder()
     {
@@ -597,10 +599,13 @@ public class BattleManager : MonoBehaviour
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
 
+        OnTargetChanged?.Invoke(_currentTarget);
         //圈圈跟着当前目标
         if (_targetCircle != null)
             _targetCircle.Attach(_currentTarget != null ? _currentTarget.transform : null);
         Debug.Log($"[Target]->{(_currentTarget ? _currentTarget.data.Name : "null")}");
+        //判断圈圈是否在player回合
+        UpdataTargetIndicatorVisibility();
     }
     private bool IsValidEnemyTarget(BaseController actor,BaseController target)
     {
@@ -669,7 +674,13 @@ public class BattleManager : MonoBehaviour
         return true;
 
     }
+    private void UpdataTargetIndicatorVisibility()
+    {
+        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
 
+        if (_targetCircle != null)
+            _targetCircle.gameObject.SetActive(playerTurn && _currentTarget != null);
+    }
 
 }
 

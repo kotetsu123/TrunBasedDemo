@@ -1166,7 +1166,7 @@ MonoBehaviour:
       Name: e0
       MaxHp: 120
       Hp: 120
-      Attack: 30
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1183,7 +1183,7 @@ MonoBehaviour:
       Name: e1
       MaxHp: 120
       Hp: 120
-      Attack: 300
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1200,7 +1200,7 @@ MonoBehaviour:
       Name: e2
       MaxHp: 120
       Hp: 120
-      Attack: 30
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1217,7 +1217,7 @@ MonoBehaviour:
       Name: e3
       MaxHp: 120
       Hp: 120
-      Attack: 30
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1234,7 +1234,7 @@ MonoBehaviour:
       Name: e4
       MaxHp: 120
       Hp: 120
-      Attack: 30
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1251,7 +1251,7 @@ MonoBehaviour:
       Name: e5
       MaxHp: 120
       Hp: 120
-      Attack: 30
+      Attack: 40
       Speed: 90
       ActionValue: 0
       MaxActionValue: 200
@@ -1269,7 +1269,7 @@ MonoBehaviour:
       Name: player0
       MaxHp: 200
       Hp: 200
-      Attack: 120
+      Attack: 50
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
@@ -1286,7 +1286,7 @@ MonoBehaviour:
       Name: player1
       MaxHp: 200
       Hp: 200
-      Attack: 120
+      Attack: 50
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
