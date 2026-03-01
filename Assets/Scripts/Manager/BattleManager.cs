@@ -8,8 +8,11 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
+public enum BattleResult { Win, Lose }
 public class BattleManager : MonoBehaviour
 {
+   
+
     public static BattleManager Instance{ get; private set; }
     //c#event 广播，当行动者改变时触发
     public event Action<BaseController, BaseController> OnActionChanged;
@@ -17,10 +20,12 @@ public class BattleManager : MonoBehaviour
     //目标锁定TargetCircle 用event
     public event Action<BaseController> OnTargetChanged;
     public event Action<bool> OnInputStateChanged;
+    //向外广播战斗是否结束
+    public event Action<BattleResult> OnBattleEnded;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
-
+    
     public bool isActing = false;
     public bool battleEnded = false;
     public bool isBattle = true;
@@ -323,8 +328,13 @@ public class BattleManager : MonoBehaviour
         if (!enemyAlive||!allyAlive)
         {
             battleEnded = true;
+            var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
             Debug.Log($"Battle Finish!");
             Debug.Log(!enemyAlive ? "You Win!" : "You Lose!");
+            //广播战斗结束
+            OnBattleEnded?.Invoke(result);
+            //强制关闭输入
+            OnInputStateChanged?.Invoke(false);
         }
     }
     void UpdateTimeLineUI(List<BaseController> ordered)

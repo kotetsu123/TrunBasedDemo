@@ -24,12 +24,14 @@ public class TragetCircleController : MonoBehaviour
 
     private void HandleInputStateChanged(bool playerTurn)
     {
+        Debug.Log($"[Circle] InputStateChanged playerTurn={playerTurn} actorTeam={battle?.CurrentActor?.data?.Team}");
         _playerTurn = playerTurn;
         Apply();
         
     }
     private void HandleTargetChanged(BaseController target)
     {
+        Debug.Log($"[Circle] TargetChanged target={(target ? target.data?.Name : "null")} playerTurn={_playerTurn}");
         _target = target;
         EnsureInstance();
         Apply();
