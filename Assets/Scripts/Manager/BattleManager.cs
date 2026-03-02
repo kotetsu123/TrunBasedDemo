@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
-public enum BattleResult { Win, Lose }
+
 public class BattleManager : MonoBehaviour
 {
    
@@ -21,7 +21,7 @@ public class BattleManager : MonoBehaviour
     public event Action<BaseController> OnTargetChanged;
     public event Action<bool> OnInputStateChanged;
     //向外广播战斗是否结束
-    public event Action<BattleResult> OnBattleEnded;
+    public event Action<BattleResultPayload> OnBattleEnded;
 
    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
@@ -319,6 +319,8 @@ public class BattleManager : MonoBehaviour
     }
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
+        if (battleEnded) return;
+        if (target == null || target.data == null) return;
         if (target.data.Hp > 0) return;
         //不要立刻battle Ended=true
         //判断是否还有任何存在的单位
@@ -328,14 +330,36 @@ public class BattleManager : MonoBehaviour
         if (!enemyAlive||!allyAlive)
         {
             battleEnded = true;
-            var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
-            Debug.Log($"Battle Finish!");
-            Debug.Log(!enemyAlive ? "You Win!" : "You Lose!");
-            //广播战斗结束
-            OnBattleEnded?.Invoke(result);
             //强制关闭输入
             OnInputStateChanged?.Invoke(false);
+            var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
+            //结算快照
+            var snapshots = BuildPartySnapShots();
+            var payload = new BattleResultPayload(result, snapshots);          
+            //广播战斗结束
+            OnBattleEnded?.Invoke(payload);         
         }
+    }
+    private List<CharacterResultSnapshot> BuildPartySnapShots()
+    {
+        var list= new List<CharacterResultSnapshot>();
+
+        foreach (var c in controllers)
+        {
+            if (c == null || c.data == null) continue;
+            if (c.data.Team != Team.Player) continue;
+
+            list.Add(new CharacterResultSnapshot
+            {
+
+                characterName = c.data.Name,
+                hp = c.data.Hp,
+                maxhp = c.data.MaxHp,
+                //TODO:添加mp之类的
+
+            });
+        }
+        return list;
     }
     void UpdateTimeLineUI(List<BaseController> ordered)
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using System;
 
 public class BattleEndPanelController : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class BattleEndPanelController : MonoBehaviour
     [SerializeField] private float panelFadeTime = 0.25f;
     [SerializeField] private float textFadeTime = 0.6f;
     [SerializeField] private float textDelay = 0.2f;
+
+    public event Action OnClosed;
 
     private Tween _panelTween;
     private Tween _txtTween;
@@ -48,12 +51,12 @@ public class BattleEndPanelController : MonoBehaviour
             resultTxt.color = c;
         }
     }
-    private void HandleBattleEnded(BattleResult result)
+    private void HandleBattleEnded(BattleResultPayload payload)
     {
         //…Ë÷√Œƒ±æ
         if (resultTxt != null)
         {
-            resultTxt.text = (result == BattleResult.Win) ? "You Win!" : "You Lose!";
+            resultTxt.text = (payload.Result == BattleResult.Win) ? "You Win!" : "You Lose!";
             var c=resultTxt.color;
             c.a = 0f;
             resultTxt.color = c;
@@ -78,6 +81,14 @@ public class BattleEndPanelController : MonoBehaviour
         }
     }
    
+    public void Close()
+    {
+        panelGourp.alpha = 0f;
+        panelGourp.blocksRaycasts= false;
+        panelGourp.interactable= false;
+
+        OnClosed?.Invoke();
+    }
 
 }
 
