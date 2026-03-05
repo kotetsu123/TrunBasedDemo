@@ -335,7 +335,10 @@ public class BattleManager : MonoBehaviour
             var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
             //结算快照
             var snapshots = BuildPartySnapShots();
-            var payload = new BattleResultPayload(result, snapshots);          
+            var payload = new BattleResultPayload(result, snapshots);
+            Debug.Log($"[BattleManager] snapshots count={snapshots?.Count ?? -1}");
+            if (snapshots != null && snapshots.Count > 0)
+                Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
             //广播战斗结束
             OnBattleEnded?.Invoke(payload);         
         }
@@ -344,17 +347,28 @@ public class BattleManager : MonoBehaviour
     {
         var list= new List<CharacterResultSnapshot>();
 
+        /*Debug.Log($"[Snapshots] controllers count={controllers.Count}");
+        foreach (var c in controllers)
+        {
+            if (c == null) { Debug.Log("[Snapshots] null controller"); continue; }
+            if (c.data == null) { Debug.Log($"[Snapshots] {c.name} data=NULL"); continue; }
+            Debug.Log($"[Snapshots] {c.name} team={c.data.Team} name={c.data.Name}");
+        }*/
         foreach (var c in controllers)
         {
             if (c == null || c.data == null) continue;
-            if (c.data.Team != Team.Player) continue;
+            if (c.data.Team!=Team.Player) continue;
 
             list.Add(new CharacterResultSnapshot
             {
-
-                characterName = c.data.Name,
+                portrait=c.portait,
+                Name = c.data.Name,
                 hp = c.data.Hp,
                 maxhp = c.data.MaxHp,
+                mp= c.data.Mp,
+                maxmp= c.data.MaxMp,
+                level= c.data.Level,
+                
                 //TODO:添加mp之类的
 
             });

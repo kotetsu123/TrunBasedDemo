@@ -6,16 +6,6 @@ using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 
-public enum ActionIntent
-{
-    Normal,
-    SkillDanerous
-}
-public enum Team
-{
-    Player,
-    Enemy
-}
 [Serializable]
 public class Character
 

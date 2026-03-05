@@ -26,7 +26,13 @@ public class ResultCharacterPanelController : MonoBehaviour
     }
     public void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots)
     {
-        for(int i = 0; i < items.Length; i++)
+        Debug.Log($"[SettlePanel] Show snapshots={(partySnapShots == null ? "NULL" : partySnapShots.Count.ToString())}");
+        if (partySnapShots != null)
+        {
+            for (int i = 0; i < partySnapShots.Count; i++)
+                Debug.Log($"[SettlePanel] snap[{i}] name={partySnapShots[i]?.Name} hp={partySnapShots[i]?.hp}/{partySnapShots[i]?.maxhp}");
+        }
+        for (int i = 0; i < items.Length; i++)
         {
             if (i < partySnapShots.Count)
             {

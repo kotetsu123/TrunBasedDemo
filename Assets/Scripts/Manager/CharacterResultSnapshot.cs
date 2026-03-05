@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class CharacterResultSnapshot 
 {
-    public string characterName;
+    public string Name;
     public Sprite portrait;
 
     public int hp;

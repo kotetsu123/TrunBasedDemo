@@ -24,7 +24,7 @@ public class CharacterResultItemView : MonoBehaviour
     public void Bind(CharacterResultSnapshot s)
     {
         if (portrait) portrait.sprite = s.portrait;
-        name = s.characterName;
+        name = s.Name;
 
         hpFill.fillAmount = (float)s.hp / s.maxhp;
         //hpFill.DOFillAmount((float)s.hp/s.maxhp,0.3f);      

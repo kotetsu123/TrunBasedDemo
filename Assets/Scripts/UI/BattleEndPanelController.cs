@@ -71,9 +71,10 @@ public class BattleEndPanelController : MonoBehaviour
     }
     private void HandleBattleEnded(BattleResultPayload payload)
     {
-        Debug.Log("[BattleEndPanel] HandleBattleEnded fired");
+        //Debug.Log("[BattleEndPanel] HandleBattleEnded fired");
         _lastPayload =payload;
         _state = PanelState.Animating;
+        Debug.Log($"[EndPanel] payload result={payload.Result} snapshots={(payload.PartySnapshots == null ? "NULL" : payload.PartySnapshots.Count.ToString())}");
         //…Ë÷√Œƒ±æ
         if (resultTxt != null)
         {
