@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   portrait: {fileID: 4463051033916200709}
-  Name: {fileID: 8824760662727130581}
+  nameTxt: {fileID: 8824760662727130581}
   hpFill: {fileID: 8391132751867912029}
   hpTxt: {fileID: 7465697389043583211}
   mpFill: {fileID: 5042569895276701841}
@@ -1227,7 +1227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.25157225, g: 0.20489688, b: 0.20489688, a: 1}
+  m_Color: {r: 0.99371064, g: 0.96558666, b: 0.96558666, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

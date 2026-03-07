@@ -7,7 +7,7 @@ public abstract class BaseController : MonoBehaviour
     public  Character data;
 
     [Header("Visual")]
-    public Sprite portait;//½ÇÉ«Ð¤Ïñ
+    public Sprite portrait;//½ÇÉ«Ð¤Ïñ
 
    private float _nextDmgLogTime = 0f;
 

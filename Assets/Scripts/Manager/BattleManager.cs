@@ -361,7 +361,7 @@ public class BattleManager : MonoBehaviour
 
             list.Add(new CharacterResultSnapshot
             {
-                portrait=c.portait,
+                portrait=c.portrait,//只有这个是走basecontroller 拿数据。下面的都是从character拿的数据
                 Name = c.data.Name,
                 hp = c.data.Hp,
                 maxhp = c.data.MaxHp,

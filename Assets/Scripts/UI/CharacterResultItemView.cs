@@ -23,8 +23,8 @@ public class CharacterResultItemView : MonoBehaviour
 
     public void Bind(CharacterResultSnapshot s)
     {
-        nameTxt.text = "TEST_NAME";
-        Debug.Log($"[BIND UI] NameTxt={nameTxt.name},TXT={nameTxt.text}");
+        /*nameTxt.text = "TEST_NAME";
+        Debug.Log($"[BIND UI] NameTxt={nameTxt.name},TXT={nameTxt.text}");*/
 
         if (portrait) portrait.sprite = s.portrait;
         nameTxt.text = s.Name;

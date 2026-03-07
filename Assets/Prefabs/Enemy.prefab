@@ -124,6 +124,10 @@ MonoBehaviour:
     Name: goblet
     MaxHp: 0
     Hp: 120
+    MaxMp: 0
+    Mp: 0
+    Level: 1
+    Exp: 0
     Attack: 50
     Speed: 90
     ActionValue: 0
@@ -134,7 +138,7 @@ MonoBehaviour:
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  portait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+  portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
   hpbarPrefab: {fileID: 1878811498021360621, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 0}
 --- !u!114 &8258665272572876294

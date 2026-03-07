@@ -1366,8 +1366,8 @@ MonoBehaviour:
       Name: player0
       MaxHp: 200
       Hp: 200
-      MaxMp: 0
-      Mp: 0
+      MaxMp: 100
+      Mp: 100
       Level: 1
       Exp: 0
       Attack: 200
@@ -1387,8 +1387,8 @@ MonoBehaviour:
       Name: player1
       MaxHp: 200
       Hp: 200
-      MaxMp: 0
-      Mp: 0
+      MaxMp: 100
+      Mp: 100
       Level: 1
       Exp: 0
       Attack: 200

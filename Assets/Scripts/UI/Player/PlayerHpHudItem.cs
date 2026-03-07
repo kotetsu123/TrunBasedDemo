@@ -56,6 +56,14 @@ public class PlayerHpHudItem : MonoBehaviour
         // 绑定新的事件
         if (_ctrl!=null&&_ctrl.data!=null)
             _ctrl.data.OnHpChanged+=HandleHpChanged;
+        //固定资产：头像/名字
+        if(Portrait != null)
+        {
+            if(_ctrl.portrait != null)
+            {
+                Portrait.sprite = _ctrl.portrait;
+            }           
+        }
         //立即刷新一次
         Refresh();
     }

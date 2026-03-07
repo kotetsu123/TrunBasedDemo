@@ -32,7 +32,7 @@ public class TimeLineIcon : MonoBehaviour
         owner = character;
         if (portImage!=null)
         {
-            portImage.sprite = owner.portait;
+            portImage.sprite = owner.portrait;
         }
     }
    public void SetHighLight(bool on)
