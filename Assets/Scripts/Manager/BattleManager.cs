@@ -367,12 +367,11 @@ public class BattleManager : MonoBehaviour
                 maxhp = c.data.MaxHp,
                 mp= c.data.Mp,
                 maxmp= c.data.MaxMp,
-                level= c.data.Level,
-                
-                //TODO:添加mp之类的
-
+                level= c.data.Level,       
             });
+           //Debug.Log($"[Snapshot] goName={c.name}, dataName={c.data.Name}");
         }
+
         return list;
     }
     void UpdateTimeLineUI(List<BaseController> ordered)

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class CharacterResultItemView : MonoBehaviour
 {
     [SerializeField] private Image portrait;
-    [SerializeField] private TMP_Text Name;
+    [SerializeField] private TMP_Text nameTxt;
     [Header("HP")]
     [SerializeField] private Image hpFill;
     [SerializeField] private TMP_Text hpTxt;
@@ -23,8 +23,11 @@ public class CharacterResultItemView : MonoBehaviour
 
     public void Bind(CharacterResultSnapshot s)
     {
+        nameTxt.text = "TEST_NAME";
+        Debug.Log($"[BIND UI] NameTxt={nameTxt.name},TXT={nameTxt.text}");
+
         if (portrait) portrait.sprite = s.portrait;
-        name = s.Name;
+        nameTxt.text = s.Name;
 
         hpFill.fillAmount = (float)s.hp / s.maxhp;
         //hpFill.DOFillAmount((float)s.hp/s.maxhp,0.3f);      
@@ -36,5 +39,6 @@ public class CharacterResultItemView : MonoBehaviour
 
         levelTxt.text = $"LV.{s.level}";
         expTxt.text = $"--";
+      
     }
 }
