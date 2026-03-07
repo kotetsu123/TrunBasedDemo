@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerHpHudUI : MonoBehaviour
 {
     [SerializeField] private BattleFormation formation;
-    [SerializeField] private PlayerHpHudItem[] slots;//4¸ö
+    [SerializeField] private PlayerHudItem[] slots;//4¸ö
 
     private void Start()
     {

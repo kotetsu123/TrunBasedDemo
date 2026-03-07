@@ -7,7 +7,7 @@ public class PlayerController : BaseController
 {
 
     //public HpBar hpbar;
-    public PlayerHpHudItem playerHud;
+    public PlayerHudItem playerHud;
    
 
     
