@@ -296,9 +296,18 @@ public class BattleManager : MonoBehaviour
         {
             //鼠标点击选目标
             HandleMouseClickSelect(actor);
+
             //Tab键切换目标
             CycleEnemyTarget(actor);
+
+            //键盘A/D键切换目标
+            if (Input.GetKeyDown(KeyCode.A))
+                SelectEnemyLeftRight(-1);
+            if(Input.GetKeyDown(KeyCode.D))
+                SelectEnemyLeftRight(1);
+
             //如果目标死了/无效了，自动选一个目标
+            if(!IsValidEnemyTarget(actor,_currentTarget))
             AutoPickTargetIfNeeded(actor);
 
             //按空格攻击
@@ -626,22 +635,7 @@ public class BattleManager : MonoBehaviour
             //直接尝试占槽（不成功就算了，先占了再说，后续可以加个提示或者自动分配）又或者是contains判断
             TryPlaceIntoFormation(c);
         }
-    }
-    //Tab键切换目标
-    private void CycleEnemyTarget(BaseController attcker)
-    {
-        if (!Input.GetKeyDown(KeyCode.Tab)) return;
-
-        var list = formation.GetAliveEnemiesInPreferredOrder();
-        if (list.Count == 0)
-        {
-            SetCurrentTarget(null);
-            return;
-        }
-        int idx = list.IndexOf(_currentTarget);
-        idx = (idx + 1) % list.Count;
-        SetCurrentTarget(list[idx]);
-    }
+    } 
     //设置当前目标，并触发事件 也是唯一改变_currentTarget的地方
     private void SetCurrentTarget(BaseController target)
     {
@@ -672,7 +666,61 @@ public class BattleManager : MonoBehaviour
         var list = formation.GetAliveEnemiesInPreferredOrder();
         SetCurrentTarget(list.Count > 0 ? list[0]:null);
     }
-    //点击检测，选敌人
+    //Tab键切换目标
+    private void CycleEnemyTarget(BaseController attcker)
+    {
+        if (!Input.GetKeyDown(KeyCode.Tab)) return;
+
+        var list = formation.GetAliveEnemiesInPreferredOrder();
+        if (list.Count == 0)
+        {
+            SetCurrentTarget(null);
+            return;
+        }
+        int idx = list.IndexOf(_currentTarget);
+        idx = (idx + 1) % list.Count;
+        SetCurrentTarget(list[idx]);
+    }
+    // A/D键左右切换目标
+    private void SelectEnemyLeftRight(int direction)
+    {
+        if (_currentActor == null || _currentActor.data == null) return;
+        if (_currentActor.data.Team != Team.Player) return;
+
+        var list = formation.GetAliveEnemiesInSpatialOrder();
+
+       /* Debug.Log($"[AD] currentTarget = {(_currentTarget == null ? "NULL" : _currentTarget.name)}");
+        string names = "";
+        for (int i = 0; i < list.Count; i++)
+        {
+            names += $"[{i}]={list[i].name} ";
+        }
+        Debug.Log($"[AD] spatial list = {names}");
+*/
+        if (list.Count == 0)
+        {
+            SetCurrentTarget(null);
+            return;
+        }
+       /* //先尝试自动补充目标
+        if (!IsValidEnemyTarget(_currentActor, _currentTarget))
+        {
+            AutoPickTargetIfNeeded(_currentActor);
+        }
+        //如果补完没有合法目标，就退出
+        if (_currentTarget == null || !list.Contains(_currentTarget))
+            return;*/
+
+        int index=list.IndexOf(_currentTarget);
+        Debug.Log($"[AD] current index = {index}, direction = {direction}");
+
+        int next = Mathf.Clamp(index + direction, 0, list.Count - 1);
+
+        if (next != index)
+            SetCurrentTarget(list[next]);
+
+        }
+    //点击检测，切换目标
     private void HandleMouseClickSelect(BaseController actor)
     {
         if (mainCamera == null) return;
@@ -688,7 +736,6 @@ public class BattleManager : MonoBehaviour
                 SetCurrentTarget(targetable.controller);
             }
         }
-
     }
     private BaseController GetRandomEnemyTarget(BaseController attacker)
     {

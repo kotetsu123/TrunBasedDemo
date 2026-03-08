@@ -1358,6 +1358,69 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e2
+      MaxHp: 120
+      Hp: 120
+      MaxMp: 0
+      Mp: 0
+      Level: 1
+      Exp: 0
+      Attack: 30
+      Speed: 80
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e3
+      MaxHp: 120
+      Hp: 120
+      MaxMp: 0
+      Mp: 0
+      Level: 1
+      Exp: 0
+      Attack: 30
+      Speed: 80
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
+  - team: 1
+    prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+    characterData:
+      Team: 1
+      Name: e4
+      MaxHp: 120
+      Hp: 120
+      MaxMp: 0
+      Mp: 0
+      Level: 1
+      Exp: 0
+      Attack: 30
+      Speed: 80
+      ActionValue: 0
+      MaxActionValue: 200
+      isOnField: 0
+      isActing: 0
+      isDead: 0
+      isPlayer: 0
+      battleEnded: 0
+      intent: 0
   initialPlayers:
   - team: 0
     prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}

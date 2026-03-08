@@ -20,7 +20,10 @@ public class BattleFormation : MonoBehaviour
 
     public event System.Action<Team,int,BaseController,BaseController> OnSlotChanged;
 
+    //slotindex 顺序
     private static readonly int[] EnemyPreferredOrder = { 2, 3, 1, 4, 0 };
+    //空间顺序
+    private static readonly int[] EnemySpatialOrder = { 4, 2, 0, 1, 3 };
 
     private void Start()
     {
@@ -106,6 +109,7 @@ public class BattleFormation : MonoBehaviour
         released = default;
         return false;
     }
+    //自动设置初始目标、tab切换目标用====随着slot index 来选中
     public List<BaseController> GetAliveEnemiesInPreferredOrder()
     {
         var result=new List<BaseController>(5);
@@ -120,7 +124,22 @@ public class BattleFormation : MonoBehaviour
             if (occ!=null&&occ.data!=null&&!occ.data.isDead&&!occ.isDead)
                 result.Add(occ);        
         }
+        return result;
+    }
+    //   A/D 键切换当前目标左边/右边用
+    public List<BaseController> GetAliveEnemiesInSpatialOrder()
+    {
+        var result = new List<BaseController>(5);
+        
 
+        for(int i = 0; i < enemySlots.Length; i++)
+        {
+           
+            var occ = enemySlots[i].occupant;
+
+            if(occ!=null&&occ.data!=null&&!occ.data.isDead&&!occ.isDead)
+                result.Add(occ);
+        }
         return result;
     }
    /* public List<BaseController> GetPlayersInSlotOrder()
