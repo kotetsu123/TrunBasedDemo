@@ -84,4 +84,23 @@ public abstract class BaseController : MonoBehaviour
 
         if(data.MaxActionValue>0)data.ActionValue= data.MaxActionValue;
     }
+    //使用技能
+    public void UseSkill(SkillData skill, BaseController target)
+    {
+        if (data.Mp < skill.mpCost)
+        {
+            Debug.Log("Not enough MP");
+            return;
+        }
+        int prevMp = data.Mp; 
+        data.Mp-= skill.mpCost;
+        data.Mp = Mathf.Max(0, data.Mp);
+        data.NotifyMpChange(prevMp, data.Mp);
+
+        int damage = data.Attack + skill.power;
+
+        target.TakeDamage(damage);
+
+        Debug.Log($"{data.Name} used {skill.skillName} on {target.data.Name}");
+    }
 }

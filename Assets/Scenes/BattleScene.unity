@@ -1337,6 +1337,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 0}
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
@@ -1358,6 +1360,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 0}
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
@@ -1379,6 +1383,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 0}
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
@@ -1400,6 +1406,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 0}
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
@@ -1421,6 +1429,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 0}
   initialPlayers:
   - team: 0
     prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
@@ -1433,7 +1443,7 @@ MonoBehaviour:
       Mp: 100
       Level: 1
       Exp: 0
-      Attack: 200
+      Attack: 100
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
@@ -1443,6 +1453,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
   - team: 0
     prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
     characterData:
@@ -1454,7 +1466,7 @@ MonoBehaviour:
       Mp: 100
       Level: 1
       Exp: 0
-      Attack: 200
+      Attack: 100
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
@@ -1464,6 +1476,8 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+      skills: []
+      testskill: {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
   spawnOnStart: 1
   worldUICanvas: {fileID: 364944995}
 --- !u!4 &629646182
@@ -2770,11 +2784,6 @@ MonoBehaviour:
   actionBarLayout: {fileID: 775316978}
   timelineMoveTime: 0.25
   formation: {fileID: 1511970245}
-  mainCamera: {fileID: 963194227}
-  enemyClickMask:
-    serializedVersion: 2
-    m_Bits: 64
-  clickMaxDistance: 200
   targetSelector: {fileID: 1710507965}
   spawner: {fileID: 629646181}
   targetCirclePrefab: {fileID: 7749736216192224019, guid: be1498ce682a6af449068e9d1022d5d5, type: 3}
@@ -4082,6 +4091,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3744409976193670767, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3835983772418355859, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}
+      propertyPath: m_FillAmount
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5604651163337925156, guid: a012bf041ee95ec4fb42b75953de7a97, type: 3}

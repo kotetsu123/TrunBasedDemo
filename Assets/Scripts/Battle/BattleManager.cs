@@ -289,25 +289,11 @@ public class BattleManager : MonoBehaviour
         bool actionChosen = false;
         Debug.Log("press the space key attack the enemy");
         //回合开始先自动选一个目标（如果当前目标无效的话）
-       // AutoPickTargetIfNeeded(actor);
+       
        targetSelector.AutoPickTargetIfNeeded(actor);
         while (!actionChosen)
         {
-            /* //鼠标点击选目标
-             HandleMouseClickSelect(actor);
-
-             //Tab键切换目标
-             CycleEnemyTarget(actor);
-
-             //键盘A/D键切换目标
-             if (Input.GetKeyDown(KeyCode.A))
-                 SelectEnemyLeftRight(-1);
-             if(Input.GetKeyDown(KeyCode.D))
-                 SelectEnemyLeftRight(1);
-
-             //如果目标死了/无效了，自动选一个目标
-             if(!IsValidEnemyTarget(actor,_currentTarget))
-             AutoPickTargetIfNeeded(actor);*/
+           
             targetSelector.HandleTargetSelectionInput(actor);
 
             //按空格攻击
@@ -323,6 +309,19 @@ public class BattleManager : MonoBehaviour
                 }
                 actionChosen = true;
             }
+            //使用技能测试版
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                var target=_currentTarget;
+                if (targetSelector.IsValidEnemyTarget(actor, target))
+                {
+                    actor.UseSkill(actor.data.testskill, target);
+
+                    CheckBattleEnd(actor, target);
+                    actionChosen = true;
+                }
+            }
+            
             yield return null;
         }
     }

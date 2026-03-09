@@ -9,10 +9,7 @@ using UnityEngine.PlayerLoop;
 [Serializable]
 public class Character
 
-{//第一天，纯数据结构
-
-
-
+{
     public Team Team;
     public event Action<int, int> OnHpChanged;//prev ,cur
     public event Action<int, int> OnMpChanged;
@@ -39,6 +36,9 @@ public class Character
     public bool isPlayer;
     public bool battleEnded; public ActionIntent intent = ActionIntent.Normal;
 
+    public List<SkillData> skills;
+
+    public SkillData testskill;
     public void NotifyHpChange(int prev, int cur) {
         Debug.Log($"[HP EVENT]{prev}->{cur} subs={(OnHpChanged == null ? 0 : OnHpChanged.GetInvocationList().Length)}");
         OnHpChanged?.Invoke(prev, cur);

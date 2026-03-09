@@ -108,11 +108,8 @@ public class PlayerHudItem : MonoBehaviour
         //ÑªÌõImage
         if (hpFill != null)
         {         
-            float t = (_ctrl.data.MaxHp <= 0) ? 0f: Mathf.Clamp01((float)_ctrl.data.Hp / _ctrl.data.MaxHp);
-
-            //hpFill.fillAmount = t;
             _hpTween?.Kill();
-            _hpTween = hpFill.DOFillAmount(t, hpTweenTime).SetEase(Ease.OutCubic);
+            _hpTween = hpFill.DOFillAmount(hpRatio, hpTweenTime).SetEase(Ease.OutCubic);
             //Debug.Log($"[FILL SET] {hpFill.name} now={hpFill.fillAmount}");
             if (downed)
             {
@@ -134,14 +131,13 @@ public class PlayerHudItem : MonoBehaviour
         //À¶Ìõimage
         if (mpFill != null)
         {
-            float t = (_ctrl.data.MaxMp <= 0) ? 0f : Mathf.Clamp01(_ctrl.data.Mp / _ctrl.data.MaxMp);
-
             _mpTween?.Kill();
-            _mpTween=mpFill.DOFillAmount(t,mpTweenTime).SetEase(Ease.OutCubic);
-
+            _mpTween=mpFill.DOFillAmount(mpRatio,mpTweenTime).SetEase(Ease.OutCubic);
+            
             var c = mpFill.color;
             c.a = alpha;
             mpFill.color = c;
+           
         }
         
         
@@ -161,6 +157,7 @@ public class PlayerHudItem : MonoBehaviour
         if (_ctrl != null && _ctrl.data != null)
         {
             _ctrl.data.OnHpChanged -= HandleHpChanged;
+            _ctrl.data.OnMpChanged -= HandleMpChanged;  
         }
     }
 }
