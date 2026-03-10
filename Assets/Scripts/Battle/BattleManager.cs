@@ -55,14 +55,17 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
     [SerializeField] private float timelineMoveTime= 0.25f;
     [SerializeField] private BattleFormation formation;
-    //点击检测相关//准备搬到BattleTargetSelector
-    
+    //点击检测相关   
     [SerializeField] private BattleTargetSelector targetSelector;
     //生成相关
     [SerializeField] private BattleSpawner spawner;
     //选中模块相关
     [SerializeField] private TargetCircle targetCirclePrefab;
     [SerializeField] private Canvas worldSpaceCanvs;
+    //战斗指令模块相关
+    [SerializeField] private BattleCommandPanel commandPanel;
+
+    private CommandType _currentCommand=CommandType.None;
 
     private TargetCircle _targetCircle;
     
@@ -84,6 +87,16 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (commandPanel != null)
+            commandPanel.OnCommandSelected += HandleCommandSelected;
+    }
+    private void OnDisable()
+    {
+        if (commandPanel != null)
+            commandPanel.OnCommandSelected -= HandleCommandSelected;
+    }
     private void Start()
     {
         
@@ -288,42 +301,61 @@ public class BattleManager : MonoBehaviour
     {
         bool actionChosen = false;
         Debug.Log("press the space key attack the enemy");
+        _currentCommand = CommandType.None;
         //回合开始先自动选一个目标（如果当前目标无效的话）
        
        targetSelector.AutoPickTargetIfNeeded(actor);
+        if (commandPanel != null)
+        {
+            commandPanel.Show();
+        }
         while (!actionChosen)
         {
-           
-            targetSelector.HandleTargetSelectionInput(actor);
-
-            //按空格攻击
-            if (Input.GetKeyDown(KeyCode.Space))
+            //还没选指令时，只等菜单按钮
+            if (_currentCommand == CommandType.None)
             {
-                var target =_currentTarget;
-                if (targetSelector.IsValidEnemyTarget(actor,target))
-                {
-                    target.TakeDamage(actor.data.Attack);
-                    //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
-                    Debug.Log($"{actor.data.Name} attack the {target.data.Name} rise {actor.data.Attack} damage");
-                    CheckBattleEnd(actor, target);
-                }
-                actionChosen = true;
+                yield return null;
+                continue;
             }
-            //使用技能测试版
-            if (Input.GetKeyDown(KeyCode.Q))
+            //选了attack 之后，才允许目标切换和确认
+            if (_currentCommand == CommandType.Attack)
             {
-                var target=_currentTarget;
-                if (targetSelector.IsValidEnemyTarget(actor, target))
+                targetSelector.HandleTargetSelectionInput(actor);
+                // 按空格攻击
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    actor.UseSkill(actor.data.testskill, target);
+                    var target = _currentTarget;
+                    if (targetSelector.IsValidEnemyTarget(actor, target))
+                    {
+                        target.TakeDamage(actor.data.Attack);
+                        //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
+                        Debug.Log($"{actor.data.Name} attack the {target.data.Name} rise {actor.data.Attack} damage");
+                        CheckBattleEnd(actor, target);
+                        actionChosen = true;
+                    }                   
+                }
+            }
+            //选了skill 之后先用q来进行测试
+            else if (_currentCommand == CommandType.Skill) {
+                targetSelector.HandleTargetSelectionInput(actor);
+                //使用技能测试版
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    var target = _currentTarget;
+                    if (targetSelector.IsValidEnemyTarget(actor, target))
+                    {
+                        actor.UseSkill(actor.data.testskill, target);
 
-                    CheckBattleEnd(actor, target);
-                    actionChosen = true;
+                        CheckBattleEnd(actor, target);
+                        actionChosen = true;
+                    }            
                 }
             }
             
             yield return null;
         }
+        if (commandPanel != null)
+            commandPanel.Hide();
     }
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
@@ -687,8 +719,35 @@ public class BattleManager : MonoBehaviour
         return true;
 
     }
-   
+   //战斗指令菜单相关
+    private void HandleCommandSelected(CommandType cmd)
+    {
+        _currentCommand = cmd;
+        switch (cmd)
+        {
+            case CommandType.Attack:
+                Debug.Log("[Command] Attack selected");
+                commandPanel.Hide();
+                break;
+            case CommandType.Skill:
+                Debug.Log("[Command] Skill selected");
+                commandPanel.Hide();
+                //TODO：改成打开skill面板
+                break;
 
+            case CommandType.Item:
+                Debug.Log("[Command] Item selected");
+                commandPanel.Hide();
+                //TODO 
+                break;
+
+            case CommandType.Run:
+                Debug.Log("[Command] Run selected");
+                commandPanel.Hide();
+                //TODO
+                break;
+        }
+    }
 }
 
 
