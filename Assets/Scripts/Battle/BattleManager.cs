@@ -75,6 +75,7 @@ public class BattleManager : MonoBehaviour
 
     public BaseController CurrentActor=>_currentActor;
     public BaseController CurrentTarget => _currentTarget;
+    public CommandType CurrentCommand=> _currentCommand;
     void Awake()
     {
         Instance = this;
@@ -574,6 +575,8 @@ public class BattleManager : MonoBehaviour
         if (_currentActor == next) return;
         var prev = _currentActor;
         _currentActor = next;
+        _currentCommand = CommandType.None;
+        NotifyInputState();
 
         Debug.Log($"[Battle] Invoke OnActionChanged: {(prev ? prev.name : "null")} -> {(next ? next.name : "null")}");
         
@@ -582,13 +585,41 @@ public class BattleManager : MonoBehaviour
         Debug.Log($"[Battle] OnActionChanged subs={(OnActionChanged == null ? 0 : OnActionChanged.GetInvocationList().Length)} prev={prev?.data?.Name} cur={_currentActor?.data?.Name}");
         OnActionChanged?.Invoke(prev, _currentActor);
 
-        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
+        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player&&_currentCommand==CommandType.Attack||_currentCommand==CommandType.Skill);
         OnInputStateChanged?.Invoke(playerTurn);
-
-
        // UpdataTargetIndicatorVisibility();
     }
-  private void RequestReorder()
+    //设置当前目标，并触发事件 也是唯一改变_currentTarget的地方
+    public void SetCurrentTarget(BaseController target)
+    {
+        if (_currentTarget == target) return;
+        //TODO: 这里重新选当前的敌人会取消选中。然后如果进行攻击的话。伤害不会判定。要么进行防呆处理：必须选中敌人才能攻击要么进行别的处理
+        if (_currentTarget != null) _currentTarget.SetTargeted(false);
+        _currentTarget = target;
+        if (_currentTarget != null) _currentTarget.SetTargeted(true);
+
+        OnTargetChanged?.Invoke(_currentTarget);
+
+        //判断圈圈是否在player回合 并且发送广播
+       // bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player && _currentCommand == CommandType.Attack || _currentCommand == CommandType.Skill);
+        //OnInputStateChanged?.Invoke(playerTurn);
+
+    }
+    private bool CanTargetSelect()
+    {
+        if (_currentActor == null || _currentActor.data == null)
+            return false;
+        if (_currentActor.data.Team != Team.Player)
+            return false;
+
+        return _currentCommand==CommandType.Attack||
+            _currentCommand==CommandType.Skill;
+    }
+    private void NotifyInputState()
+    {
+        OnInputStateChanged?.Invoke(CanTargetSelect());
+    }
+    private void RequestReorder()
     {
         _reorderRequested = true;
     }
@@ -667,22 +698,7 @@ public class BattleManager : MonoBehaviour
             TryPlaceIntoFormation(c);
         }
     } 
-    //设置当前目标，并触发事件 也是唯一改变_currentTarget的地方
-    public void SetCurrentTarget(BaseController target)
-    {
-        if (_currentTarget == target) return;
-        //TODO: 这里重新选当前的敌人会取消选中。然后如果进行攻击的话。伤害不会判定。要么进行防呆处理：必须选中敌人才能攻击要么进行别的处理
-        if(_currentTarget!=null)_currentTarget.SetTargeted(false);
-        _currentTarget = target;
-        if (_currentTarget != null) _currentTarget.SetTargeted(true);
-
-        OnTargetChanged?.Invoke(_currentTarget);
-      
-        //判断圈圈是否在player回合 并且发送广播
-        bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player);
-        OnInputStateChanged?.Invoke(playerTurn);
-      
-    }
+   
    
     private BaseController GetRandomEnemyTarget(BaseController attacker)
     {
@@ -723,6 +739,7 @@ public class BattleManager : MonoBehaviour
     private void HandleCommandSelected(CommandType cmd)
     {
         _currentCommand = cmd;
+        NotifyInputState();
         switch (cmd)
         {
             case CommandType.Attack:

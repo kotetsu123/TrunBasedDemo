@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TragetCircleController : MonoBehaviour
+public class TargetCircleController : MonoBehaviour
 {
     [SerializeField] private BattleManager battle;
     [SerializeField] private TargetCircle targetCirclePrefab;//直接引用带脚本的prefabs
     [SerializeField] private Transform circleParent;
 
-    private bool _playerTurn;
+    //private bool _playerTurn;
+    private bool _canTargetSelect;
     private TargetCircle _instance;//圈圈实例 
-    private BaseController _target;//被选中的目标
+    private BaseController _target;//被选中的目标//_lastTarget
 
     
     void Awake()
@@ -22,16 +23,19 @@ public class TragetCircleController : MonoBehaviour
         }
     }
 
-    private void HandleInputStateChanged(bool playerTurn)
+    private void HandleInputStateChanged(bool canTargetSelect)
     {
-        Debug.Log($"[Circle] InputStateChanged playerTurn={playerTurn} actorTeam={battle?.CurrentActor?.data?.Team}");
-        _playerTurn = playerTurn;
+        _canTargetSelect = canTargetSelect;
+        if(!canTargetSelect)
+            
+        Debug.Log($"[Circle] InputStateChanged playerTurn={canTargetSelect} actorTeam={battle?.CurrentActor?.data?.Team}");
+        _canTargetSelect = canTargetSelect;
         Apply();
         
     }
     private void HandleTargetChanged(BaseController target)
     {
-        Debug.Log($"[Circle] TargetChanged target={(target ? target.data?.Name : "null")} playerTurn={_playerTurn}");
+        Debug.Log($"[Circle] TargetChanged target={(target ? target.data?.Name : "null")} canTargetSelect={_canTargetSelect}");
         _target = target;
         EnsureInstance();
         Apply();
@@ -57,7 +61,7 @@ public class TragetCircleController : MonoBehaviour
         if (_instance == null) return;
 
         //规则：玩家回合+有目标 才显示
-        if (_playerTurn && _target != null)
+        if (_canTargetSelect && _target != null)
             _instance.Attach(_target.transform);
         else
             _instance.Attach(null);
