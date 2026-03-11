@@ -64,6 +64,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Canvas worldSpaceCanvs;
     //战斗指令模块相关
     [SerializeField] private BattleCommandPanel commandPanel;
+    [SerializeField] private SkillPanelController skillPanel;
 
     private CommandType _currentCommand=CommandType.None;
 
@@ -72,6 +73,8 @@ public class BattleManager : MonoBehaviour
 
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
+
+    private SkillData _selectedSkill;
 
     public BaseController CurrentActor=>_currentActor;
     public BaseController CurrentTarget => _currentTarget;
@@ -92,12 +95,17 @@ public class BattleManager : MonoBehaviour
     {
         if (commandPanel != null)
             commandPanel.OnCommandSelected += HandleCommandSelected;
+        skillPanel.OnSkillSelected += HandleSkillSelected;
+        skillPanel.OnCancel += HandleSkillCancel;
     }
     private void OnDisable()
     {
         if (commandPanel != null)
             commandPanel.OnCommandSelected -= HandleCommandSelected;
+        skillPanel.OnSkillSelected -= HandleSkillSelected;
+        skillPanel.OnCancel -= HandleSkillCancel;
     }
+   
     private void Start()
     {
         
@@ -340,16 +348,22 @@ public class BattleManager : MonoBehaviour
             else if (_currentCommand == CommandType.Skill) {
                 targetSelector.HandleTargetSelectionInput(actor);
                 //使用技能测试版
-                if (Input.GetKeyDown(KeyCode.Q))
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    var target = _currentTarget;
+                    if(_selectedSkill != null)
+                    {
+                        actor.UseSkill(_selectedSkill, _currentTarget);
+                        CheckBattleEnd(actor, _currentTarget);
+                        actionChosen = true;
+                    }
+                   /* var target = _currentTarget;
                     if (targetSelector.IsValidEnemyTarget(actor, target))
                     {
                         actor.UseSkill(actor.data.testskill, target);
 
                         CheckBattleEnd(actor, target);
                         actionChosen = true;
-                    }            
+                    }            */
                 }
             }
             
@@ -739,18 +753,20 @@ public class BattleManager : MonoBehaviour
     private void HandleCommandSelected(CommandType cmd)
     {
         _currentCommand = cmd;
-        NotifyInputState();
+       
         switch (cmd)
         {
             case CommandType.Attack:
                 Debug.Log("[Command] Attack selected");
+                NotifyInputState();
                 commandPanel.Hide();
                 break;
             case CommandType.Skill:
                 Debug.Log("[Command] Skill selected");
                 commandPanel.Hide();
+                skillPanel.Show();
                 //TODO：改成打开skill面板
-                break;
+                return;//等待玩家选择技能
 
             case CommandType.Item:
                 Debug.Log("[Command] Item selected");
@@ -765,6 +781,23 @@ public class BattleManager : MonoBehaviour
                 break;
         }
     }
+    private void HandleSkillSelected(SkillData skill)
+    {
+        _selectedSkill = skill;
+
+        skillPanel.Hide();
+
+        _currentCommand = CommandType.Skill;
+        NotifyInputState();
+
+
+    }
+    private void HandleSkillCancel()
+    {
+        skillPanel.Hide();
+        commandPanel.Show();
+    }
+
 }
 
 
