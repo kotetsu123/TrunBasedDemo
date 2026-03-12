@@ -320,6 +320,11 @@ public class BattleManager : MonoBehaviour
         }
         while (!actionChosen)
         {
+            //skillPanel 返回commanPanel
+            HandleSkillCancel();
+            //选中返回
+            HandleCancelInput();
+
             //还没选指令时，只等菜单按钮
             if (_currentCommand == CommandType.None)
             {
@@ -346,6 +351,7 @@ public class BattleManager : MonoBehaviour
             }
             //选了skill 之后先用q来进行测试
             else if (_currentCommand == CommandType.Skill) {
+
                 targetSelector.HandleTargetSelectionInput(actor);
                 //使用技能测试版
                 if (Input.GetKeyDown(KeyCode.Space))
@@ -789,15 +795,48 @@ public class BattleManager : MonoBehaviour
 
         _currentCommand = CommandType.Skill;
         NotifyInputState();
-
-
     }
     private void HandleSkillCancel()
     {
+        if(skillPanel==null||commandPanel==null) return;
+
+        //只在skillpanel 打开的时候处理
+        if (!skillPanel.IsOpen) return;
+        //右键或者esc键
+        if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
+            return;
+
         skillPanel.Hide();
         commandPanel.Show();
-    }
 
+        _currentCommand = CommandType.None;
+        NotifyInputState();
+
+    }
+    private void HandleCancelInput()
+    {
+        if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
+            return;
+        //skill 目标选择中->回到skillpanel
+        if (_currentCommand == CommandType.Skill && _selectedSkill != null)
+        {
+            _selectedSkill = null;
+            _currentCommand = CommandType.None;
+            NotifyInputState();
+
+            skillPanel.Show();
+            return;
+        }
+        //attack  目标选择中->返回commanPanel
+        if (_currentCommand == CommandType.Attack)
+        {
+            _currentCommand = CommandType.None;
+            NotifyInputState();
+
+            commandPanel.Show();
+            return;
+        }
+    }
 }
 
 

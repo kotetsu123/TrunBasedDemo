@@ -11,6 +11,7 @@ public class SkillPanelController : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private SkillData testSkill;
 
+    public bool IsOpen => canvasGroup != null && canvasGroup.alpha > 0.99f;
     private void Awake()
     {
         HideImmediate();
