@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: be5f8da1612a2a945aabffefdc955b46, type: 3}
-  m_Name: Heal
+  m_Name: Revive
   m_EditorClassIdentifier: 
-  skillName: Heal
-  skillType: 1
-  mpCost: 5
-  power: 40
+  skillName: Revive
+  skillType: 2
+  targetType: 4
+  mpCost: 35
+  power: 10

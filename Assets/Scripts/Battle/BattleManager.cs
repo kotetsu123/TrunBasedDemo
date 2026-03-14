@@ -779,7 +779,8 @@ public class BattleManager : MonoBehaviour
             case CommandType.Skill:
                 Debug.Log("[Command] Skill selected");
                 commandPanel.Hide();
-                skillPanel.Show();
+                skillPanel.Show(_currentActor);
+                Debug.Log($"[SkillCommand]{_currentActor.name}");
                 //TODO：改成打开skill面板
                 return;//等待玩家选择技能
 
@@ -841,7 +842,7 @@ public class BattleManager : MonoBehaviour
             _currentCommand = CommandType.None;
             NotifyInputState();
 
-            skillPanel.Show();
+            skillPanel.Show(_currentActor);
             return;
         }
         //attack  目标选择中->返回commanPanel

@@ -4,13 +4,15 @@ using UnityEngine;
 
 public abstract class BaseController : MonoBehaviour
 {
-    public  Character data;
+    public Character data;
 
     [Header("Visual")]
     public Sprite portrait;//½ÇÉ«Ð¤Ïñ
 
-   private float _nextDmgLogTime = 0f;
+    private float _nextDmgLogTime = 0f;
 
+    [SerializeField] private List<SkillData> skills;
+    public IReadOnlyList<SkillData> Skills => skills;
     public abstract bool isPlayer { get; }
    // public abstract bool isDead { get; }
     public virtual bool isDead=>data.isDead;
