@@ -34,9 +34,9 @@ public class SkillPanelController : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
     }
-    public void OnClickSkill()
+    public void OnClickSkill(SkillData skill)
     {
-        OnSkillSelected?.Invoke(testSkill);
+        OnSkillSelected?.Invoke(skill);
     }
     public void OnClickBack()
     {

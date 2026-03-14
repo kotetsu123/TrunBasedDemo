@@ -42,6 +42,12 @@ public abstract class BaseController : MonoBehaviour
         }
 
     }
+    public void Heal(int amout)
+    {
+        int prevHp = data.Hp;
+        data.Hp = Mathf.Min(data.MaxHp, data.Hp + amout);
+        data.NotifyHpChange(prevHp, data.Hp);
+    }
     //给子类"拓展"的钩子
     protected virtual void OnDeath()
     {
@@ -97,10 +103,32 @@ public abstract class BaseController : MonoBehaviour
         data.Mp = Mathf.Max(0, data.Mp);
         data.NotifyMpChange(prevMp, data.Mp);
 
-        int damage = data.Attack + skill.power;
+        switch (skill.skillType)
+        {
+            case SkillType.Damage:
+                {
+                    int damage = data.Attack + skill.power;
+                    target.TakeDamage(damage);
+                    Debug.Log($"{data.Name} used {skill.skillName} on {target.data.Name}");
+                    break;
+                }
+            case SkillType.Heal:
+                {
+                    Debug.Log("Heal branch entered");
+                    this.Heal(skill.power);
+                    //target.Heal(skill.power);
+                    Debug.Log($"[SkillType HEAL]{data.Name} healed {target.data.Name} for {skill.power}");
+                    break;
+                }
+            case SkillType.Revive:
+                {
+                   // target.Revive();
+                    break;
+                }
 
-        target.TakeDamage(damage);
+        }
+       
 
-        Debug.Log($"{data.Name} used {skill.skillName} on {target.data.Name}");
+        
     }
 }

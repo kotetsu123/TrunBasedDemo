@@ -51,6 +51,7 @@ public class BattleManager : MonoBehaviour
     //当前目标
     private  BaseController  _currentTarget;
     
+    private bool actionChosen = false;
 
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
     [SerializeField] private float timelineMoveTime= 0.25f;
@@ -308,7 +309,8 @@ public class BattleManager : MonoBehaviour
     }
     IEnumerator WaitForPlayerAction(BaseController actor)
     {
-        bool actionChosen = false;
+        actionChosen = false;
+
         Debug.Log("press the space key attack the enemy");
         _currentCommand = CommandType.None;
         //回合开始先自动选一个目标（如果当前目标无效的话）
@@ -352,24 +354,31 @@ public class BattleManager : MonoBehaviour
             //选了skill 之后先用q来进行测试
             else if (_currentCommand == CommandType.Skill) {
 
-                targetSelector.HandleTargetSelectionInput(actor);
-                //使用技能测试版
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (_selectedSkill == null){
+                    yield return null;
+                    continue;
+                }
+                // 需要选敌人的技能
+                if (_selectedSkill.skillType == SkillType.Damage)
                 {
-                    if(_selectedSkill != null)
+                    targetSelector.HandleTargetSelectionInput(actor);
+                    //使用技能测试版
+                    if (Input.GetKeyDown(KeyCode.Space))
                     {
-                        actor.UseSkill(_selectedSkill, _currentTarget);
-                        CheckBattleEnd(actor, _currentTarget);
-                        actionChosen = true;
+                        if (_selectedSkill != null)
+                        {
+                            actor.UseSkill(_selectedSkill, _currentTarget);
+                            CheckBattleEnd(actor, _currentTarget);
+                            actionChosen = true;
+                        }
                     }
-                   /* var target = _currentTarget;
-                    if (targetSelector.IsValidEnemyTarget(actor, target))
+                    //不需要选敌人的技能：Heal、Revive
+                    else if(_selectedSkill.skillType==SkillType.Heal||_selectedSkill.skillType== SkillType.Revive)
                     {
-                        actor.UseSkill(actor.data.testskill, target);
-
-                        CheckBattleEnd(actor, target);
+                        actor.UseSkill(_selectedSkill, actor);
+                        CheckBattleEnd(actor, actor);
                         actionChosen = true;
-                    }            */
+                    }          
                 }
             }
             
@@ -793,6 +802,14 @@ public class BattleManager : MonoBehaviour
 
         skillPanel.Hide();
 
+        _currentCommand = CommandType.Skill;
+        if (skill.skillType == SkillType.Heal)
+        {
+            _currentActor.UseSkill(skill, _currentActor);
+            OnInputStateChanged?.Invoke(false);
+            actionChosen = true;
+            return;
+        }
         _currentCommand = CommandType.Skill;
         NotifyInputState();
     }
