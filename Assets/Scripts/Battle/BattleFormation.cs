@@ -142,19 +142,19 @@ public class BattleFormation : MonoBehaviour
         }
         return result;
     }
-   /* public List<BaseController> GetPlayersInSlotOrder()
+    public List<BaseController> GetPlayersInSlotOrder()
     {
-        var result=new List<BaseController>(4);
+        var result = new List<BaseController>(4);
 
-        for (int i = 0; i <playerSlots.Length; i++)
+        for (int i = 0; i < playerSlots.Length; i++)
         {
-            var occ= playerSlots[i].occupant;
+            var occ = playerSlots[i].occupant;
 
             if (occ != null && occ.data != null && !occ.data.isDead && !occ.isDead)
                 result.Add(occ);
         }
         return result;
-    }*/
+    }
     public BaseController GetPlaeyrAsSlot(int i)
     {
         if (i < 0 || i >= playerSlots.Length) return null;

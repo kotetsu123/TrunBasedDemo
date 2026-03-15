@@ -50,6 +50,9 @@ public class BattleManager : MonoBehaviour
     private BaseController _currentActor;
     //当前目标
     private  BaseController  _currentTarget;
+    //当前目标类型
+    private SkillTargetType _currentTargetType;
+
     
     private bool actionChosen = false;
 
@@ -336,7 +339,7 @@ public class BattleManager : MonoBehaviour
             //选了attack 之后，才允许目标切换和确认
             if (_currentCommand == CommandType.Attack)
             {
-                targetSelector.HandleTargetSelectionInput(actor);
+                targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
                 // 按空格攻击
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
@@ -358,28 +361,52 @@ public class BattleManager : MonoBehaviour
                     yield return null;
                     continue;
                 }
-                // 需要选敌人的技能
-                if (_selectedSkill.skillType == SkillType.Damage)
+                /* // 需要选敌人的技能
+                 if (_selectedSkill.skillType == SkillType.Damage)
+                 {
+                     targetSelector.HandleTargetSelectionInput(actor);
+                     //使用技能测试版
+                     if (Input.GetKeyDown(KeyCode.Space))
+                     {
+                         if (_selectedSkill != null)
+                         {
+                             actor.UseSkill(_selectedSkill, _currentTarget);
+                             CheckBattleEnd(actor, _currentTarget);
+                             actionChosen = true;
+                         }
+                     }
+                     //不需要选敌人的技能：Heal、Revive
+                     else if(_selectedSkill.skillType==SkillType.Heal||_selectedSkill.skillType== SkillType.Revive)
+                     {
+                         actor.UseSkill(_selectedSkill, actor);
+                         CheckBattleEnd(actor, actor);
+                         actionChosen = true;
+                     }          
+                 }*/
+                if (_currentTargetType == SkillTargetType.Self)
                 {
-                    targetSelector.HandleTargetSelectionInput(actor);
-                    //使用技能测试版
                     if (Input.GetKeyDown(KeyCode.Space))
-                    {
-                        if (_selectedSkill != null)
-                        {
-                            actor.UseSkill(_selectedSkill, _currentTarget);
-                            CheckBattleEnd(actor, _currentTarget);
-                            actionChosen = true;
-                        }
-                    }
-                    //不需要选敌人的技能：Heal、Revive
-                    else if(_selectedSkill.skillType==SkillType.Heal||_selectedSkill.skillType== SkillType.Revive)
                     {
                         actor.UseSkill(_selectedSkill, actor);
                         CheckBattleEnd(actor, actor);
                         actionChosen = true;
-                    }          
+                    }
                 }
+                else
+                {
+                    targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        var target = _currentTarget;
+                        if (targetSelector.IsValidTarget(actor, target,_currentTargetType))
+                        {
+                            actor.UseSkill(_selectedSkill, target);
+                            CheckBattleEnd(actor, target); 
+                            actionChosen = true;
+                        }
+                    }
+                }
+                
             }
             
             yield return null;
@@ -800,15 +827,31 @@ public class BattleManager : MonoBehaviour
     private void HandleSkillSelected(SkillData skill)
     {
         _selectedSkill = skill;
-
         skillPanel.Hide();
 
         _currentCommand = CommandType.Skill;
-        if (skill.skillType == SkillType.Heal)
+        _currentTargetType = skill.targetType;
+
+        if (skill.targetType == SkillTargetType.Self)
         {
-            _currentActor.UseSkill(skill, _currentActor);
-            OnInputStateChanged?.Invoke(false);
-            actionChosen = true;
+            _currentTarget = _currentActor;
+            OnTargetChanged?.Invoke(_currentTarget);
+            NotifyInputState();
+            return;           
+        }
+        if (skill.targetType == SkillTargetType.EnmeySingle)
+        {
+            targetSelector.AutoPickTargetIfNeeded( _currentTarget);
+            OnTargetChanged?.Invoke(_currentTarget);
+            NotifyInputState();
+            return;
+        }
+        //暂时还没做 ally target 逻辑，先默认锁定自己测试
+        if (skill.targetType == SkillTargetType.AllySingle)
+        {
+            _currentTarget = _currentActor;
+            OnTargetChanged?.Invoke(_currentTarget);
+            NotifyInputState();
             return;
         }
         _currentCommand = CommandType.Skill;
