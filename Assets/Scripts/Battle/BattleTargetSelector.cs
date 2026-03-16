@@ -57,6 +57,15 @@ public class BattleTargetSelector : MonoBehaviour
  */
            // return;
         }
+        if (targetType == SkillTargetType.AllyDeadSingle)
+        {
+            CycleDeadAllyTarget(actor);
+
+            if (!IsValidDeadAllyTarget(actor, battleManager.CurrentTarget))
+                AutoPickDeadAllyTargetIfNeeded(actor);
+
+            return;
+        }
 
     }
     public bool IsValidEnemyTarget(BaseController actor, BaseController target) { 
@@ -114,9 +123,15 @@ public class BattleTargetSelector : MonoBehaviour
 
         var list = formation.GetPlayersInSlotOrder();
         battleManager.SetCurrentTarget(list.Count > 0 ? list[0] : null);
-
     }
-    //Tab键切换目标
+    public void AutoPickDeadAllyTargetIfNeeded(BaseController actor)
+    {
+        if (IsValidDeadAllyTarget(actor, battleManager.CurrentTarget)) return;
+
+        var list = formation.GetDeadPlayersInSlotOrder();
+        battleManager.SetCurrentTarget(list.Count > 0 ? list[0] : null);
+    }
+    //Tab键切换目标（敌人）
     private void CycleEnemyTarget(BaseController attcker)
     {
         if (!Input.GetKeyDown(KeyCode.Tab)) return;
@@ -131,6 +146,7 @@ public class BattleTargetSelector : MonoBehaviour
         idx = (idx + 1) % list.Count;
       battleManager.SetCurrentTarget(list[idx]);
     }
+    //（玩家/活）
     private void CycleAllyTarget(BaseController attcker)
     {
         if (!Input.GetKeyDown(KeyCode.Tab)) return;
@@ -144,6 +160,20 @@ public class BattleTargetSelector : MonoBehaviour
         int idx = list.IndexOf(battleManager.CurrentTarget);
         idx = (idx + 1) % list.Count;
       battleManager.SetCurrentTarget(list[idx]);
+    }
+    //（玩家/死）
+    private void CycleDeadAllyTarget(BaseController attacker)
+    {
+        if (!Input.GetKeyDown(KeyCode.Tab)) return;
+        var list=formation.GetDeadPlayersInSlotOrder();
+        if (list.Count == 0)
+        {
+            battleManager.SetCurrentTarget(null);
+            return;
+        }
+        int idx = list.IndexOf(battleManager.CurrentTarget);
+        idx=(idx+1)%list.Count;
+        battleManager.SetCurrentTarget(list[idx]);
     }
     // A/D键左右切换目标
     private void SelectEnemyLeftRight(int direction)
