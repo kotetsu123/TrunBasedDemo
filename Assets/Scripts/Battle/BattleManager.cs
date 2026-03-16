@@ -386,7 +386,7 @@ public class BattleManager : MonoBehaviour
                 if (_currentTargetType == SkillTargetType.Self)
                 {
                     if (Input.GetKeyDown(KeyCode.Space))
-                    {
+                    {                     
                         actor.UseSkill(_selectedSkill, actor);
                         CheckBattleEnd(actor, actor);
                         actionChosen = true;
@@ -397,7 +397,7 @@ public class BattleManager : MonoBehaviour
                     targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
                     if (Input.GetKeyDown(KeyCode.Space))
                     {
-                        var target = _currentTarget;
+                        var target = _currentTarget;                       
                         if (targetSelector.IsValidTarget(actor, target,_currentTargetType))
                         {
                             actor.UseSkill(_selectedSkill, target);
@@ -465,8 +465,7 @@ public class BattleManager : MonoBehaviour
                 mp= c.data.Mp,
                 maxmp= c.data.MaxMp,
                 level= c.data.Level,       
-            });
-           //Debug.Log($"[Snapshot] goName={c.name}, dataName={c.data.Name}");
+            });          
         }
 
         return list;
@@ -653,7 +652,7 @@ public class BattleManager : MonoBehaviour
         if (_currentTarget != null) _currentTarget.SetTargeted(false);
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
-
+        Debug.Log($"[SetCurrentTarget] now = {_currentTarget?.data.Name}");
         OnTargetChanged?.Invoke(_currentTarget);
 
         //判断圈圈是否在player回合 并且发送广播
@@ -667,9 +666,15 @@ public class BattleManager : MonoBehaviour
             return false;
         if (_currentActor.data.Team != Team.Player)
             return false;
+        if (_currentCommand == CommandType.Attack)
+            return true;
+        if (_currentCommand == CommandType.Skill)
+        {
+            if (_selectedSkill == null) return false;
+            return _selectedSkill.targetType != SkillTargetType.Self;
+        }
 
-        return _currentCommand==CommandType.Attack||
-            _currentCommand==CommandType.Skill;
+        return false;
     }
     private void NotifyInputState()
     {
@@ -800,6 +805,8 @@ public class BattleManager : MonoBehaviour
         {
             case CommandType.Attack:
                 Debug.Log("[Command] Attack selected");
+                _currentTargetType = SkillTargetType.EnmeySingle;
+                targetSelector.AutoPickTargetIfNeeded(_currentActor);
                 NotifyInputState();
                 commandPanel.Hide();
                 break;
@@ -845,13 +852,12 @@ public class BattleManager : MonoBehaviour
             OnTargetChanged?.Invoke(_currentTarget);
             NotifyInputState();
             return;
-        }
-        //暂时还没做 ally target 逻辑，先默认锁定自己测试
+        }        
         if (skill.targetType == SkillTargetType.AllySingle)
         {
-            _currentTarget = _currentActor;
+            targetSelector.AutoPickAllyTargetIfNeeded(_currentActor);
             OnTargetChanged?.Invoke(_currentTarget);
-            NotifyInputState();
+            NotifyInputState();           
             return;
         }
         _currentCommand = CommandType.Skill;

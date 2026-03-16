@@ -56,6 +56,7 @@ public class BattleTargetSelector : MonoBehaviour
                  AutoPickTargetIfNeeded(actor);
  */
             return;
+           // return;
         }
 
     }

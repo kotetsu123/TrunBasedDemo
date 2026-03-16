@@ -95,6 +95,7 @@ public abstract class BaseController : MonoBehaviour
     //使用技能
     public void UseSkill(SkillData skill, BaseController target)
     {
+        Debug.Log($"[UseSkill] actor={data.Name}, target={target?.data.Name}, skill={skill.skillName}, type={skill.skillType}, targetType={skill.targetType}");
         if (data.Mp < skill.mpCost)
         {
             Debug.Log("Not enough MP");
@@ -117,7 +118,7 @@ public abstract class BaseController : MonoBehaviour
             case SkillType.Heal:
                 {
                     Debug.Log("Heal branch entered");
-                    this.Heal(skill.power);
+                    target.Heal(skill.power);
                     //target.Heal(skill.power);
                     Debug.Log($"[SkillType HEAL]{data.Name} healed {target.data.Name} for {skill.power}");
                     break;
