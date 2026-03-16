@@ -55,7 +55,6 @@ public class BattleTargetSelector : MonoBehaviour
              if (!IsValidEnemyTarget(actor, battleManager.CurrentTarget))
                  AutoPickTargetIfNeeded(actor);
  */
-            return;
            // return;
         }
 

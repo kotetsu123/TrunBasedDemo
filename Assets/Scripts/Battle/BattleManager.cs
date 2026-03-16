@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
@@ -187,11 +188,12 @@ public class BattleManager : MonoBehaviour
             InitializeBattle();
         }
 
-            timeLineIcons.Add(character, icon);
+        timeLineIcons.Add(character, icon);
 
         //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         FindObjectOfType<TimeLineUI>()?.BuildCache();
 
+        character.OnRevied += HandleCharacterRevived;
         RequestReorder();//最后一帧搞一下
     }
 
@@ -400,6 +402,7 @@ public class BattleManager : MonoBehaviour
                         var target = _currentTarget;                       
                         if (targetSelector.IsValidTarget(actor, target,_currentTargetType))
                         {
+                            
                             actor.UseSkill(_selectedSkill, target);
                             CheckBattleEnd(actor, target); 
                             actionChosen = true;
@@ -774,7 +777,7 @@ public class BattleManager : MonoBehaviour
         int index = UnityEngine.Random.Range(0, candidates.Count);
         return candidates[index];
     }
-    public bool Revive(BaseController ctrl, float hpAmount)
+   /* public bool Revive(BaseController ctrl, float hpAmount)
     {
         if (ctrl == null || !ctrl.data.isDead)
             return false;
@@ -794,8 +797,7 @@ public class BattleManager : MonoBehaviour
 
         RequestReorder();
         return true;
-
-    }
+    }*/
    //战斗指令菜单相关
     private void HandleCommandSelected(CommandType cmd)
     {
@@ -860,6 +862,13 @@ public class BattleManager : MonoBehaviour
             NotifyInputState();           
             return;
         }
+        if (skill.targetType == SkillTargetType.AllyDeadSingle)
+        {
+            targetSelector.AutoPickDeadAllyTargetIfNeeded(_currentActor);
+            OnTargetChanged?.Invoke(_currentTarget);
+            NotifyInputState();
+            return;
+        }
         _currentCommand = CommandType.Skill;
         NotifyInputState();
     }
@@ -903,6 +912,19 @@ public class BattleManager : MonoBehaviour
             commandPanel.Show();
             return;
         }
+    }
+    private void HandleCharacterRevived(BaseController ctrl) 
+    {
+        if (ctrl == null || ctrl.data == null) return;
+        if (ctrl.data.isDead || ctrl.data.Hp <= 0) return;
+
+
+       if(!controllers.Contains(ctrl))
+        //重新加入时间轴
+        RegisterController(ctrl);
+
+        RequestReorder();
+
     }
 }
 

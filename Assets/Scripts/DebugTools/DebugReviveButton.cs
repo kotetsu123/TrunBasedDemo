@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 
 public class DebugReviveButton : MonoBehaviour
-{
+{/*
     [SerializeField] private BattleManager battle;
     [SerializeField] private BattleFormation formation;
     [SerializeField] private int reviveHp = 10;
@@ -24,5 +24,5 @@ public class DebugReviveButton : MonoBehaviour
                 return;
             }
         }
-    }
+    }*/
 }

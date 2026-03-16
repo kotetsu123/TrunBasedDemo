@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseController : MonoBehaviour
 {
+    public Action<BaseController> OnRevied;
+
     public Character data;
+    
 
     [Header("Visual")]
     public Sprite portrait;//角色肖像
@@ -49,6 +53,23 @@ public abstract class BaseController : MonoBehaviour
         int prevHp = data.Hp;
         data.Hp = Mathf.Min(data.MaxHp, data.Hp + amout);
         data.NotifyHpChange(prevHp, data.Hp);
+    }
+    public void Revive(int amount)
+    {
+        if (data == null) return;
+
+        bool wasDead=data.isDead||isDead||data.Hp<=0;
+        if (!wasDead) return;
+
+        data.isDead=false;
+        //isDead=false;
+
+        int prevHp= data.Hp;
+        data.Hp = Mathf.Clamp(amount, 1, data.MaxHp);
+        data.NotifyHpChange(prevHp, data.Hp);
+
+        OnRevied?.Invoke(this);
+
     }
     //给子类"拓展"的钩子
     protected virtual void OnDeath()
@@ -101,10 +122,13 @@ public abstract class BaseController : MonoBehaviour
             Debug.Log("Not enough MP");
             return;
         }
+
         int prevMp = data.Mp; 
         data.Mp-= skill.mpCost;
         data.Mp = Mathf.Max(0, data.Mp);
         data.NotifyMpChange(prevMp, data.Mp);
+
+       // bool revivedTarget = false;
 
         switch (skill.skillType)
         {
@@ -125,13 +149,10 @@ public abstract class BaseController : MonoBehaviour
                 }
             case SkillType.Revive:
                 {
-                   // target.Revive();
+                  target.Revive(skill.power);
                     break;
                 }
 
-        }
-       
-
-        
+        }  
     }
 }

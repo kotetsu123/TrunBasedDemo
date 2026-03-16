@@ -155,6 +155,18 @@ public class BattleFormation : MonoBehaviour
         }
         return result;
     }
+    public List<BaseController> GetDeadPlayersInSlotOrder()
+    {
+        var result = new List<BaseController>(4);
+        for(int i = 0; i < playerSlots.Length; i++)
+        {
+            var occ=playerSlots[i].occupant;
+
+            if(occ!=null&&occ.data!=null&&(occ.data.isDead||occ.isDead||occ.data.Hp<=0))
+                result.Add(occ);
+        }
+        return result;
+    }
     public BaseController GetPlaeyrAsSlot(int i)
     {
         if (i < 0 || i >= playerSlots.Length) return null;
