@@ -139,6 +139,10 @@ MonoBehaviour:
     battleEnded: 0
     intent: 0
   portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+  skills:
+  - {fileID: 11400000, guid: 357a4c0dd6c99c64e8b86b286d59b25a, type: 2}
+  - {fileID: 11400000, guid: 98a4d05ce4017f949a04c792d3ed9d19, type: 2}
+  - {fileID: 11400000, guid: 613a7b9efc48f3d45a1a6aad6a1ec6eb, type: 2}
   hpbarPrefab: {fileID: 1878811498021360621, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 0}
 --- !u!114 &8258665272572876294

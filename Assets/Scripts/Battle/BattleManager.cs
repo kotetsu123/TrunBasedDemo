@@ -277,10 +277,12 @@ public class BattleManager : MonoBehaviour
         if (actor == null || actor.data == null || actor.data.isDead)
         {
             isActing = false;
+            if (actor != null && actor.data != null)
+                actor.data.isActing = false;
             yield break;
         }
         //
-        if (actor.isPlayer)
+        if (actor.data.Team==Team.Player)
         {
             //等待玩家输入
             Debug.Log("等待玩家输入指令...");
@@ -288,12 +290,14 @@ public class BattleManager : MonoBehaviour
             if (actor == null || actor.data == null || actor.data.isDead)
             {
                 isActing = false;
+                if(actor != null && actor.data != null)
+                    actor.data.isActing = false;
                 yield break;
             }
         }
         else
         {
-            //敌人自动行动
+            /*//敌人自动行动
             yield return new WaitForSeconds(0.5f);
             var target = GetRandomEnemyTarget(actor);
             if (target != null)
@@ -303,11 +307,22 @@ public class BattleManager : MonoBehaviour
                 //Debug.LogError("[ATTACK] after TakeDamage");
                 CheckBattleEnd(actor, target);
             }
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1f);*/
+            yield return StartCoroutine(WaitForEnemyAction(actor));
+            if (actor == null || actor.data == null || actor.data.isDead)
+            {
+                isActing = false;
+                if (actor != null && actor.data != null)
+                    actor.data.isActing = false;
+            }
         }
         //行动完成后恢复行动值      
-        actor.data.ActionValue = actor.data.MaxActionValue;
-        RequestReorder();
+        if (!battleEnded)
+        {
+            actor.data.ActionValue = actor.data.MaxActionValue;
+            RequestReorder();
+        }
+        actor.data.isActing = false;
         isActing = false;
         
         Debug.Log($"{actor.data.Name}结束行动！");
@@ -363,28 +378,7 @@ public class BattleManager : MonoBehaviour
                     yield return null;
                     continue;
                 }
-                /* // 需要选敌人的技能
-                 if (_selectedSkill.skillType == SkillType.Damage)
-                 {
-                     targetSelector.HandleTargetSelectionInput(actor);
-                     //使用技能测试版
-                     if (Input.GetKeyDown(KeyCode.Space))
-                     {
-                         if (_selectedSkill != null)
-                         {
-                             actor.UseSkill(_selectedSkill, _currentTarget);
-                             CheckBattleEnd(actor, _currentTarget);
-                             actionChosen = true;
-                         }
-                     }
-                     //不需要选敌人的技能：Heal、Revive
-                     else if(_selectedSkill.skillType==SkillType.Heal||_selectedSkill.skillType== SkillType.Revive)
-                     {
-                         actor.UseSkill(_selectedSkill, actor);
-                         CheckBattleEnd(actor, actor);
-                         actionChosen = true;
-                     }          
-                 }*/
+                 // 需要选敌人的技能               
                 if (_currentTargetType == SkillTargetType.Self)
                 {
                     if (Input.GetKeyDown(KeyCode.Space))
@@ -416,6 +410,106 @@ public class BattleManager : MonoBehaviour
         }
         if (commandPanel != null)
             commandPanel.Hide();
+    }
+    IEnumerator WaitForEnemyAction(BaseController actor)
+    {
+        yield return new WaitForSeconds(0.5f);//停顿一下
+
+        var skill=ChooseEnemySkill(actor);
+        if (skill == null)
+        {
+            Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} has no usable skill.");
+            yield break;
+        }
+        var target = ChooseEnemyTarget(actor, skill);
+        if (target == null)
+        {
+            Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
+            yield break;
+        }
+
+        actor.UseSkill(skill, target);
+        CheckBattleEnd(actor, target);
+
+        yield return new WaitForSeconds(1f);
+    }
+    private SkillData ChooseEnemySkill(BaseController actor)
+    {
+        var skills = actor.Skills;
+
+        Debug.Log($"[ChooseEnemySkill] actor={actor.data.Name}, skillCount={(skills == null ? -1 : skills.Count)}, hp={actor.data.Hp}/{actor.data.MaxHp}, healUsed={actor.healUsedCount}");
+        if (actor.data.Hp < actor.data.MaxHp * 0.5f&&actor.healUsedCount<2)
+        {
+            var heal = FindSkillByType(actor.Skills, SkillType.Heal);
+            Debug.Log($"[ChooseEnemySkill] heal={(heal == null ? "null" : heal.skillName)}");
+
+            if (heal!=null)
+            {
+                return heal;
+            }
+        }
+        var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
+        Debug.Log($"[ChooseEnemySkill] damage count = {(damageSkills == null ? -1 : damageSkills.Count)}");
+
+        if (damageSkills != null)
+        {
+            for (int i = 0; i < damageSkills.Count; i++)
+            {
+                Debug.Log($"[ChooseEnemySkill] damage[{i}] = {damageSkills[i].skillName}");
+            }
+        }
+        if (damageSkills.Count == 0)
+            return null;
+        int index = UnityEngine.Random.Range(0, damageSkills.Count);
+
+       
+        return damageSkills[index];
+    }
+    //单个
+    private SkillData FindSkillByType(IReadOnlyList<SkillData> skills,SkillType type)
+    {
+        if (skills == null) return null;
+         
+        for(int i = 0; i < skills.Count; i++)
+        {
+            var skill = skills[i];
+            if (skill != null && skill.skillType == type)
+                return skill;
+        }
+        return null;
+    }
+    private List<SkillData> FindSkillsByType(IReadOnlyList<SkillData> skills,SkillType type)
+    {
+        List<SkillData> result = new List<SkillData>();
+
+        if (skills == null) return result;
+
+        for(int i = 0; i < result.Count; i++)
+        {
+            var skill = skills[i];
+            if (skill != null && skill.skillType == type)
+            {
+                result.Add(skill);
+            }
+        }
+        return result;
+    }
+    private BaseController ChooseEnemyTarget(BaseController actor,SkillData skill)
+    {
+        if (actor == null || skill == null)
+            return null;
+        switch (skill.targetType)
+        {
+            case SkillTargetType.EnemySingle:
+                //敌人的敌人=玩家 这里使用的函数其实是通用函数
+                return GetRandomEnemyTarget(actor);
+            case SkillTargetType.AllySingle:
+                return GetRandomAllyTarget(actor);
+            case SkillTargetType.Self:
+                return actor;
+            default:
+                return actor;
+        }
     }
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
@@ -769,13 +863,23 @@ public class BattleManager : MonoBehaviour
         if (attacker == null) return null;
 
         var candidates = controllers
-            .Where(c => c != null && c.data != null && !c.data.isDead && !c.isDead && c.data.Team != attacker.data.Team)
+            .Where(c => c != null && c.data != null && !c.isDead && c.data.Team != attacker.data.Team)
             .ToList();
         if (candidates.Count == 0)
             return null;
 
         int index = UnityEngine.Random.Range(0, candidates.Count);
         return candidates[index];
+    }
+    private BaseController GetRandomAllyTarget(BaseController actor)
+    {
+        var list=controllers
+            .Where(c=>c!=null&&c.data!=null&&!c.isDead&&c.data.Team==actor.data.Team)
+            .ToList();
+
+        if (list.Count == 0)
+            return null;
+        return list[UnityEngine.Random.Range(0, list.Count)];
     }
    /* public bool Revive(BaseController ctrl, float hpAmount)
     {
@@ -807,7 +911,7 @@ public class BattleManager : MonoBehaviour
         {
             case CommandType.Attack:
                 Debug.Log("[Command] Attack selected");
-                _currentTargetType = SkillTargetType.EnmeySingle;
+                _currentTargetType = SkillTargetType.EnemySingle;
                 targetSelector.AutoPickTargetIfNeeded(_currentActor);
                 NotifyInputState();
                 commandPanel.Hide();
@@ -848,7 +952,7 @@ public class BattleManager : MonoBehaviour
             NotifyInputState();
             return;           
         }
-        if (skill.targetType == SkillTargetType.EnmeySingle)
+        if (skill.targetType == SkillTargetType.EnemySingle)
         {
             targetSelector.AutoPickTargetIfNeeded( _currentTarget);
             OnTargetChanged?.Invoke(_currentTarget);

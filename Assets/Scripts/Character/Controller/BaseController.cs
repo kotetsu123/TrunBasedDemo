@@ -8,7 +8,8 @@ public abstract class BaseController : MonoBehaviour
     public Action<BaseController> OnRevied;
 
     public Character data;
-    
+
+    public int healUsedCount = 0;
 
     [Header("Visual")]
     public Sprite portrait;//½ÇÉ«Ð¤Ïñ
@@ -143,7 +144,10 @@ public abstract class BaseController : MonoBehaviour
                 {
                     Debug.Log("Heal branch entered");
                     target.Heal(skill.power);
-                    //target.Heal(skill.power);
+                    if (data.Team == Team.Enemy)
+                    {
+                        healUsedCount++;
+                    }
                     Debug.Log($"[SkillType HEAL]{data.Name} healed {target.data.Name} for {skill.power}");
                     break;
                 }

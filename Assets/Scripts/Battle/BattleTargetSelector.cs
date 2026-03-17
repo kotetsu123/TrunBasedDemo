@@ -24,7 +24,7 @@ public class BattleTargetSelector : MonoBehaviour
 
         if (targetType == SkillTargetType.Self)
             return;
-        if (targetType == SkillTargetType.EnmeySingle)
+        if (targetType == SkillTargetType.EnemySingle)
         {
             //鼠标点击 切换目标
             HandleMouseClickSelectEnemy(actor);
@@ -96,7 +96,7 @@ public class BattleTargetSelector : MonoBehaviour
         if(actor==null||target==null||target.data==null) return false;
         switch (targetType)
         {
-            case SkillTargetType.EnmeySingle:
+            case SkillTargetType.EnemySingle:
                 return IsValidEnemyTarget(actor, target);
             case SkillTargetType.AllySingle:
                 return IsValidAllyTarget(actor, target);

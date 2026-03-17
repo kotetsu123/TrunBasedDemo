@@ -4,8 +4,8 @@ using UnityEngine;
 
 public enum SkillTargetType
 {
-    EnmeySingle,
-    EnmeyAll,
+    EnemySingle,
+    EnemyAll,
     AllySingle,
     AllyAll,
     AllyDeadSingle,
