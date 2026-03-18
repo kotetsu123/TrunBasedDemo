@@ -484,7 +484,7 @@ public class BattleManager : MonoBehaviour
 
         if (skills == null) return result;
 
-        for(int i = 0; i < result.Count; i++)
+        for(int i = 0; i < skills.Count; i++)
         {
             var skill = skills[i];
             if (skill != null && skill.skillType == type)
