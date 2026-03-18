@@ -88,7 +88,7 @@ public abstract class BaseController : MonoBehaviour
 
         //hp/MaxHp初始化兜底（防止MaxHp=0）
         if(this.data.MaxHp<=0&&this.data.Hp>0)
-            this.data.Hp= this.data.MaxHp;
+            this.data.MaxHp= this.data.Hp;
 
         //最后兜底：两个都<=0 就给个默认值，避免除0和UI全0
         if (this.data.MaxHp <= 0)

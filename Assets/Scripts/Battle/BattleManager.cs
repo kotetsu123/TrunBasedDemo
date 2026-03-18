@@ -416,17 +416,17 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);//停顿一下
 
         var skill=ChooseEnemySkill(actor);
-        if (skill == null)
+        /*if (skill == null)
         {
             Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} has no usable skill.");
             yield break;
-        }
+        }*/
         var target = ChooseEnemyTarget(actor, skill);
-        if (target == null)
+       /* if (target == null)
         {
             Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
             yield break;
-        }
+        }*/
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
@@ -437,11 +437,11 @@ public class BattleManager : MonoBehaviour
     {
         var skills = actor.Skills;
 
-        Debug.Log($"[ChooseEnemySkill] actor={actor.data.Name}, skillCount={(skills == null ? -1 : skills.Count)}, hp={actor.data.Hp}/{actor.data.MaxHp}, healUsed={actor.healUsedCount}");
+       // Debug.Log($"[ChooseEnemySkill] actor={actor.data.Name}, skillCount={(skills == null ? -1 : skills.Count)}, hp={actor.data.Hp}/{actor.data.MaxHp}, healUsed={actor.healUsedCount}");
         if (actor.data.Hp < actor.data.MaxHp * 0.5f&&actor.healUsedCount<2)
         {
             var heal = FindSkillByType(actor.Skills, SkillType.Heal);
-            Debug.Log($"[ChooseEnemySkill] heal={(heal == null ? "null" : heal.skillName)}");
+          //  Debug.Log($"[ChooseEnemySkill] heal={(heal == null ? "null" : heal.skillName)}");
 
             if (heal!=null)
             {
@@ -449,15 +449,15 @@ public class BattleManager : MonoBehaviour
             }
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
-        Debug.Log($"[ChooseEnemySkill] damage count = {(damageSkills == null ? -1 : damageSkills.Count)}");
+        //Debug.Log($"[ChooseEnemySkill] damage count = {(damageSkills == null ? -1 : damageSkills.Count)}");
 
-        if (damageSkills != null)
+      /*  if (damageSkills != null)
         {
             for (int i = 0; i < damageSkills.Count; i++)
             {
                 Debug.Log($"[ChooseEnemySkill] damage[{i}] = {damageSkills[i].skillName}");
             }
-        }
+        }*/
         if (damageSkills.Count == 0)
             return null;
         int index = UnityEngine.Random.Range(0, damageSkills.Count);

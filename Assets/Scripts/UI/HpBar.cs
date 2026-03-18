@@ -31,12 +31,21 @@ public class HpBar : MonoBehaviour
     }
     public void Bind(BaseController character)
     {
+        UnBind();
+
         owner = character;
+        if (owner != null&&owner.data!=null) {
+            owner.data.OnHpChanged += HandleHpChanged;
+        }
         UpdateHp();
        /* if (owner != null)
         {
             Debug.Log($"{owner.data.Name} 捆绑的owener的名字");
         }*/
+    }
+    private void HandleHpChanged(int prevHp,int curHp)
+    {
+        UpdateHp();
     }
     public void UpdateHp()
     {
@@ -48,8 +57,19 @@ public class HpBar : MonoBehaviour
         //该函数是unity提供的安全函数，用来把数值限制在0~1之间，
         fill.fillAmount = Mathf.Clamp01(ratio);
     }
+    private void UnBind()
+    {
+        if (owner != null && owner.data != null)
+        {
+            owner.data.OnHpChanged -= HandleHpChanged;
+        }
+    }
     public void Hide()
     {
         gameObject.SetActive(false);
+    }
+    private void OnDestroy()
+    {
+        UnBind();
     }
 }
