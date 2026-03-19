@@ -17,6 +17,10 @@ public abstract class BaseController : MonoBehaviour
     private float _nextDmgLogTime = 0f;
 
     [SerializeField] private List<SkillData> skills;
+
+    [Header("Floating Text")]
+    [SerializeField] private GameObject floatingTextPrefab;
+    [SerializeField] private Transform floatringTexAnchor;
     public IReadOnlyList<SkillData> Skills => skills;
     public abstract bool isPlayer { get; }
    // public abstract bool isDead { get; }
@@ -41,6 +45,11 @@ public abstract class BaseController : MonoBehaviour
         int prev = data.Hp;
         data.Hp = Mathf.Max(0, data.Hp - damage);
 
+        int actualDamage = prev - data.Hp;
+        if (actualDamage > 0)
+        {
+            ShowFloatingText($"-{actualDamage}", Color.red);
+        }
         data.NotifyHpChange(prev, data.Hp);
         if (data.Hp <= 0)
         {
@@ -53,6 +62,13 @@ public abstract class BaseController : MonoBehaviour
     {
         int prevHp = data.Hp;
         data.Hp = Mathf.Min(data.MaxHp, data.Hp + amout);
+
+        int actualHeal = data.Hp - prevHp;
+        if (actualHeal > 0)
+        {
+            ShowFloatingText($"+{actualHeal}",Color.green);
+        }
+
         data.NotifyHpChange(prevHp, data.Hp);
     }
     public void Revive(int amount)
@@ -67,6 +83,9 @@ public abstract class BaseController : MonoBehaviour
 
         int prevHp= data.Hp;
         data.Hp = Mathf.Clamp(amount, 1, data.MaxHp);
+
+        ShowFloatingText($"+{data.Hp}",Color.green);
+
         data.NotifyHpChange(prevHp, data.Hp);
 
         OnRevied?.Invoke(this);
@@ -158,5 +177,26 @@ public abstract class BaseController : MonoBehaviour
                 }
 
         }  
+    }
+    protected void ShowFloatingText(string message,Color color)
+    {
+        if (floatingTextPrefab == null) return;
+
+        Vector3 spawnPos = floatringTexAnchor != null 
+            ? floatringTexAnchor.position 
+            : transform.position + Vector3.up * 2f;
+
+        spawnPos += new Vector3(UnityEngine.Random.Range(-0.3f, 0.3f), 0f, 0f);
+
+        GameObject obj = Instantiate(floatingTextPrefab, spawnPos, Quaternion.identity);
+        FloatingText ft=obj.GetComponent<FloatingText>();
+        if (ft != null)
+        {
+            ft.SetUp(message,color);
+        }        
+    }
+    protected void ShowFloatingText(string message)
+    {
+        ShowFloatingText(message,Color.white);
     }
 }

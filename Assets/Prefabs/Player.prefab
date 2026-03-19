@@ -32,7 +32,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.5, z: -5.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2854306370101234013}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7150308265531917700
@@ -137,10 +138,44 @@ MonoBehaviour:
     isPlayer: 1
     battleEnded: 0
     intent: 0
+  healUsedCount: 0
   portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
   skills:
   - {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
   - {fileID: 11400000, guid: f79225a73c1c10049be0285b1a59256c, type: 2}
   - {fileID: 11400000, guid: 9e95882b9ebb1e443b8b228246d4b802, type: 2}
   - {fileID: 11400000, guid: 1fc1b5791aa80474a9044361c8911bb3, type: 2}
+  floatingTextPrefab: {fileID: 3498894492765518994, guid: b8c628566a340cc48bc2bc7cdb98cef8, type: 3}
+  floatringTexAnchor: {fileID: 2854306370101234013}
   playerHud: {fileID: 0}
+--- !u!1 &4211168402686058920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2854306370101234013}
+  m_Layer: 0
+  m_Name: FloatingAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2854306370101234013
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4211168402686058920}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6492541482423702865}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
