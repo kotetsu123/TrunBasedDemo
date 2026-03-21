@@ -19,6 +19,8 @@ public class BattleManager : MonoBehaviour
     //目标锁定TargetCircle 用event
     public event Action<BaseController> OnTargetChanged;
     public event Action<bool> OnInputStateChanged;
+    //当前actor 高光
+    public event Action<BaseController>OnCurrentActorChanged;
     //向外广播战斗是否结束
     public event Action<BattleResultPayload> OnBattleEnded;
 
@@ -752,6 +754,8 @@ public class BattleManager : MonoBehaviour
         Debug.Log($"[Battle] OnActionChanged subs={(del == null ? 0 : del.GetInvocationList().Length) }");*/
         Debug.Log($"[Battle] OnActionChanged subs={(OnActionChanged == null ? 0 : OnActionChanged.GetInvocationList().Length)} prev={prev?.data?.Name} cur={_currentActor?.data?.Name}");
         OnActionChanged?.Invoke(prev, _currentActor);
+
+        OnCurrentActorChanged?.Invoke(_currentActor);
 
         bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player&&_currentCommand==CommandType.Attack||_currentCommand==CommandType.Skill);
         OnInputStateChanged?.Invoke(playerTurn);
