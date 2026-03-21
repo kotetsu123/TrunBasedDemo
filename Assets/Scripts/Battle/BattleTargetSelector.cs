@@ -23,7 +23,11 @@ public class BattleTargetSelector : MonoBehaviour
         if (actor.data.Team != Team.Player) return;
 
         if (targetType == SkillTargetType.Self)
+        {
+            battleManager.SetCurrentTarget(actor);
             return;
+        }
+           
         if (targetType == SkillTargetType.EnemySingle)
         {
             //鼠标点击 切换目标
@@ -66,7 +70,7 @@ public class BattleTargetSelector : MonoBehaviour
 
             return;
         }
-
+       
     }
     public bool IsValidEnemyTarget(BaseController actor, BaseController target) { 
         if (actor == null || actor.data == null) return false;

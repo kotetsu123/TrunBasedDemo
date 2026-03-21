@@ -378,9 +378,25 @@ public class BattleManager : MonoBehaviour
                     yield return null;
                     continue;
                 }
-                 // 需要选敌人的技能               
-                if (_currentTargetType == SkillTargetType.Self)
+                targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
+                if (Input.GetKeyDown(KeyCode.Space))
                 {
+                    var target = _currentTarget;
+                    if (_currentTargetType == SkillTargetType.Self)
+                    {
+                        target = actor;
+                    }
+                    if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
+                    {
+                        actor.UseSkill(_selectedSkill, target);
+                        CheckBattleEnd(actor, target);
+                        actionChosen = true;
+                    }
+                }
+                /*if (_currentTargetType == SkillTargetType.Self)
+                {
+                    
+                   // targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
                     if (Input.GetKeyDown(KeyCode.Space))
                     {                     
                         actor.UseSkill(_selectedSkill, actor);
@@ -388,7 +404,7 @@ public class BattleManager : MonoBehaviour
                         actionChosen = true;
                     }
                 }
-                else
+                else// 需要选敌人的技能     
                 {
                     targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
                     if (Input.GetKeyDown(KeyCode.Space))
@@ -402,7 +418,7 @@ public class BattleManager : MonoBehaviour
                             actionChosen = true;
                         }
                     }
-                }
+                }*/
                 
             }
             
@@ -744,12 +760,20 @@ public class BattleManager : MonoBehaviour
     //设置当前目标，并触发事件 也是唯一改变_currentTarget的地方
     public void SetCurrentTarget(BaseController target)
     {
-        if (_currentTarget == target) return;
+        if (_currentTarget != null && _currentTarget != target)
+            _currentTarget.SetTargeted(false);
+
+        _currentTarget = target;
+
+        if(_currentTarget !=null)
+            _currentTarget.SetTargeted(true);
+
+      /*  if (_currentTarget == target) return;
         //TODO: 这里重新选当前的敌人会取消选中。然后如果进行攻击的话。伤害不会判定。要么进行防呆处理：必须选中敌人才能攻击要么进行别的处理
         if (_currentTarget != null) _currentTarget.SetTargeted(false);
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
-        Debug.Log($"[SetCurrentTarget] now = {_currentTarget?.data.Name}");
+        Debug.Log($"[SetCurrentTarget] now = {_currentTarget?.data.Name}");*/
         OnTargetChanged?.Invoke(_currentTarget);
 
         //判断圈圈是否在player回合 并且发送广播
@@ -768,7 +792,8 @@ public class BattleManager : MonoBehaviour
         if (_currentCommand == CommandType.Skill)
         {
             if (_selectedSkill == null) return false;
-            return _selectedSkill.targetType != SkillTargetType.Self;
+            // return _selectedSkill.targetType != SkillTargetType.Self;
+            return true;
         }
 
         return false;
@@ -945,13 +970,7 @@ public class BattleManager : MonoBehaviour
         _currentCommand = CommandType.Skill;
         _currentTargetType = skill.targetType;
 
-        if (skill.targetType == SkillTargetType.Self)
-        {
-            _currentTarget = _currentActor;
-            OnTargetChanged?.Invoke(_currentTarget);
-            NotifyInputState();
-            return;           
-        }
+     
         if (skill.targetType == SkillTargetType.EnemySingle)
         {
             targetSelector.AutoPickTargetIfNeeded( _currentTarget);
@@ -969,6 +988,13 @@ public class BattleManager : MonoBehaviour
         if (skill.targetType == SkillTargetType.AllyDeadSingle)
         {
             targetSelector.AutoPickDeadAllyTargetIfNeeded(_currentActor);
+            OnTargetChanged?.Invoke(_currentTarget);
+            NotifyInputState();
+            return;
+        }
+        if (skill.targetType == SkillTargetType.Self)
+        {
+            targetSelector.AutoPickAllyTargetIfNeeded( _currentActor);
             OnTargetChanged?.Invoke(_currentTarget);
             NotifyInputState();
             return;
