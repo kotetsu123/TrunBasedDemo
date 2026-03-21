@@ -13,6 +13,9 @@ public class TargetCircle : MonoBehaviour
 
     public void Attach(Transform target)
     {
+        if (_target == target)
+            return;
+
         _target = target;
         if (_target != null)
         {
@@ -54,6 +57,7 @@ public class TargetCircle : MonoBehaviour
             .DOScale(1.1f, 0.8f)
             .SetEase(Ease.InOutSine)//控制动画“速度曲线”
             .SetLoops(-1, LoopType.Yoyo);
+       
     }
 
     private void StopBreath()

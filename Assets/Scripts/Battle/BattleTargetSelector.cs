@@ -24,7 +24,9 @@ public class BattleTargetSelector : MonoBehaviour
 
         if (targetType == SkillTargetType.Self)
         {
-            battleManager.SetCurrentTarget(actor);
+            if (battleManager.CurrentTarget != actor)
+                battleManager.SetCurrentTarget(actor);
+
             return;
         }
            
