@@ -73,6 +73,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleCommandPanel commandPanel;
     [SerializeField] private SkillPanelController skillPanel;
 
+    [SerializeField] private SkillNamePopController skillNamePopUp;
+
     private CommandType _currentCommand=CommandType.None;
 
     private TargetCircle _targetCircle;
@@ -1059,6 +1061,11 @@ public class BattleManager : MonoBehaviour
 
         RequestReorder();
 
+    }
+    public void ShowSkillName(string skillName)
+    {
+        if (skillNamePopUp != null)
+            skillNamePopUp.Show(skillName);
     }
 }
 
