@@ -367,6 +367,8 @@ public class BattleManager : MonoBehaviour
                     var target = _currentTarget;
                     if (targetSelector.IsValidEnemyTarget(actor, target))
                     {
+                        ShowSkillName("Attack");
+
                         target.TakeDamage(actor.data.Attack);
                         //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
                         Debug.Log($"{actor.data.Name} attack the {target.data.Name} rise {actor.data.Attack} damage");
@@ -456,33 +458,21 @@ public class BattleManager : MonoBehaviour
     private SkillData ChooseEnemySkill(BaseController actor)
     {
         var skills = actor.Skills;
-
-       // Debug.Log($"[ChooseEnemySkill] actor={actor.data.Name}, skillCount={(skills == null ? -1 : skills.Count)}, hp={actor.data.Hp}/{actor.data.MaxHp}, healUsed={actor.healUsedCount}");
+      
         if (actor.data.Hp < actor.data.MaxHp * 0.5f&&actor.healUsedCount<2)
         {
             var heal = FindSkillByType(actor.Skills, SkillType.Heal);
-          //  Debug.Log($"[ChooseEnemySkill] heal={(heal == null ? "null" : heal.skillName)}");
-
-            if (heal!=null)
+       
+            if (heal!=null&&GetBestHealTarget(actor)!=null)
             {
                 return heal;
             }
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
-        //Debug.Log($"[ChooseEnemySkill] damage count = {(damageSkills == null ? -1 : damageSkills.Count)}");
-
-      /*  if (damageSkills != null)
-        {
-            for (int i = 0; i < damageSkills.Count; i++)
-            {
-                Debug.Log($"[ChooseEnemySkill] damage[{i}] = {damageSkills[i].skillName}");
-            }
-        }*/
+       
         if (damageSkills.Count == 0)
             return null;
-        int index = UnityEngine.Random.Range(0, damageSkills.Count);
-
-       
+        int index = UnityEngine.Random.Range(0, damageSkills.Count);      
         return damageSkills[index];
     }
     //单个
@@ -524,6 +514,9 @@ public class BattleManager : MonoBehaviour
                 //敌人的敌人=玩家 这里使用的函数其实是通用函数
                 return GetRandomEnemyTarget(actor);
             case SkillTargetType.AllySingle:
+                if (skill.skillType == SkillType.Heal)
+                    return GetBestHealTarget(actor);
+
                 return GetRandomAllyTarget(actor);
             case SkillTargetType.Self:
                 return actor;
@@ -531,6 +524,39 @@ public class BattleManager : MonoBehaviour
                 return actor;
         }
     }
+    private BaseController GetBestHealTarget(BaseController actor)
+    {
+        if (actor == null || actor.data == null)
+            return null;
+
+        BaseController best = null;
+        float lowestHpRatio=float.MaxValue;
+
+        foreach(var unit in controllers)
+        {
+            if (unit == null || unit.data == null) continue;
+            if (unit.data.Team != actor.data.Team) continue;
+            if (unit.isDead || unit.data.isDead) continue;
+            if (!unit.data.isOnField) continue;
+            if (unit.data.Hp >= unit.data.MaxHp) continue;
+
+            float hpRatio=(float)unit.data.Hp/unit.data.MaxHp;
+
+            if (hpRatio < lowestHpRatio)
+            {
+                lowestHpRatio = hpRatio;
+                best = unit;
+            }
+        }
+        return best;
+    }
+    /*private List<BaseController> GetAliveAllies(BaseController actor)
+    {
+        List<BaseController> result = new List<BaseController>();
+        if (actor == null || actor.data == null)
+            return result;
+        foreach (var unit in )
+    }*/
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
         if (battleEnded) return;
