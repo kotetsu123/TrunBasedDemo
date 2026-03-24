@@ -72,9 +72,10 @@ public class BattleManager : MonoBehaviour
     //战斗指令模块相关
     [SerializeField] private BattleCommandPanel commandPanel;
     [SerializeField] private SkillPanelController skillPanel;
-
+    //弹出技能名字相关
     [SerializeField] private SkillNamePopController skillNamePopUp;
-
+    //道具相关
+    [SerializeField] private ItemPanelController itemPanel;
     private CommandType _currentCommand=CommandType.None;
 
     private TargetCircle _targetCircle;
@@ -84,6 +85,7 @@ public class BattleManager : MonoBehaviour
     private Tween _moveTween;//防止重入
 
     private SkillData _selectedSkill;
+    private ItemData _selectedItem;
 
     public BaseController CurrentActor=>_currentActor;
     public BaseController CurrentTarget => _currentTarget;
@@ -399,6 +401,26 @@ public class BattleManager : MonoBehaviour
                         actionChosen = true;
                     }
                 }
+                else if (_currentCommand == CommandType.Item)
+                {
+                    if (_selectedItem == null)
+                    {
+                        yield return null;
+                        continue;
+                    }
+                    targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
+
+                    if (Input.GetKeyDown(KeyCode.Space)){
+                        var target = _currentTarget;
+
+                        if (targetSelector.IsValidAllyTarget(actor, target))
+                        {
+                            UseItem(actor, _selectedItem, target);
+                            CheckBattleEnd(actor, target);
+                            actionChosen = true;
+                        }
+                    }
+                }
                 /*if (_currentTargetType == SkillTargetType.Self)
                 {
                     
@@ -530,7 +552,7 @@ public class BattleManager : MonoBehaviour
             return null;
 
         BaseController best = null;
-        float lowestHpRatio=float.MaxValue;
+        float lowestHpRatio=float.MaxValue;//先设置一个极大的数，当作当前最低血量比例
 
         foreach(var unit in controllers)
         {
@@ -540,10 +562,12 @@ public class BattleManager : MonoBehaviour
             if (!unit.data.isOnField) continue;
             if (unit.data.Hp >= unit.data.MaxHp) continue;
 
+            //当前这个单位的血量百分比
             float hpRatio=(float)unit.data.Hp/unit.data.MaxHp;
 
             if (hpRatio < lowestHpRatio)
             {
+                //对比
                 lowestHpRatio = hpRatio;
                 best = unit;
             }
@@ -581,6 +605,19 @@ public class BattleManager : MonoBehaviour
                 Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
             //广播战斗结束
             OnBattleEnded?.Invoke(payload);         
+        }
+    }
+    private void UseItem(BaseController actor,ItemData item,BaseController target)
+    {
+        if(actor==null||item==null||target==null) return;
+
+        ShowSkillName(item.itemName);
+
+        switch (item.itemtype)
+        {
+            case ItemType.Heal:
+                target.Heal(item.power);
+                break;
         }
     }
     private List<CharacterResultSnapshot> BuildPartySnapShots()
@@ -913,8 +950,6 @@ public class BattleManager : MonoBehaviour
             TryPlaceIntoFormation(c);
         }
     } 
-   
-   
     private BaseController GetRandomEnemyTarget(BaseController attacker)
     {
         if (attacker == null) return null;
@@ -938,27 +973,7 @@ public class BattleManager : MonoBehaviour
             return null;
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
-   /* public bool Revive(BaseController ctrl, float hpAmount)
-    {
-        if (ctrl == null || !ctrl.data.isDead)
-            return false;
-
-        ctrl.data.isDead = false;
-        ctrl.data.Hp =(int) MathF.Max(1f, hpAmount);
-        ctrl.enabled = true;
-
-        int prev = ctrl.data.Hp;
-        int cur=(int)Mathf.Max(1f, hpAmount);
-
-        //让hud收到变化
-        ctrl.data.NotifyHpChange(prev, cur);
-
-        //重新加入时间轴
-        RegisterController(ctrl);
-
-        RequestReorder();
-        return true;
-    }*/
+  
    //战斗指令菜单相关
     private void HandleCommandSelected(CommandType cmd)
     {
@@ -985,6 +1000,7 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("[Command] Item selected");
                 commandPanel.Hide();
                 //TODO 
+                itemPanel.Show();
                 break;
 
             case CommandType.Run:
@@ -1044,12 +1060,21 @@ public class BattleManager : MonoBehaviour
         if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
             return;
 
-        skillPanel.Hide();
-        commandPanel.Show();
+        CancelSkillSelection();
+    }
+    public void HandleItemSelected(ItemData item)
+    {
+        if (item == null) return;
 
-        _currentCommand = CommandType.None;
+        _selectedItem= item;
+        _currentCommand = CommandType.Item;
+        switch (item.itemtype)
+        {
+            case ItemType.Heal:
+                _currentTargetType = SkillTargetType.AllySingle;
+                break;
+        }
         NotifyInputState();
-
     }
     private void HandleCancelInput()
     {
@@ -1092,6 +1117,18 @@ public class BattleManager : MonoBehaviour
     {
         if (skillNamePopUp != null)
             skillNamePopUp.Show(skillName);
+    }
+    public void CancelSkillSelection()
+    {
+        skillPanel.Hide();
+        commandPanel.Show();
+
+        _currentCommand = CommandType.None;
+        NotifyInputState();
+    }
+    public void CancelItemSelection()
+    {
+        //if()
     }
 }
 
