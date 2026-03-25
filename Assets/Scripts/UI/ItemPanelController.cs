@@ -23,6 +23,12 @@ public class ItemPanelController : MonoBehaviour
             canvasGroup.interactable = true;
         }
     }
+    public void Hide()
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+    }
     public void HideImmediate()
     {
         canvasGroup.alpha = 0f;

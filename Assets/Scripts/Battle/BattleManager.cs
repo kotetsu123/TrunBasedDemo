@@ -348,8 +348,10 @@ public class BattleManager : MonoBehaviour
         }
         while (!actionChosen)
         {
-            //skillPanel 返回commanPanel
+            //skillPanel 返回commandPanel
             HandleSkillCancel();
+            //itemPanel 返回commandPanel
+            HandleItemCancel();
             //选中返回
             HandleCancelInput();
 
@@ -401,26 +403,7 @@ public class BattleManager : MonoBehaviour
                         actionChosen = true;
                     }
                 }
-                else if (_currentCommand == CommandType.Item)
-                {
-                    if (_selectedItem == null)
-                    {
-                        yield return null;
-                        continue;
-                    }
-                    targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
-
-                    if (Input.GetKeyDown(KeyCode.Space)){
-                        var target = _currentTarget;
-
-                        if (targetSelector.IsValidAllyTarget(actor, target))
-                        {
-                            UseItem(actor, _selectedItem, target);
-                            CheckBattleEnd(actor, target);
-                            actionChosen = true;
-                        }
-                    }
-                }
+               
                 /*if (_currentTargetType == SkillTargetType.Self)
                 {
                     
@@ -449,7 +432,27 @@ public class BattleManager : MonoBehaviour
                 }*/
                 
             }
-            
+            else if (_currentCommand == CommandType.Item)
+            {
+                if (_selectedItem == null)
+                {
+                    yield return null;
+                    continue;
+                }
+                targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
+
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    var target = _currentTarget;
+
+                    if (targetSelector.IsValidAllyTarget(actor, target))
+                    {
+                        UseItem(actor, _selectedItem, target);
+                        CheckBattleEnd(actor, target);
+                        actionChosen = true;
+                    }
+                }
+            }
             yield return null;
         }
         if (commandPanel != null)
@@ -617,6 +620,7 @@ public class BattleManager : MonoBehaviour
         {
             case ItemType.Heal:
                 target.Heal(item.power);
+                Debug.Log($"[ItemHeal]{_currentActor.name} used item {_currentTarget.name} has healed {item.power}HP {_currentTarget.name} current HP={_currentTarget.data.Hp} ");
                 break;
         }
     }
@@ -864,7 +868,11 @@ public class BattleManager : MonoBehaviour
             // return _selectedSkill.targetType != SkillTargetType.Self;
             return true;
         }
-
+        if (_currentCommand == CommandType.Item)
+        {
+            if (_selectedItem == null) return false;
+            return true;
+        }
         return false;
     }
     private void NotifyInputState()
@@ -1062,6 +1070,16 @@ public class BattleManager : MonoBehaviour
 
         CancelSkillSelection();
     }
+    private void HandleItemCancel()
+    {
+        if (itemPanel == null || commandPanel == null) return;
+        //只在itempanel 打开的时候处理
+        if (!itemPanel.IsOpen) return;
+        //右键或esc键
+        if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
+            return;
+        CancelItemSelection();
+    }
     public void HandleItemSelected(ItemData item)
     {
         if (item == null) return;
@@ -1072,6 +1090,8 @@ public class BattleManager : MonoBehaviour
         {
             case ItemType.Heal:
                 _currentTargetType = SkillTargetType.AllySingle;
+                targetSelector.AutoPickAllyTargetIfNeeded(_currentActor);
+               
                 break;
         }
         NotifyInputState();
@@ -1097,6 +1117,14 @@ public class BattleManager : MonoBehaviour
             NotifyInputState();
 
             commandPanel.Show();
+            return;
+        }
+        if (_currentCommand == CommandType.Item)
+        {
+            _currentCommand = CommandType.None;
+            NotifyInputState();
+
+            itemPanel.Show();
             return;
         }
     }
@@ -1128,7 +1156,11 @@ public class BattleManager : MonoBehaviour
     }
     public void CancelItemSelection()
     {
-        //if()
+        itemPanel.Hide();
+        commandPanel.Show();
+
+        _currentCommand = CommandType.None;
+        NotifyInputState();
     }
 }
 
