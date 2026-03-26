@@ -124,6 +124,7 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
+        if (battleEnded) return;//如果战斗结束，跳过本次更新
         if (isActing) return;//正在行动中，跳过本次更新
         if (!isBattleReady) return;//战斗未准备好，跳过本次更新
 
@@ -133,10 +134,7 @@ public class BattleManager : MonoBehaviour
         {
             updateActionValues();
         }
-        if (battleEnded)
-        {
-            return;
-        }         
+        
     }
     private void LateUpdate()
     {
@@ -348,6 +346,11 @@ public class BattleManager : MonoBehaviour
         }
         while (!actionChosen)
         {
+            if (battleEnded) {
+                actionChosen=true;
+                yield break;
+            }
+                
             //skillPanel 返回commandPanel
             HandleSkillCancel();
             //itemPanel 返回commandPanel
@@ -453,7 +456,12 @@ public class BattleManager : MonoBehaviour
                     }
                 }
             }
-            yield return null;
+            else if (_currentCommand == CommandType.Run)
+            {
+                HandleRun(actor);
+                actionChosen = true;
+            }
+                yield return null;
         }
         if (commandPanel != null)
             commandPanel.Hide();
@@ -1161,6 +1169,31 @@ public class BattleManager : MonoBehaviour
 
         _currentCommand = CommandType.None;
         NotifyInputState();
+    }
+    private void HandleRun(BaseController actor)
+    {
+        battleEnded = true;
+
+        _currentCommand = CommandType.None;
+        _selectedSkill = null;
+        _selectedItem = null;
+        SetCurrentTarget(null);
+
+        if (commandPanel != null)
+            commandPanel.Hide();
+        if (skillPanel != null)
+            skillPanel.Hide();
+        if(itemPanel!=null)
+            itemPanel.Hide();
+
+        NotifyInputState();
+
+        ShowSkillName("Run");
+
+        var snapshots = BuildPartySnapShots();
+        var payload = new BattleResultPayload(BattleResult.Escape, snapshots);
+
+        OnBattleEnded?.Invoke(payload);
     }
 }
 

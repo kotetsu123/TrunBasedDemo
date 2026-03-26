@@ -78,7 +78,19 @@ public class BattleEndPanelController : MonoBehaviour
         //…Ë÷√Œƒ±æ
         if (resultTxt != null)
         {
-            resultTxt.text = (payload.Result == BattleResult.Win) ? "You Win!" : "You Lose!";
+            switch (payload.Result)
+            {
+                case BattleResult.Win:
+                    resultTxt.text = "You Win!";
+                    break;
+                case BattleResult.Lose:
+                    resultTxt.text = "You Lose!";
+                    break;
+                case BattleResult.Escape:
+                    resultTxt.text = "You Have Escaped";
+                    break;
+            }
+           // resultTxt.text = (payload.Result == BattleResult.Win) ? "You Win!" : "You Lose!";
             var c=resultTxt.color;
             c.a = 0f;
             resultTxt.color = c;
