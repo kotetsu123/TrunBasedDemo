@@ -108,6 +108,7 @@ public class BattleManager : MonoBehaviour
             commandPanel.OnCommandSelected += HandleCommandSelected;
         skillPanel.OnSkillSelected += HandleSkillSelected;
         skillPanel.OnCancel += HandleSkillCancel;
+        itemPanel.OnItemSelected += HandleItemSelected;
     }
     private void OnDisable()
     {
@@ -115,6 +116,7 @@ public class BattleManager : MonoBehaviour
             commandPanel.OnCommandSelected -= HandleCommandSelected;
         skillPanel.OnSkillSelected -= HandleSkillSelected;
         skillPanel.OnCancel -= HandleSkillCancel;
+        itemPanel.OnItemSelected -= HandleItemSelected;
     }
    
     private void Start()

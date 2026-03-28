@@ -5808,7 +5808,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1343589044}
         m_TargetAssemblyTypeName: ItemPanelController, Assembly-CSharp
-        m_MethodName: OnItemButtonClicked
+        m_MethodName: OnClickItem
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 11400000, guid: 1dd1fab1a86b02e469020980ac42b0aa, type: 2}
