@@ -23,8 +23,10 @@ public class BattleManager : MonoBehaviour
     public event Action<BaseController>OnCurrentActorChanged;
     //向外广播战斗是否结束
     public event Action<BattleResultPayload> OnBattleEnded;
+    //道具数量改变
+    public Action<ItemData, int> OnItemCountChanged;
 
-   // public List<Character> characters = new List<BaseController>();
+    // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
     
     public bool isActing = false;
@@ -78,9 +80,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private ItemPanelController itemPanel;
     [SerializeField] private List<ItemData> startingItems=new List<ItemData>();
     [SerializeField] private List<int> startItemCounts = new List<int>();
-                     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
-                     public Action<ItemData, int> OnItemCountChanged;
 
+
+
+    private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
 
     private CommandType _currentCommand=CommandType.None;
 
@@ -96,6 +99,7 @@ public class BattleManager : MonoBehaviour
     public BaseController CurrentActor=>_currentActor;
     public BaseController CurrentTarget => _currentTarget;
     public CommandType CurrentCommand=> _currentCommand;
+   
     void Awake()
     {
         Instance = this;
@@ -1212,7 +1216,21 @@ public class BattleManager : MonoBehaviour
 
         OnBattleEnded?.Invoke(payload);
     }
-    //道具使用相关，后续需要拆除使用广播和UI 逻辑分离的原则，改成事件驱动
+    //道具使用相关
+    public List<ItemData> GetAvailableItems()
+    {
+        List<ItemData> result=new List<ItemData>();
+
+        for(int i = 0; i < startingItems.Count; i++)
+        {
+            var item=startingItems[i];
+            if (item == null) continue;
+            if (result.Contains(item)) continue;
+
+            result.Add(item);
+        }
+        return result;
+    }
     private void InitItemInventory()
     {
         _itemCounts.Clear();
