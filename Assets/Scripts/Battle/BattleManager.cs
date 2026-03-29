@@ -76,6 +76,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private SkillNamePopController skillNamePopUp;
     //道具相关
     [SerializeField] private ItemPanelController itemPanel;
+    [SerializeField] private List<ItemData> startingItems=new List<ItemData>();
+    [SerializeField] private List<int> startItemCounts = new List<int>();
+    private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
+
     private CommandType _currentCommand=CommandType.None;
 
     private TargetCircle _targetCircle;
@@ -216,6 +220,7 @@ public class BattleManager : MonoBehaviour
         isBattleReady = true;
         //开局就刷新一次 UI 排列
         RequestReorder();
+        InitItemInventory();
 
         Debug.Log("[BattleManager] Battle Ready!");      
     }
@@ -453,6 +458,7 @@ public class BattleManager : MonoBehaviour
                     if (targetSelector.IsValidAllyTarget(actor, target))
                     {
                         UseItem(actor, _selectedItem, target);
+
                         CheckBattleEnd(actor, target);
                         actionChosen = true;
                     }
@@ -624,6 +630,11 @@ public class BattleManager : MonoBehaviour
     {
         if(actor==null||item==null||target==null) return;
 
+        if (!CanUseItem(item))
+        {
+            Debug.Log($"[Item]{item.itemName}is out of stock");
+            return;
+        }
         ShowSkillName(item.itemName);
 
         switch (item.itemtype)
@@ -633,6 +644,7 @@ public class BattleManager : MonoBehaviour
                 Debug.Log($"[ItemHeal]{_currentActor.name} used item {_currentTarget.name} has healed {item.power}HP {_currentTarget.name} current HP={_currentTarget.data.Hp} ");
                 break;
         }
+       ConsumeItem(item);
     }
     private List<CharacterResultSnapshot> BuildPartySnapShots()
     {
@@ -1093,6 +1105,7 @@ public class BattleManager : MonoBehaviour
     public void HandleItemSelected(ItemData item)
     {
         if (item == null) return;
+        if (!CanUseItem(item)) return;
 
         _selectedItem= item;
         _currentCommand = CommandType.Item;
@@ -1196,6 +1209,41 @@ public class BattleManager : MonoBehaviour
         var payload = new BattleResultPayload(BattleResult.Escape, snapshots);
 
         OnBattleEnded?.Invoke(payload);
+    }
+    //道具使用相关，后续需要拆除使用广播和UI 逻辑分离的原则，改成事件驱动
+    private void InitItemInventory()
+    {
+        _itemCounts.Clear();
+
+        int count = Mathf.Min(startingItems.Count, startItemCounts.Count);
+        for(int i=0;i<count; i++)
+        {
+            var item= startingItems[i];
+            int itemCount = startItemCounts[i];
+
+            if (item == null) continue;
+
+            _itemCounts[item] = Mathf.Max(0, itemCount);
+        }
+    }
+    //读取道具数量
+    public int GetItemCount(ItemData item)
+    {
+        if (item == null) return 0;
+        return _itemCounts.TryGetValue(item, out int count) ? count : 0;
+    }
+    //是否可以使用
+    public bool CanUseItem(ItemData item)
+    {
+        return GetItemCount(item) > 0;
+    }
+    //使用消耗道具
+    private void ConsumeItem(ItemData item)
+    {
+        if (item == null) return;
+        if (!_itemCounts.ContainsKey(item)) return;
+
+        _itemCounts[item]=Mathf.Max(0, _itemCounts[item] - 1);
     }
 }
 

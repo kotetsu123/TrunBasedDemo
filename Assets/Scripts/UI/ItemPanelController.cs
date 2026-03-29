@@ -2,12 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class ItemPanelController : MonoBehaviour
 {
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private GameObject itemPanel;
     [SerializeField] private BattleManager battle;
+    //TODO: This should be a list of items, not just one item
+    [SerializeField] private ItemData potionItem;
+    [SerializeField] private TMPro.TMP_Text potionCountTxt;
+    [SerializeField]private Button potionButton;
 
     public Action<ItemData> OnItemSelected;
 
@@ -26,6 +31,7 @@ public class ItemPanelController : MonoBehaviour
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
         }
+        Refresh();
     }
     public void Hide()
     {
@@ -46,5 +52,18 @@ public class ItemPanelController : MonoBehaviour
         // battle.HandleItemSelected(item);
         OnItemSelected?.Invoke(item);
         HideImmediate();
+        Refresh();
+    }
+    public void Refresh()
+    {
+        if (battle == null || potionItem == null) return;
+        int count = battle.GetItemCount(potionItem);
+
+        if (potionItem != null)
+            potionCountTxt.text = $"x{ count}";
+        if (potionButton != null)
+        {
+            potionButton.interactable = count > 0;
+        }
     }
 }
