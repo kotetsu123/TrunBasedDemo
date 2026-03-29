@@ -19,6 +19,16 @@ public class ItemPanelController : MonoBehaviour
 
     public bool IsOpen => canvasGroup != null && canvasGroup.alpha > 0.99f;
 
+    private void OnEnable()
+    {
+        if (battle != null)
+            battle.OnItemCountChanged += HandleItemCountChanged;
+    }
+    private void OnDisable()
+    {
+        if(battle!=null)
+            battle.OnItemCountChanged -= HandleItemCountChanged;
+    }
     private void Awake()
     {
         HideImmediate();
@@ -52,7 +62,7 @@ public class ItemPanelController : MonoBehaviour
         // battle.HandleItemSelected(item);
         OnItemSelected?.Invoke(item);
         HideImmediate();
-        Refresh();
+        
     }
     public void Refresh()
     {
@@ -65,5 +75,9 @@ public class ItemPanelController : MonoBehaviour
         {
             potionButton.interactable = count > 0;
         }
+    }
+    private void HandleItemCountChanged(ItemData item,int newCount)
+    {
+        Refresh();
     }
 }

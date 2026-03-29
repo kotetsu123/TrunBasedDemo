@@ -78,7 +78,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private ItemPanelController itemPanel;
     [SerializeField] private List<ItemData> startingItems=new List<ItemData>();
     [SerializeField] private List<int> startItemCounts = new List<int>();
-    private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
+                     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
+                     public Action<ItemData, int> OnItemCountChanged;
+
 
     private CommandType _currentCommand=CommandType.None;
 
@@ -1244,6 +1246,8 @@ public class BattleManager : MonoBehaviour
         if (!_itemCounts.ContainsKey(item)) return;
 
         _itemCounts[item]=Mathf.Max(0, _itemCounts[item] - 1);
+
+        OnItemCountChanged?.Invoke(item, _itemCounts[item]);
     }
 }
 
