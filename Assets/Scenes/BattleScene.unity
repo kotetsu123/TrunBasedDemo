@@ -1260,8 +1260,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 518036928}
-  skillNameText: {fileID: 1533397268}
   fadeDuration: 0.15
+  useInteraction: 0
+  skillNameText: {fileID: 1533397268}
   visibleDuration: 0.8
 --- !u!1001 &525684029
 PrefabInstance:
@@ -4007,6 +4008,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1343589045}
+  fadeDuration: 0.15
+  useInteraction: 1
   contentRoot: {fileID: 232217489}
   itemViewPrefab: {fileID: 6759771005133109974, guid: 26b948c160c94f64e903a620da9ad30e, type: 3}
   battle: {fileID: 1454933262}
@@ -4204,6 +4207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1431504865}
   fadeDuration: 0.15
+  useInteraction: 1
   contentRoot: {fileID: 806607266}
   skillItemPrefab: {fileID: 7544719156696802443, guid: 04cffd5d119c47940bea7d56ddd983e9, type: 3}
 --- !u!1 &1454933259

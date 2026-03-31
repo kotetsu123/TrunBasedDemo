@@ -7,6 +7,7 @@ public class BasePanel : MonoBehaviour
 {
     [SerializeField]protected CanvasGroup canvasGroup;
     [SerializeField] protected float fadeDuration = 0.15f;
+    [SerializeField] protected bool useInteraction = true;
 
     protected Tween currentTween;
 
@@ -26,8 +27,8 @@ public class BasePanel : MonoBehaviour
 
         currentTween?.Kill();
 
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
+        canvasGroup.blocksRaycasts = useInteraction;
+        canvasGroup.interactable = useInteraction;
 
         currentTween= canvasGroup.DOFade(1f, fadeDuration);
     }

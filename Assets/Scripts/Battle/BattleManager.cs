@@ -1173,7 +1173,7 @@ public class BattleManager : MonoBehaviour
     public void ShowSkillName(string skillName)
     {
         if (skillNamePopUp != null)
-            skillNamePopUp.Show(skillName);
+            skillNamePopUp.Play(skillName);
     }
     public void CancelSkillSelection()
     {
