@@ -4,9 +4,8 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 
-public class ItemPanelController : MonoBehaviour
-{
-    [SerializeField] private CanvasGroup canvasGroup;
+public class ItemPanelController : BasePanel
+{   
     [SerializeField] private Transform contentRoot;
     [SerializeField]private ItemItemView itemViewPrefab;
     [SerializeField] private BattleManager battle;
@@ -16,9 +15,6 @@ public class ItemPanelController : MonoBehaviour
 
     private readonly List<ItemItemView> _spwanItems = new List<ItemItemView>();
     
-
-    public bool IsOpen => canvasGroup != null && canvasGroup.alpha > 0.99f;
-
     private void OnEnable()
     {
         if (battle != null)
@@ -29,32 +25,17 @@ public class ItemPanelController : MonoBehaviour
         if(battle!=null)
             battle.OnItemCountChanged -= HandleItemCountChanged;
     }
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         HideImmediate();
     }
-    public void Show()
+    public override void Show()
     {
-        
-           canvasGroup.alpha= 1f;
-            canvasGroup.blocksRaycasts = true;
-            canvasGroup.interactable = true;
-        
+        Refresh();
+        base.Show();
         Refresh();
     }
-    public void Hide()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
-    }
-    public void HideImmediate()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
-    }
-   
     public void Refresh()
     {
         ClearItems();

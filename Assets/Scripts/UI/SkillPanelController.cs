@@ -3,43 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkillPanelController : MonoBehaviour
+public class SkillPanelController : BasePanel
 {
-
     public event Action<SkillData> OnSkillSelected;
     public event Action OnCancel;
 
-   
-    [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Transform contentRoot;
     [SerializeField] private SkillItemView skillItemPrefab;
 
     private readonly List<SkillItemView> _items = new();
 
-    public bool IsOpen => canvasGroup != null && canvasGroup.alpha > 0.99f;
-    private void Awake()
+  protected override void Awake()
     {
+        base.Awake();
         HideImmediate();
     }
     public void Show(BaseController actor)
     {
         Rebuild(actor);
 
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
-    }
-    public void Hide()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
-    }
-    public  void HideImmediate()
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        base.Show();
     }
     public void OnClickSkill(SkillData skill)
     {

@@ -458,7 +458,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 350, y: 0}
+  m_SizeDelta: {x: 350, y: 260}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &232217490
 MonoBehaviour:
@@ -499,7 +499,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_HorizontalFit: 0
-  m_VerticalFit: 2
+  m_VerticalFit: 0
 --- !u!1001 &252337099
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4203,6 +4203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 1431504865}
+  fadeDuration: 0.15
   contentRoot: {fileID: 806607266}
   skillItemPrefab: {fileID: 7544719156696802443, guid: 04cffd5d119c47940bea7d56ddd983e9, type: 3}
 --- !u!1 &1454933259
