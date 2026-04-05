@@ -5,19 +5,32 @@ using DG.Tweening;
 using UnityEngine.UI;
 public class TimelineIconView : MonoBehaviour
 {
+    [SerializeField] private LayoutElement layoutElement;
     [Header("Refs")]
     [SerializeField] private RectTransform visualRoot;
     [SerializeField] private CanvasGroup glow;
 
     [Header("Anim")]
     [SerializeField] private float actionScale = 1.12f;
+    [SerializeField] private float nextScale = 1.04f;
     [SerializeField] private float animTime = 0.25f;
 
     [Header("Glow")]
     [SerializeField] private float nextAlpha = 0.35f;
     [SerializeField] private float activeAlpha = 0.65f;
 
+    [Header("Layout")]
+    [SerializeField]private float normalWidth = 60;
+    [SerializeField]private float normalHeight = 40;
+    [SerializeField]private float nextWidth = 62f;
+    [SerializeField]private float nextHeight = 40f;
+    [SerializeField]private float activeWidth = 68f;
+    [SerializeField]private float activeHeight = 48f;
+
     [SerializeField] private Image glowImage;
+
+    
+
     private Color _defalutGlowColor;
 
     public enum TimeLineState {Normal,Next,Active }
@@ -81,6 +94,9 @@ public class TimelineIconView : MonoBehaviour
         _state = state;
 
         _active = false;
+
+        ApplyLayoutSize(state);
+
         if (visualRoot)
             visualRoot.localScale = Vector3.one;
 
@@ -93,6 +109,8 @@ public class TimelineIconView : MonoBehaviour
 
         //Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
         //if (_state == state) return;
+        ApplyLayoutSize(state);
+
         if (_state == state)
         {
             Debug.Log($"[SetState] SKIP same state id={GetInstanceID()} state={state}");
@@ -101,12 +119,11 @@ public class TimelineIconView : MonoBehaviour
     
        _tween ?.Kill();
         _state = state;
-        if (!isActiveAndEnabled || visualRoot == null) return;
-
        
-        
+        if (!isActiveAndEnabled || visualRoot == null) return;    
         //=====目标值=====
-        float targetScale=(state==TimeLineState.Active)? actionScale:1f;
+        float targetScale=(state==TimeLineState.Active)? actionScale:
+            (state==TimeLineState.Next)?nextScale:1f;
 
         float tarrgetAlpha =
             (state == TimeLineState.Active) ? activeAlpha :
@@ -124,10 +141,7 @@ public class TimelineIconView : MonoBehaviour
 
         var seq = DOTween.Sequence().SetLink(gameObject);//.SetUpdate(true);
         Debug.Log($"[SetState] f={Time.frameCount} created tween id={GetInstanceID()} state={state} targetScale={targetScale}");
-
-
         //scaled 动画
-
         seq.Append(visualRoot.DOScale(targetScale, animTime).SetEase(state == TimeLineState.Active ? Ease.OutBack : Ease.OutQuint));
 
         /*seq.OnUpdate(() =>
@@ -148,8 +162,26 @@ public class TimelineIconView : MonoBehaviour
         _tween = seq;
         Debug.Log($"[ScaleTest] visualRoot={visualRoot.name} parent={visualRoot.parent?.name} startScale={visualRoot.localScale}");
         Debug.Log($"[ScaleParam] actionScale={actionScale} animTime={animTime}");
+    }
+    private void ApplyLayoutSize(TimeLineState state)
+    {
+        if(layoutElement==null)return;
 
+        switch (state)
+        {
+            case TimeLineState.Normal:
+                layoutElement.preferredWidth = normalWidth;
+                layoutElement.preferredHeight = normalHeight;
+                break;
+            case TimeLineState.Next:
+                layoutElement.preferredWidth = nextWidth;
+                layoutElement.preferredHeight = nextHeight;
+                break;
+            case TimeLineState.Active:
+                layoutElement.preferredWidth = activeWidth;
+                layoutElement.preferredHeight = activeHeight;
+                break;
+        }
 
     }
-
 }
