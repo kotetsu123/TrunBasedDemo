@@ -23,7 +23,7 @@ public class Character
     public int Mp;
 
     public int Level = 1;
-    public int Exp = 0;//总经验
+    public int Exp = 0;//当前等级内经验
 
     public int Attack;
     public float Speed;
@@ -46,6 +46,52 @@ public class Character
     public void NotifyMpChange(int prev, int cur)
     {
         OnMpChanged?.Invoke(prev, cur);
+    }
+    /// <summary>
+    /// 获取经验
+    /// 返回本次生了多少级， 方便结算界面显示
+    /// </summary>
+    public int GainExp(int amount)
+    {
+        if (amount <= 0)
+        {
+            Debug.LogWarning($"[GainExp]{Name} gain amount<=0:{amount}");
+            return 0;
+        }
+        Debug.Log($"[GainExp] {Name} +{amount} EXP (before: Lv{Level}, Exp={Exp}/{GetExpToNextLevel()})");
+        Exp += amount;
+        int levelUpCount = 0;
+
+        while (Exp >= GetExpToNextLevel())
+        {
+            Exp -= GetExpToNextLevel();
+            LevelUp();
+            levelUpCount++;
+        }
+
+        Debug.Log($"[GainExp] {Name} after: Lv{Level}, Exp={Exp}/{GetExpToNextLevel()}, levelUps={levelUpCount}");
+        return levelUpCount;
+    }
+    public void LevelUp()
+    {
+        Level++;
+
+        //每升一级，增加10点攻击力和5点最大HP
+        MaxHp += 5;
+        MaxMp += 5;
+        Attack += 10;
+        Speed += 0.5f;
+        //HP和MP回复满
+        int prevHp = Hp;
+        int prevMp = Mp;
+
+        Hp = MaxHp;
+        Mp = MaxMp;
+
+        NotifyHpChange(prevHp, Hp);
+        NotifyMpChange(prevMp, Mp);
+
+        Debug.Log($"[LevelUp] {Name} leveled up! -> Lv.{Level}");
     }
     public int GetExpToNextLevel()
     {

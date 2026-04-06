@@ -359,6 +359,13 @@ public class BattleManager : MonoBehaviour
         }
         while (!actionChosen)
         {
+
+            //debug 经验系统用
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                actor.data.GainExp(120);
+            }
+
             if (battleEnded) {
                 actionChosen=true;
                 yield break;
