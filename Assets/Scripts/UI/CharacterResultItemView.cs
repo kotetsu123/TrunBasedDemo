@@ -38,7 +38,7 @@ public class CharacterResultItemView : MonoBehaviour
         mpTxt.text = $"{s.mp}/{s.maxmp}";
 
         levelTxt.text = $"LV.{s.level}";
-        expTxt.text = $"--";
+        expTxt.text = $"{s.exp}/{s.expToNextLevel}";
       
     }
 }

@@ -82,6 +82,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private List<int> startItemCounts = new List<int>();
 
 
+    //经验奖励
+    //暂时写死，后续可以改成根据敌人类型/数量动态计算
+    //const int rewardExp = 120;
+
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
 
@@ -629,6 +633,11 @@ public class BattleManager : MonoBehaviour
             //强制关闭输入
             OnInputStateChanged?.Invoke(false);
             var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
+            if (result == BattleResult.Win)
+            {
+                const int rewardExp = 120;
+                AwardPartyExp(rewardExp);
+            }
             //结算快照
             var snapshots = BuildPartySnapShots();
             var payload = new BattleResultPayload(result, snapshots);
@@ -637,6 +646,19 @@ public class BattleManager : MonoBehaviour
                 Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
             //广播战斗结束
             OnBattleEnded?.Invoke(payload);         
+        }
+    }
+    //经验值添加方法
+    private void AwardPartyExp(int amount)
+    {
+        foreach(var c in controllers)
+        {
+            if (c == null || c.data == null)
+                continue;
+            if (c.data.Team != Team.Player)
+                continue;
+
+            c.data.GainExp(amount);
         }
     }
     private void UseItem(BaseController actor,ItemData item,BaseController target)
@@ -683,7 +705,9 @@ public class BattleManager : MonoBehaviour
                 maxhp = c.data.MaxHp,
                 mp= c.data.Mp,
                 maxmp= c.data.MaxMp,
-                level= c.data.Level,       
+                level= c.data.Level,
+                exp= c.data.Exp,
+                expToNextLevel= c.data.GetExpToNextLevel()
             });          
         }
 

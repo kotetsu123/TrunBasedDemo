@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResultCharacterPanelController : MonoBehaviour
+public class ResultCharacterPanelController : BasePanel
 {
     [SerializeField] private BattleEndPanelController endPanel;
     //settlepanel canvasGroup
-    [SerializeField] private CanvasGroup canvasGroup;
-
+   
     [SerializeField] private CharacterResultItemView[] items = new CharacterResultItemView[4];
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         Hide();
     }
     private void OnEnable()
@@ -24,7 +24,7 @@ public class ResultCharacterPanelController : MonoBehaviour
         if (endPanel != null)
             endPanel.OnClosed -= HandleEndPanelClosed;
     }
-    public void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots)
+    public  void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots)
     {
         Debug.Log($"[SettlePanel] Show snapshots={(partySnapShots == null ? "NULL" : partySnapShots.Count.ToString())}");
         if (partySnapShots != null)
@@ -48,13 +48,7 @@ public class ResultCharacterPanelController : MonoBehaviour
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
     }
-    public void Hide()
-    {
-        canvasGroup.alpha = 0;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable= false;
-
-    }
+    
     private void HandleEndPanelClosed(BattleResultPayload payload)
     {
         Show(payload.PartySnapshots);

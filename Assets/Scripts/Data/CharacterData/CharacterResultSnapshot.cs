@@ -15,8 +15,8 @@ public class CharacterResultSnapshot
     public int maxmp;
 
     public int level;
-    public int exp;//当前经验（总经验）
-    public int expToNextLevel;  //升级所需经验（到下一级）
+    public int exp;//当前等级内经验
+    public int expToNextLevel;  //当前等级升到下一等级需要的经验
 }
 public class BattleResultPayload
 {
