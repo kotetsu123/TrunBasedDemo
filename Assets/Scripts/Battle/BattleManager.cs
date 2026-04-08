@@ -82,9 +82,10 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private List<int> startItemCounts = new List<int>();
 
 
-    //经验奖励
-    //暂时写死，后续可以改成根据敌人类型/数量动态计算
-    //const int rewardExp = 120;
+    //经验相关
+    [SerializeField] private LevelUpPopController levelUpPopup;
+    private List<LevelUpResult> _lastLevelUpResults= new List<LevelUpResult>();
+
 
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
@@ -231,6 +232,7 @@ public class BattleManager : MonoBehaviour
         //开局就刷新一次 UI 排列
         RequestReorder();
         InitItemInventory();
+        _lastLevelUpResults.Clear();
 
         Debug.Log("[BattleManager] Battle Ready!");      
     }
@@ -622,6 +624,7 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;
         if (target == null || target.data == null) return;
         if (target.data.Hp > 0) return;
+        _lastLevelUpResults.Clear();
         //不要立刻battle Ended=true
         //判断是否还有任何存在的单位
         bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Enemy);
@@ -636,7 +639,7 @@ public class BattleManager : MonoBehaviour
             if (result == BattleResult.Win)
             {
                 const int rewardExp = 120;
-                AwardPartyExp(rewardExp);
+                _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
             }
             //结算快照
             var snapshots = BuildPartySnapShots();
@@ -649,16 +652,41 @@ public class BattleManager : MonoBehaviour
         }
     }
     //经验值添加方法
-    private void AwardPartyExp(int amount)
+    private List<LevelUpResult> AwardPartyExp(int amount)
     {
+        var result=new List<LevelUpResult>();
+
         foreach(var c in controllers)
         {
             if (c == null || c.data == null)
                 continue;
             if (c.data.Team != Team.Player)
                 continue;
+            int beforeLevel = c.data.Level;
 
             c.data.GainExp(amount);
+
+            int afterLevel = c.data.Level;
+
+            result.Add(new LevelUpResult(c.name, beforeLevel, afterLevel));
+        }
+
+        return result;
+    }
+    private IEnumerator PlayLevelUpPopUps(List<LevelUpResult> results)
+    {
+        if (results == null || results.Count == 0)
+            yield break;
+        foreach(var result in results)
+        {
+            if (!result.DidLevelUp)
+                continue;
+            if (levelUpPopup != null)
+            {
+                levelUpPopup.Play(result);
+
+                yield return new WaitForSeconds(1.3f);
+            }
         }
     }
     private void UseItem(BaseController actor,ItemData item,BaseController target)
