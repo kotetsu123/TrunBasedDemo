@@ -86,6 +86,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private LevelUpPopController levelUpPopup;
     private List<LevelUpResult> _lastLevelUpResults= new List<LevelUpResult>();
 
+    public IReadOnlyList<LevelUpResult>LastLevelUpResults=> _lastLevelUpResults;
 
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
@@ -151,7 +152,7 @@ public class BattleManager : MonoBehaviour
         {
             updateActionValues();
         }
-        
+             
     }
     private void LateUpdate()
     {
@@ -619,6 +620,7 @@ public class BattleManager : MonoBehaviour
             return result;
         foreach (var unit in )
     }*/
+    //检测战斗是否结束（任何一方全灭）
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
         if (battleEnded) return;
@@ -632,24 +634,34 @@ public class BattleManager : MonoBehaviour
 
         if (!enemyAlive||!allyAlive)
         {
-            battleEnded = true;
-            //强制关闭输入
-            OnInputStateChanged?.Invoke(false);
-            var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;
-            if (result == BattleResult.Win)
-            {
-                const int rewardExp = 120;
-                _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
-            }
-            //结算快照
-            var snapshots = BuildPartySnapShots();
-            var payload = new BattleResultPayload(result, snapshots);
-            Debug.Log($"[BattleManager] snapshots count={snapshots?.Count ?? -1}");
-            if (snapshots != null && snapshots.Count > 0)
-                Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
-            //广播战斗结束
-            OnBattleEnded?.Invoke(payload);         
+            var result = !enemyAlive ? BattleResult.Win : BattleResult.Lose;    
+           HandleBattleEnd(result);          
         }
+    }
+    //战斗结束后的处理
+    private void HandleBattleEnd(BattleResult result)
+    {
+        if (battleEnded) return;
+
+         battleEnded = true;
+        //强制关闭输入
+        OnInputStateChanged?.Invoke(false);
+        //清空上一次升级结果
+        _lastLevelUpResults.Clear();
+        //胜利时发经验
+        if (result == BattleResult.Win)
+        {
+            const int rewardExp = 120;
+            _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
+        }
+        //结算快照
+        var snapshots = BuildPartySnapShots();
+        var payload = new BattleResultPayload(result, snapshots);
+        Debug.Log($"[BattleManager] snapshots count={snapshots?.Count ?? -1}");
+        if (snapshots != null && snapshots.Count > 0)
+            Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
+        //广播战斗结束
+        OnBattleEnded?.Invoke(payload);
     }
     //经验值添加方法
     private List<LevelUpResult> AwardPartyExp(int amount)
@@ -673,22 +685,7 @@ public class BattleManager : MonoBehaviour
 
         return result;
     }
-    private IEnumerator PlayLevelUpPopUps(List<LevelUpResult> results)
-    {
-        if (results == null || results.Count == 0)
-            yield break;
-        foreach(var result in results)
-        {
-            if (!result.DidLevelUp)
-                continue;
-            if (levelUpPopup != null)
-            {
-                levelUpPopup.Play(result);
-
-                yield return new WaitForSeconds(1.3f);
-            }
-        }
-    }
+   
     private void UseItem(BaseController actor,ItemData item,BaseController target)
     {
         if(actor==null||item==null||target==null) return;

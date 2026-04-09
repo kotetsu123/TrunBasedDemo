@@ -19,6 +19,9 @@ public class LevelUpPopController : BasePanel
     }
     public void Play(LevelUpResult result)
     {
+        if (result == null || !result.DidLevelUp)
+            return;
+
         if(_playRoutine!=null)
             StopCoroutine( _playRoutine );
 
@@ -31,7 +34,7 @@ public class LevelUpPopController : BasePanel
         if (titleTxt != null)
             titleTxt.text = "Level Up!";
         if (levelTxt != null)
-            levelTxt.text = $"Lv.{result.beforeLevel}-> Lv.{result.afterLevel}";
+            levelTxt.text = $"Lv.{result.beforeLevel} ¡ú  Lv.{result.afterLevel}";
         base.Show();
         yield return new WaitForSeconds(fadeDuration + visibleDuration);
 
@@ -39,5 +42,10 @@ public class LevelUpPopController : BasePanel
         yield return  new WaitForSeconds(fadeDuration);
 
         _playRoutine = null;
+    }
+
+    public float GetTotalDuration()
+    {
+        return fadeDuration + visibleDuration + fadeDuration;
     }
 }

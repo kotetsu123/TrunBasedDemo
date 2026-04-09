@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ResultCharacterPanelController : BasePanel
@@ -8,6 +9,8 @@ public class ResultCharacterPanelController : BasePanel
     //settlepanel canvasGroup
    
     [SerializeField] private CharacterResultItemView[] items = new CharacterResultItemView[4];
+
+    [SerializeField]private LevelUpPopController levelUpPopup;  
 
     protected override void Awake()
     {
@@ -47,10 +50,30 @@ public class ResultCharacterPanelController : BasePanel
         canvasGroup.alpha = 1;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
+       
     }
-    
+    private IEnumerator PlayLevelUpPopUps(List<LevelUpResult> results)
+    {
+
+
+        if (results == null || results.Count == 0)
+            yield break;
+        foreach (var result in results)
+        {
+            if (!result.DidLevelUp)
+                continue;
+            if (levelUpPopup != null)
+            {
+                levelUpPopup.Play(result);
+
+                yield return new WaitForSeconds( levelUpPopup.GetTotalDuration());
+            }
+        }
+    }
+
     private void HandleEndPanelClosed(BattleResultPayload payload)
     {
         Show(payload.PartySnapshots);
+        StartCoroutine(PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList()));
     }
 }
