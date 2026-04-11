@@ -680,7 +680,7 @@ public class BattleManager : MonoBehaviour
 
             int afterLevel = c.data.Level;
 
-            result.Add(new LevelUpResult(c.name, beforeLevel, afterLevel));
+            result.Add(new LevelUpResult(c.data.Name, beforeLevel, afterLevel));
         }
 
         return result;
