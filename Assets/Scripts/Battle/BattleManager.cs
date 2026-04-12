@@ -36,12 +36,13 @@ public class BattleManager : MonoBehaviour
 
     public PlayerController player;
     public EnemyController enemy;
+    //时间轴相关
     public GameObject timeLineIconPrefab;
     public RectTransform actionBarPanel;
 
     
 
-    public List<RectTransform> slots;
+   // public List<RectTransform> slots;
 
     private Dictionary<BaseController, TimeLineIcon> timeLineIcons = new Dictionary<BaseController, TimeLineIcon>();
     
@@ -60,9 +61,17 @@ public class BattleManager : MonoBehaviour
 
     
     private bool actionChosen = false;
+    //时间轴相关
+    [SerializeField] private RectTransform actionbarPanel;// 原来的layout root
+    [SerializeField] private RectTransform iconVisualRoot;//新增：icon显示层
+    [SerializeField] private GameObject slotPrefab;//新增：slot预制体
+   
 
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
     [SerializeField] private float timelineMoveTime= 0.25f;
+
+    private readonly List<RectTransform>_slots=new List<RectTransform>();
+
     [SerializeField] private BattleFormation formation;
     //点击检测相关   
     [SerializeField] private BattleTargetSelector targetSelector;
@@ -94,7 +103,8 @@ public class BattleManager : MonoBehaviour
     private CommandType _currentCommand=CommandType.None;
 
     private TargetCircle _targetCircle;
-    
+
+    private bool _timelineDirty = false;//需要刷新时间轴UI
 
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
@@ -174,7 +184,27 @@ public class BattleManager : MonoBehaviour
 
         PublishOrdered(ordered);
     }
-
+    private void EnsureSlotCount(int requiredCount)
+    {
+        if (actionbarPanel == null || slotPrefab == null) return;
+        //不够就补slot，够了就显示/隐藏
+        while (_slots.Count < requiredCount)
+        {
+            var go = Instantiate(slotPrefab, actionbarPanel);
+            var rt = go.GetComponent<RectTransform>();
+            if(rt!=null)
+                _slots.Add(rt);
+        }
+        for (int i = 0; i < _slots.Count; i++)
+        {
+            bool shouldShow = i < requiredCount;
+            if (_slots[i] != null && _slots[i].gameObject.activeSelf!=shouldShow)
+                _slots[i].gameObject.SetActive(shouldShow);
+        }
+        //强制刷新布局
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(actionbarPanel);
+    }
     public void RegisterCharacter(BaseController character)
     {
 
@@ -199,7 +229,8 @@ public class BattleManager : MonoBehaviour
          {
              InitializeBattle();
          }*/
-        var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
+        //var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
+        var iconobj = Instantiate(timeLineIconPrefab, iconVisualRoot);
         var icon = iconobj.GetComponent<TimeLineIcon>();
         icon.Bind(character);
         if (isBattleReady)
@@ -216,7 +247,8 @@ public class BattleManager : MonoBehaviour
         FindObjectOfType<TimeLineUI>()?.BuildCache();
 
         character.OnRevied += HandleCharacterRevived;
-        RequestReorder();//最后一帧搞一下
+        _timelineDirty= true;//注册角色后需要刷新时间轴
+        //RequestReorder();//最后一帧搞一下
     }
 
     void InitializeBattle()
@@ -344,6 +376,12 @@ public class BattleManager : MonoBehaviour
         if (!battleEnded)
         {
             actor.data.ActionValue = actor.data.MaxActionValue;
+            _timelineDirty = true;
+        }
+
+        if (_timelineDirty)
+        {
+            _timelineDirty = false;
             RequestReorder();
         }
         actor.data.isActing = false;
@@ -743,6 +781,61 @@ public class BattleManager : MonoBehaviour
         if (ordered == null || ordered.Count == 0) return;
         Debug.Log($"[UpdateTimeLineUI] updateTimeLineUI called");
 
+        EnsureSlotCount(ordered.Count);
+
+        
+        if (!_timelineInitialized)
+        {
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                var c = ordered[i];
+                if (!timeLineIcons.TryGetValue(c, out var icon) || icon == null) continue;
+               if(i>=_slots.Count||_slots[i]==null) continue;
+                //直接把icon 变成slot 的子物体，让layoutGroup 帮忙排好位置
+
+               var rt=icon.GetComponent<RectTransform>();
+                if (rt == null) continue;
+                if (rt.parent != iconVisualRoot)
+                    rt.SetParent(iconVisualRoot, false);
+
+                rt.anchoredPosition = _slots[i].anchoredPosition;
+              
+            }
+            
+            _timelineInitialized = true;
+            return;
+        }
+        //如果上一次还在移动，先杀掉（避免重入）
+        _moveTween?.Kill();
+        _moveTween = null;
+
+    //创建新的动画序列
+        var seq=DOTween.Sequence();
+
+        for(int i = 0; i < ordered.Count; i++)
+        {
+            var c=ordered[i];
+            if (!timeLineIcons.TryGetValue(c, out var icon) || icon == null) continue;
+            if (i > _slots.Count || _slots[i] == null) continue;
+
+            var rt= icon.GetComponent<RectTransform>();
+            if (rt == null) continue;
+
+            if(rt.parent!=iconVisualRoot)
+                rt.SetParent(iconVisualRoot, false);
+
+            Vector2 targetPos = _slots[i].anchoredPosition;
+
+            rt.DOKill(false);
+            seq.Join(rt.DOAnchorPos(targetPos, timelineMoveTime).SetEase(Ease.OutSine));
+        }
+        _moveTween= seq;      
+    }
+   /* void UpdateTimeLineUI(List<BaseController> ordered)
+    {
+        if (ordered == null || ordered.Count == 0) return;
+        Debug.Log($"[UpdateTimeLineUI] updateTimeLineUI called");
+
 
         //0)第一个，只让layout 把位置摆正，防止初次乱飞
         if(!_timelineInitialized)
@@ -832,7 +925,7 @@ public class BattleManager : MonoBehaviour
         });
 
         _moveTween = seq;
-    }
+    }*/
     public void NotifyDeath(BaseController dead)
     {
         if(_currentTarget==dead)
@@ -861,27 +954,36 @@ public class BattleManager : MonoBehaviour
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
-            Destroy(icon.gameObject);
-
-        timeLineIcons.Remove(dead);
-        //刷新时间轴(避免ui 还显示旧顺序)
-        RequestReorder();
-
-        //表现层，隐藏并摧毁角色本体//敌人的情况下
+        {
+            timeLineIcons.Remove(dead);
+            Destroy(icon.gameObject);          
+        }
+        else
+        {
+            timeLineIcons.Remove(dead);
+        }
+        //站位层，只有敌人需要释放站位
         if (dead.data.Team == Team.Enemy)
         {
             //从站位中释放//只有enmey才会
             formation.Release(dead, out _);
             dead.data.isOnField = false;
+        }
+            //刷新时间轴(避免ui 还显示旧顺序)
+            // _timelineDirty = true;//需要时间轴更新
+            RequestReorder();
 
+        //表现层，隐藏并摧毁角色本体//敌人的情况下
+        if(dead!=null&&dead.gameObject!=null)
             dead.gameObject.SetActive(false);
-            //等待一帧真正销毁（防协程美剧中途爆炸）
-            yield return null;
-            Destroy(dead.gameObject);
-            //释放formation slot
-            //formation.Release(dead.data.Team,deadSlotIndex);
+        //等待一帧真正销毁（防协程美剧中途爆炸）
+        yield return null;
+        //敌人真正销毁，并且补位
+        if (dead != null && dead.data != null && dead.data.Team == Team.Enemy)
+        {
+            if (dead.gameObject != null)
+                Destroy(dead.gameObject);
             spawner?.TryFillOneEnemy();
-            yield break;
         }
         else
         {
@@ -889,8 +991,29 @@ public class BattleManager : MonoBehaviour
             //TODO:进入倒地状态，（濒死）状态机
             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
             yield break;
-
         }
+        /* if (dead.data.Team == Team.Enemy)
+         {
+             //从站位中释放//只有enmey才会
+             formation.Release(dead, out _);
+             dead.data.isOnField = false;
+
+             dead.gameObject.SetActive(false);
+             //等待一帧真正销毁（防协程美剧中途爆炸）
+             yield return null;
+             Destroy(dead.gameObject);
+             //释放formation slot
+             //formation.Release(dead.data.Team,deadSlotIndex);
+             spawner?.TryFillOneEnemy();
+             yield break;
+         }
+         else
+         {
+             //Player 不销毁
+             //TODO:进入倒地状态，（濒死）状态机
+             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
+             yield break;
+         }*/
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
     private void SetCurrentActor(BaseController next)
@@ -1007,7 +1130,9 @@ public class BattleManager : MonoBehaviour
 
         timeLineIcons.Remove(ctrl);
         
-        RequestReorder();
+        _timelineDirty = true;//注销角色后需要刷新时间轴
+
+      //  RequestReorder();
     }
     //最小占槽并且对齐
     public bool TryPlaceIntoFormation(BaseController ctrl)
@@ -1222,8 +1347,8 @@ public class BattleManager : MonoBehaviour
        if(!controllers.Contains(ctrl))
         //重新加入时间轴
         RegisterController(ctrl);
-
-        RequestReorder();
+       _timelineDirty = true;//角色复活后需要刷新时间轴
+       // RequestReorder();
 
     }
     public void ShowSkillName(string skillName)
