@@ -21,7 +21,11 @@ public class BattleCameraDirector : MonoBehaviour
     private void OnEnable()
     {
         if(battle!=null)
-            battle.OnCurrentActorChanged += HandleCurrentActorChanged;  
+            battle.OnCurrentActorChanged += HandleCurrentActorChanged;
+        else
+        {
+            Debug.LogWarning("[Camera] battleManager is null in OnEnable");
+        }
     }
     private void OnDisable()
     {
@@ -34,10 +38,12 @@ public class BattleCameraDirector : MonoBehaviour
     }
     private void HandleCurrentActorChanged(BaseController actor)
     {
+        Debug.Log($"[Camera] HandleCurrentActorChanged -> {actor?.data?.Name}");
+
         if (actor == null) return;
         FocusActorTurnShot(actor);
     }
-    private void FocusActorTurnShot(BaseController actor)
+    public void FocusActorTurnShot(BaseController actor)
     {
        if(actor==null) return;
 
@@ -47,7 +53,7 @@ public class BattleCameraDirector : MonoBehaviour
             MoveToShot(anchor.TrunCameraPoint);
         }
     }
-    private void FocusTargetHitShot(BaseController target)
+    public  void FocusTargetHitShot(BaseController target)
     {
         if (target == null) return;
         

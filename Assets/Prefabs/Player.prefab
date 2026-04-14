@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3601771321397286948}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -123,18 +123,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data:
     Team: 0
-    Name: Player
+    Name: Player0
     MaxHp: 0
     Hp: 200
     MaxMp: 0
     Mp: 0
     Level: 1
     Exp: 0
-    Attack: 50
+    Attack: 120
     Speed: 100
     ActionValue: 0
     MaxActionValue: 200
-    isOnField: 0
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 1
@@ -189,7 +189,7 @@ Transform:
   m_GameObject: {fileID: 1087215609079979727}
   serializedVersion: 2
   m_LocalRotation: {x: -0.08508985, y: -0.21561591, z: -0.018863956, w: 0.97258097}
-  m_LocalPosition: {x: 1.5, y: 0.3, z: -7}
+  m_LocalPosition: {x: 1.5, y: -0.3, z: -1.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -250,13 +250,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4244201632595124308}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.9914449, z: -0.13052616, w: 0}
-  m_LocalPosition: {x: 0, y: 1.6, z: -2.6}
+  m_LocalRotation: {x: 0, y: 0.9990483, z: -0.043619405, w: 0}
+  m_LocalPosition: {x: -0.08, y: 0.64, z: 1.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2465192344767164884}
-  m_LocalEulerAnglesHint: {x: 15, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 5, y: 180, z: 0}
 --- !u!1 &4867717988088708691
 GameObject:
   m_ObjectHideFlags: 0
@@ -266,7 +266,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2465192344767164884}
-  - component: {fileID: 9125912743264577579}
   m_Layer: 0
   m_Name: BattleCameraAnchor
   m_TagString: Untagged
@@ -291,17 +290,3 @@ Transform:
   - {fileID: 1381937604341077637}
   m_Father: {fileID: 6492541482423702865}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &9125912743264577579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4867717988088708691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cd2d04e4a55f3a45b605353d88ea887, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trunCameraPoint: {fileID: 2055821088294449597}
-  hitCameraPoint: {fileID: 1381937604341077637}

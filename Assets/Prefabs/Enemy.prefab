@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 8629807113058029914}
   - component: {fileID: 7958136867823104485}
   - component: {fileID: 8258665272572876294}
+  - component: {fileID: 861706346037040605}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -66,6 +67,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2358419330789022985}
+  - {fileID: 9092506404980332443}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6247913678870561713
@@ -164,7 +166,7 @@ MonoBehaviour:
     Speed: 90
     ActionValue: 0
     MaxActionValue: 200
-    isOnField: 0
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 0
@@ -176,7 +178,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 357a4c0dd6c99c64e8b86b286d59b25a, type: 2}
   - {fileID: 11400000, guid: 98a4d05ce4017f949a04c792d3ed9d19, type: 2}
   - {fileID: 11400000, guid: 613a7b9efc48f3d45a1a6aad6a1ec6eb, type: 2}
-  floatingTextPrefab: {fileID: 3498894492765518994, guid: b8c628566a340cc48bc2bc7cdb98cef8, type: 3}
+  floatingTextPrefab: {fileID: 0}
   floatringTexAnchor: {fileID: 2358419330789022985}
   hpbarPrefab: {fileID: 1878811498021360621, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 0}
@@ -193,3 +195,80 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
+--- !u!114 &861706346037040605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3653005007927200776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cd2d04e4a55f3a45b605353d88ea887, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trunCameraPoint: {fileID: 2490223457870588715}
+  hitCameraPoint: {fileID: 2490223457870588715}
+--- !u!1 &5733588951159379460
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9092506404980332443}
+  m_Layer: 0
+  m_Name: BattleCameraAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9092506404980332443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5733588951159379460}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2490223457870588715}
+  m_Father: {fileID: 4495699354803280348}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6433487233234149186
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2490223457870588715}
+  m_Layer: 6
+  m_Name: TurnCameraPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2490223457870588715
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6433487233234149186}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.2588191, y: -0, z: -0, w: 0.9659258}
+  m_LocalPosition: {x: 0.077, y: 1.19, z: -2.73}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9092506404980332443}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}

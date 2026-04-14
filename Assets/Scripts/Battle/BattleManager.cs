@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class BattleManager : MonoBehaviour
@@ -19,7 +20,7 @@ public class BattleManager : MonoBehaviour
     //目标锁定TargetCircle 用event
     public event Action<BaseController> OnTargetChanged;
     public event Action<bool> OnInputStateChanged;
-    //当前actor 高光
+    //当前actor //高光//镜头
     public event Action<BaseController>OnCurrentActorChanged;
     //向外广播战斗是否结束
     public event Action<BattleResultPayload> OnBattleEnded;
@@ -97,6 +98,8 @@ public class BattleManager : MonoBehaviour
 
     public IReadOnlyList<LevelUpResult>LastLevelUpResults=> _lastLevelUpResults;
 
+    //战斗镜头相关
+    [SerializeField] private BattleCameraDirector cameraDirector;
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
 
@@ -432,6 +435,7 @@ public class BattleManager : MonoBehaviour
             //选了attack 之后，才允许目标切换和确认
             if (_currentCommand == CommandType.Attack)
             {
+                
                 targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
                 // 按空格攻击
                 if (Input.GetKeyDown(KeyCode.Space))
@@ -439,6 +443,8 @@ public class BattleManager : MonoBehaviour
                     var target = _currentTarget;
                     if (targetSelector.IsValidEnemyTarget(actor, target))
                     {
+                        //cameraDirector?.FocusTargetHitShot(target);
+
                         ShowSkillName("Attack");
 
                         target.TakeDamage(actor.data.Attack);
@@ -466,6 +472,10 @@ public class BattleManager : MonoBehaviour
                     }
                     if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
                     {
+                        if(_currentTargetType==SkillTargetType.Self||target==actor)
+                            cameraDirector?.FocusActorTurnShot(actor);
+                        else
+                            cameraDirector?.FocusTargetHitShot(target);
                         actor.UseSkill(_selectedSkill, target);
                         CheckBattleEnd(actor, target);
                         actionChosen = true;
@@ -543,11 +553,18 @@ public class BattleManager : MonoBehaviour
             yield break;
         }*/
         var target = ChooseEnemyTarget(actor, skill);
-       /* if (target == null)
+        /* if (target == null)
+         {
+             Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
+             yield break;
+         }*/
+        if (target != null)
         {
-            Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
-            yield break;
-        }*/
+            if(skill!=null&&skill.targetType==SkillTargetType.Self)
+                cameraDirector?.FocusActorTurnShot(actor);
+            else
+                cameraDirector?.FocusTargetHitShot(target);
+        }
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
