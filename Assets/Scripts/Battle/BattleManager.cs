@@ -100,6 +100,12 @@ public class BattleManager : MonoBehaviour
 
     //战斗镜头相关
     [SerializeField] private BattleCameraDirector cameraDirector;
+    [Header("Battle Presentation Timing")]
+    [SerializeField] private float attackCameraLeadTime = 0.2f;
+    [SerializeField] private float attackImpactHoldTime = 0.15f;
+
+    [SerializeField] private float skillCameraLeadTime = 0.2f;
+    [SerializeField] private float skilllimpactHoldTime = 0.15f;
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
 
@@ -356,17 +362,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            /*//敌人自动行动
-            yield return new WaitForSeconds(0.5f);
-            var target = GetRandomEnemyTarget(actor);
-            if (target != null)
-            {
-                //Debug.LogError($"[ATTACK] attacker={actor.data.Name} target={(target ? target.data.Name : "null")} targetType={target?.GetType().Name}");
-                target.TakeDamage(actor.data.Attack);
-                //Debug.LogError("[ATTACK] after TakeDamage");
-                CheckBattleEnd(actor, target);
-            }
-            yield return new WaitForSeconds(1f);*/
+            //敌人自动行动            
             yield return StartCoroutine(WaitForEnemyAction(actor));
             if (actor == null || actor.data == null || actor.data.isDead)
             {
@@ -443,19 +439,13 @@ public class BattleManager : MonoBehaviour
                     var target = _currentTarget;
                     if (targetSelector.IsValidEnemyTarget(actor, target))
                     {
-                        //cameraDirector?.FocusTargetHitShot(target);
-
-                        ShowSkillName("Attack");
-
-                        target.TakeDamage(actor.data.Attack);
-                        //Debug.LogFormat($"{actor.Name} attack the {target.Name} rise {actor.Attack} damage");
-                        Debug.Log($"{actor.data.Name} attack the {target.data.Name} rise {actor.data.Attack} damage");
-                        CheckBattleEnd(actor, target);
                         actionChosen = true;
+                        yield return StartCoroutine(PlayAttackSequence(actor, target));
+                        
                     }                   
                 }
             }
-            //选了skill 之后先用q来进行测试
+           
             else if (_currentCommand == CommandType.Skill) {
 
                 if (_selectedSkill == null){
@@ -472,43 +462,11 @@ public class BattleManager : MonoBehaviour
                     }
                     if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
                     {
-                        if(_currentTargetType==SkillTargetType.Self||target==actor)
-                            cameraDirector?.FocusActorTurnShot(actor);
-                        else
-                            cameraDirector?.FocusTargetHitShot(target);
-                        actor.UseSkill(_selectedSkill, target);
-                        CheckBattleEnd(actor, target);
+                       
                         actionChosen = true;
+                        yield return StartCoroutine(PlaySkillSequence(actor, target, _selectedSkill, _currentTargetType));
                     }
                 }
-               
-                /*if (_currentTargetType == SkillTargetType.Self)
-                {
-                    
-                   // targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
-                    if (Input.GetKeyDown(KeyCode.Space))
-                    {                     
-                        actor.UseSkill(_selectedSkill, actor);
-                        CheckBattleEnd(actor, actor);
-                        actionChosen = true;
-                    }
-                }
-                else// 需要选敌人的技能     
-                {
-                    targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
-                    if (Input.GetKeyDown(KeyCode.Space))
-                    {
-                        var target = _currentTarget;                       
-                        if (targetSelector.IsValidTarget(actor, target,_currentTargetType))
-                        {
-                            
-                            actor.UseSkill(_selectedSkill, target);
-                            CheckBattleEnd(actor, target); 
-                            actionChosen = true;
-                        }
-                    }
-                }*/
-                
             }
             else if (_currentCommand == CommandType.Item)
             {
@@ -570,6 +528,47 @@ public class BattleManager : MonoBehaviour
         CheckBattleEnd(actor, target);
 
         yield return new WaitForSeconds(1f);
+    }
+    private IEnumerator PlayAttackSequence(BaseController actor,BaseController target)
+    {
+        if (actor == null || target == null)
+            yield break;
+
+        //摄像头锁定
+        cameraDirector?.LockCamera();
+        cameraDirector?.FocusTargetHitShot(target);
+        //给镜头一点移动时间
+        yield return new WaitForSeconds(attackCameraLeadTime);
+        //显示技能名字
+        ShowSkillName("Attack");
+        //造成伤害
+        target.TakeDamage(actor.data.Attack);
+
+        CheckBattleEnd(actor, target);
+        //给镜头一点时间看伤害结果
+        yield return new WaitForSeconds(attackImpactHoldTime);
+
+        cameraDirector?.UnlockCamera();
+
+    }
+    private IEnumerator PlaySkillSequence(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
+    {
+        if(actor==null||target==null||_selectedSkill==null)
+            yield break;
+        //摄像头锁定
+        cameraDirector?.LockCamera();
+
+        //根据确认时的targettype 决定镜头
+        if(_selectedSkill.targetType == SkillTargetType.Self||target==actor)
+            cameraDirector?.FocusActorTurnShot(actor);
+        else
+            cameraDirector?.FocusTargetHitShot(target);
+        yield return new WaitForSeconds(skillCameraLeadTime);
+
+        actor.UseSkill(skill, target);
+        CheckBattleEnd(actor, target);
+        yield return new WaitForSeconds(skilllimpactHoldTime);
+        cameraDirector?.UnlockCamera();
     }
     private SkillData ChooseEnemySkill(BaseController actor)
     {

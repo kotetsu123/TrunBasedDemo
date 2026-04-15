@@ -17,6 +17,9 @@ public class BattleCameraDirector : MonoBehaviour
     [SerializeField]private AnimationCurve moveCurve=AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     private Coroutine _cameraMoveRoutine;
+    private bool _isLocked;
+
+    public bool IsLocked => _isLocked;
 
     private void OnEnable()
     {
@@ -36,9 +39,19 @@ public class BattleCameraDirector : MonoBehaviour
     {
         //SnapToShot(defaultBattleShot);
     }
+    public void LockCamera()
+    {
+               _isLocked = true;
+    }
+    public void UnlockCamera()
+    {
+        _isLocked = false;
+    }
     private void HandleCurrentActorChanged(BaseController actor)
     {
         Debug.Log($"[Camera] HandleCurrentActorChanged -> {actor?.data?.Name}");
+        if (_isLocked)
+            return;
 
         if (actor == null) return;
         FocusActorTurnShot(actor);
