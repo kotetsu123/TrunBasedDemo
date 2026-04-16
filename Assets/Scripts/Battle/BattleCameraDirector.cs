@@ -16,6 +16,9 @@ public class BattleCameraDirector : MonoBehaviour
     [SerializeField]private float moveDuration = 0.35f;
     [SerializeField]private AnimationCurve moveCurve=AnimationCurve.EaseInOut(0, 0, 1, 1);
 
+    //特殊镜头点
+    [SerializeField] private Transform interactionShotPoint;
+
     private Coroutine _cameraMoveRoutine;
     private bool _isLocked;
 
@@ -75,6 +78,41 @@ public class BattleCameraDirector : MonoBehaviour
         {
             MoveToShot(anchor.HitCameraPoint);
         }
+    }
+    //双方镜头
+    public void FocusInteractionShot(BaseController attacker,BaseController target)
+    {
+        if(attacker==null||target==null||targetCamera==null) return;
+        
+        Vector3 attackerPos=attacker.transform.position;
+        Vector3 targetPos=target.transform.position;
+
+        //中点
+        Vector3 mid = (attackerPos + targetPos) * 0.5f;
+        //攻击方向
+        Vector3 dir = (targetPos - attackerPos).normalized;
+        //偏方向
+        Vector3 side = Vector3.Cross(Vector3.up, dir).normalized;
+
+        //调整参数
+        float backDistance = 3.0f;//往后退多少
+        float  sideOffset = 1.5f;//往侧面偏移多少
+        float height = 1.0f;//高度
+
+        //计算摄像机位置
+        Vector3 camPos=
+            mid
+            -dir* backDistance 
+            + side * sideOffset
+            + Vector3.up * height;
+        //看向点（略微偏向target的上半身）
+        Vector3 lookAt=mid+ Vector3.up * 1.2f;
+
+        
+        interactionShotPoint.transform.position= camPos;
+        interactionShotPoint.transform.rotation= Quaternion.LookRotation(lookAt - camPos);
+
+        MoveToShot(interactionShotPoint.transform);      
     }
     public void FocusPlayerGroup()
     {

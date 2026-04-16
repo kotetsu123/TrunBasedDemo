@@ -101,7 +101,7 @@ public class BattleManager : MonoBehaviour
     //战斗镜头相关
     [SerializeField] private BattleCameraDirector cameraDirector;
     [Header("Battle Presentation Timing")]
-    [SerializeField] private float attackCameraLeadTime = 0.2f;
+    [SerializeField] private float attackCameraLeadTime = 0.25f;
     [SerializeField] private float attackImpactHoldTime = 0.15f;
 
     [SerializeField] private float skillCameraLeadTime = 0.2f;
@@ -516,16 +516,7 @@ public class BattleManager : MonoBehaviour
              Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
              yield break;
          }*/
-        if (target != null)
-        {
-            if(skill!=null&&skill.targetType==SkillTargetType.Self)
-                cameraDirector?.FocusActorTurnShot(actor);
-            else
-                cameraDirector?.FocusTargetHitShot(target);
-        }
-
-        actor.UseSkill(skill, target);
-        CheckBattleEnd(actor, target);
+       yield return StartCoroutine(PlayEnemyActionSequence(actor, target, skill));
 
         yield return new WaitForSeconds(1f);
     }
@@ -536,9 +527,11 @@ public class BattleManager : MonoBehaviour
 
         //摄像头锁定
         cameraDirector?.LockCamera();
-        cameraDirector?.FocusTargetHitShot(target);
+        cameraDirector?.FocusInteractionShot(actor, target);
         //给镜头一点移动时间
         yield return new WaitForSeconds(attackCameraLeadTime);
+        //播放攻击动画
+        yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
         //显示技能名字
         ShowSkillName("Attack");
         //造成伤害
@@ -567,6 +560,35 @@ public class BattleManager : MonoBehaviour
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
+        yield return new WaitForSeconds(skilllimpactHoldTime);
+        cameraDirector?.UnlockCamera();
+    }
+    private IEnumerator PlayEnemyActionSequence(BaseController actor, BaseController target,SkillData skill)
+    {
+        if (actor == null || actor.data == null || skill == null)
+            yield break;
+        if (target == null || target.data == null || target.data.isDead)
+            yield break;
+        cameraDirector? .LockCamera();
+        //自身技能看自己
+        if (skill.targetType == SkillTargetType.Self || target == actor)
+        {
+            cameraDirector?.FocusActorTurnShot(actor);
+        }
+        else
+        {
+            cameraDirector?.FocusInteractionShot(target, actor);
+        }
+
+        //给镜头一点时间
+        yield return new WaitForSeconds(skillCameraLeadTime);
+
+        yield return new WaitForSeconds(0.5f);
+
+        actor.UseSkill(skill, target);
+        CheckBattleEnd(actor, target);
+
+        //给镜头一点时间看结果
         yield return new WaitForSeconds(skilllimpactHoldTime);
         cameraDirector?.UnlockCamera();
     }
