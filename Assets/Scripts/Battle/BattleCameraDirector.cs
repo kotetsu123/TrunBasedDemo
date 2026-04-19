@@ -79,7 +79,9 @@ public class BattleCameraDirector : MonoBehaviour
             MoveToShot(anchor.HitCameraPoint);
         }
     }
-    //双方镜头
+    //双方镜头//在这个版本当中，会存在，如果是玩家攻击敌人，则镜头偏向玩家；如果是敌人攻击玩家，则镜头偏向敌人
+    //所以需要需要规定一个 规则： 镜头偏向玩家
+    //所以我们需要在外面封装一个新的方法，因此此方法为其底层函数
     public void FocusInteractionShot(BaseController attacker,BaseController target)
     {
         if(attacker==null||target==null||targetCamera==null) return;
@@ -113,6 +115,30 @@ public class BattleCameraDirector : MonoBehaviour
         interactionShotPoint.transform.rotation= Quaternion.LookRotation(lookAt - camPos);
 
         MoveToShot(interactionShotPoint.transform);      
+    }
+    //双方镜头，封装规则：镜头偏向玩家
+    public void FocusPlayerSideInteractionSHot(BaseController actor, BaseController target)
+    {
+        if (actor == null || target == null)
+            return;
+        if (actor.data == null || target.data == null)
+            return;
+        //规则：
+        //只要玩家在这组交互里，镜头就偏向玩家
+        if (actor.data.Team == Team.Player)
+        {
+            //玩家出手：正常顺序
+            FocusInteractionShot(actor, target);
+            return;
+        }
+        if (target.data.Team == Team.Player)
+        {
+            //敌人出手，镜头偏向玩家，所以颠倒顺序
+            FocusInteractionShot(target, actor);
+             return;
+        }
+        //都不是玩家，则默认规则
+        FocusInteractionShot(actor, target);
     }
     public void FocusPlayerGroup()
     {

@@ -527,7 +527,7 @@ public class BattleManager : MonoBehaviour
 
         //摄像头锁定
         cameraDirector?.LockCamera();
-        cameraDirector?.FocusInteractionShot(actor, target);
+        cameraDirector?.FocusPlayerSideInteractionSHot(actor, target);
         //给镜头一点移动时间
         yield return new WaitForSeconds(attackCameraLeadTime);
         //播放攻击动画
@@ -577,7 +577,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            cameraDirector?.FocusInteractionShot(target, actor);
+            cameraDirector?.FocusPlayerSideInteractionSHot(actor, target);
         }
 
         //给镜头一点时间
