@@ -90,25 +90,33 @@ public class BattleCameraDirector : MonoBehaviour
         Vector3 targetPos=target.transform.position;
 
         //中点
-        Vector3 mid = (attackerPos + targetPos) * 0.5f;
+       // Vector3 mid = (attackerPos + targetPos) * 0.5f;
         //攻击方向
         Vector3 dir = (targetPos - attackerPos).normalized;
         //偏方向
         Vector3 side = Vector3.Cross(Vector3.up, dir).normalized;
-
+        //相机离actor 身后多远
+        float backDistance = 3.0f;
+        //相机离actor 侧面多远
+        float sideOffset = 1.0f;
+        //相机离actor 多高
+        float height = 1.0f;
+        
+/*
         //调整参数
         float backDistance = 3.0f;//往后退多少
         float  sideOffset = 1.5f;//往侧面偏移多少
-        float height = 1.0f;//高度
+        float height = 1.0f;//高度*/
 
         //计算摄像机位置
         Vector3 camPos=
-            mid
+            attackerPos
             -dir* backDistance 
-            + side * sideOffset
+            -side * sideOffset
             + Vector3.up * height;
         //看向点（略微偏向target的上半身）
-        Vector3 lookAt=mid+ Vector3.up * 1.2f;
+
+        Vector3 lookAt = targetPos;//+ Vector3.up * 1.2f;
 
         
         interactionShotPoint.transform.position= camPos;
