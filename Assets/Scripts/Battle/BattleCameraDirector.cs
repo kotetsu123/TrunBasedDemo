@@ -89,8 +89,7 @@ public class BattleCameraDirector : MonoBehaviour
         Vector3 attackerPos=attacker.transform.position;
         Vector3 targetPos=target.transform.position;
 
-        //中点
-       // Vector3 mid = (attackerPos + targetPos) * 0.5f;
+     
         //攻击方向
         Vector3 dir = (targetPos - attackerPos).normalized;
         //偏方向
@@ -102,23 +101,16 @@ public class BattleCameraDirector : MonoBehaviour
         //相机离actor 多高
         float height = 1.0f;
         
-/*
-        //调整参数
-        float backDistance = 3.0f;//往后退多少
-        float  sideOffset = 1.5f;//往侧面偏移多少
-        float height = 1.0f;//高度*/
-
         //计算摄像机位置
         Vector3 camPos=
             attackerPos
             -dir* backDistance 
             -side * sideOffset
             + Vector3.up * height;
-        //看向点（略微偏向target的上半身）
-
-        Vector3 lookAt = targetPos;//+ Vector3.up * 1.2f;
-
         
+
+        Vector3 lookAt = targetPos;//
+     
         interactionShotPoint.transform.position= camPos;
         interactionShotPoint.transform.rotation= Quaternion.LookRotation(lookAt - camPos);
 
@@ -147,6 +139,48 @@ public class BattleCameraDirector : MonoBehaviour
         }
         //都不是玩家，则默认规则
         FocusInteractionShot(actor, target);
+    }
+    public void FocusPlayerSideTargetPreviewShot(BaseController actor,BaseController target)
+    {
+        if (actor == null || target == null || targetCamera == null || interactionShotPoint == null)
+            return;
+        if(actor.data==null||target.data==null) 
+            return;
+
+        BaseController previewActor = actor;
+        BaseController previewTarget = target;
+
+        //规则：统一偏向玩家
+        if(actor.data.Team==Team.Enemy&&target.data.Team==Team.Player)
+        {
+            previewActor = target;
+            previewTarget = actor;
+        }
+        Vector3 actorPos= previewActor.transform.position;
+        Vector3 targetPos= previewTarget.transform.position;
+
+        //攻击方向
+        Vector3 dir=(targetPos-actorPos).normalized;
+        //偏方向
+        Vector3 side=Vector3.Cross(Vector3.up,dir).normalized;
+
+        //浏览参数
+        float backDistance=3.0f;
+        float sideOffset=2.5f;
+        float height=2f;
+
+        Vector3 camPos=
+            actorPos
+            -dir* backDistance
+            +side*sideOffset
+            + Vector3.up*height;
+
+        Vector3 lookAt=targetPos;
+        interactionShotPoint.position= camPos;
+        interactionShotPoint.rotation= Quaternion.LookRotation(lookAt-camPos);
+
+        MoveToShot(interactionShotPoint);
+
     }
     public void FocusPlayerGroup()
     {

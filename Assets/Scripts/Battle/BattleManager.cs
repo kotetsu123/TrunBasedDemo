@@ -527,12 +527,8 @@ public class BattleManager : MonoBehaviour
 
         //摄像头锁定
         cameraDirector?.LockCamera();
-        cameraDirector?.FocusPlayerSideInteractionSHot(actor, target);
-        //给镜头一点移动时间
         yield return new WaitForSeconds(attackCameraLeadTime);
-        //播放攻击动画
-        yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
-        //显示技能名字
+
         ShowSkillName("Attack");
         //造成伤害
         target.TakeDamage(actor.data.Attack);
@@ -556,7 +552,10 @@ public class BattleManager : MonoBehaviour
             cameraDirector?.FocusActorTurnShot(actor);
         else
             cameraDirector?.FocusTargetHitShot(target);
+        //给镜头一点时间
         yield return new WaitForSeconds(skillCameraLeadTime);
+
+        yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
@@ -1240,6 +1239,9 @@ public class BattleManager : MonoBehaviour
                 Debug.Log("[Command] Attack selected");
                 _currentTargetType = SkillTargetType.EnemySingle;
                 targetSelector.AutoPickTargetIfNeeded(_currentActor);
+                if(_currentActor!=null&&_currentTarget!=null)
+                    cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _currentTarget);
+
                 NotifyInputState();
                 commandPanel.Hide();
                 break;
