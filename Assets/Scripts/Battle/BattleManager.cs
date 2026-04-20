@@ -527,6 +527,7 @@ public class BattleManager : MonoBehaviour
 
         //摄像头锁定
         cameraDirector?.LockCamera();
+
         yield return new WaitForSeconds(attackCameraLeadTime);
 
         ShowSkillName("Attack");
@@ -971,7 +972,7 @@ public class BattleManager : MonoBehaviour
     }
     private IEnumerator HandleDeathCoroutine(BaseController dead)
     {
-        if (dead == null) yield break;
+        if (dead == null||dead.data==null) yield break;
 
         if (_currentTarget == dead)
             SetCurrentTarget(null);
@@ -1011,15 +1012,17 @@ public class BattleManager : MonoBehaviour
             RequestReorder();
 
         //表现层，隐藏并摧毁角色本体//敌人的情况下
-        if(dead!=null&&dead.gameObject!=null)
-            dead.gameObject.SetActive(false);
-        //等待一帧真正销毁（防协程美剧中途爆炸）
-        yield return null;
-        //敌人真正销毁，并且补位
-        if (dead != null && dead.data != null && dead.data.Team == Team.Enemy)
+        if (dead.data.Team == Team.Enemy)
         {
             if (dead.gameObject != null)
+                dead.gameObject.SetActive(false);
+
+            //等待一帧真正销毁（防协程美剧中途爆炸）
+            yield return null;
+            //敌人真正销毁，并且补位
+            if (dead.gameObject != null)
                 Destroy(dead.gameObject);
+
             spawner?.TryFillOneEnemy();
         }
         else
@@ -1029,28 +1032,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
             yield break;
         }
-        /* if (dead.data.Team == Team.Enemy)
-         {
-             //从站位中释放//只有enmey才会
-             formation.Release(dead, out _);
-             dead.data.isOnField = false;
-
-             dead.gameObject.SetActive(false);
-             //等待一帧真正销毁（防协程美剧中途爆炸）
-             yield return null;
-             Destroy(dead.gameObject);
-             //释放formation slot
-             //formation.Release(dead.data.Team,deadSlotIndex);
-             spawner?.TryFillOneEnemy();
-             yield break;
-         }
-         else
-         {
-             //Player 不销毁
-             //TODO:进入倒地状态，（濒死）状态机
-             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
-             yield break;
-         }*/
+       
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
     private void SetCurrentActor(BaseController next)
