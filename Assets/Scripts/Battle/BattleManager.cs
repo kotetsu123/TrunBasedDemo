@@ -1011,6 +1011,7 @@ public class BattleManager : MonoBehaviour
             // _timelineDirty = true;//需要时间轴更新
             RequestReorder();
 
+
         //表现层，隐藏并摧毁角色本体//敌人的情况下
         if (dead.data.Team == Team.Enemy)
         {
@@ -1031,8 +1032,7 @@ public class BattleManager : MonoBehaviour
             //TODO:进入倒地状态，（濒死）状态机
             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
             yield break;
-        }
-       
+        }   
     }
     //设置当前行动者，并触发事件 也是唯一改变_currentActor的地方
     private void SetCurrentActor(BaseController next)
@@ -1262,6 +1262,9 @@ public class BattleManager : MonoBehaviour
         {
             targetSelector.AutoPickTargetIfNeeded( _currentTarget);
             OnTargetChanged?.Invoke(_currentTarget);
+            if(_currentActor!=null&&_currentTarget!=null)
+                cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _currentTarget);
+
             NotifyInputState();
             return;
         }        
