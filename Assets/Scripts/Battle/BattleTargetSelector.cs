@@ -122,6 +122,7 @@ public class BattleTargetSelector : MonoBehaviour
         //从formation获取按照槽位优先级排序的存活敌人
         var list = formation.GetAliveEnemiesInPreferredOrder();
         battleManager.SetCurrentTarget(list.Count > 0 ? list[0] : null);
+        battleManager.SetPreviewTarget(list.Count > 0 ? list[0] : null);
     }
     public void AutoPickAllyTargetIfNeeded(BaseController actor)
     {
@@ -146,11 +147,13 @@ public class BattleTargetSelector : MonoBehaviour
         if (list.Count == 0)
         {
            battleManager.SetCurrentTarget(null);
+            battleManager.SetPreviewTarget(null);
             return;
         }
         int idx = list.IndexOf(battleManager.CurrentTarget);
         idx = (idx + 1) % list.Count;
       battleManager.SetCurrentTarget(list[idx]);
+         battleManager.SetPreviewTarget(list[idx]);
     }
     //（玩家/活）
     private void CycleAllyTarget(BaseController attcker)
@@ -193,6 +196,7 @@ public class BattleTargetSelector : MonoBehaviour
         if (list.Count == 0)
         {
             battleManager.SetCurrentTarget(null);
+            battleManager.SetPreviewTarget(null);
             return;
         }
        
@@ -202,7 +206,12 @@ public class BattleTargetSelector : MonoBehaviour
         int next = Mathf.Clamp(index + direction, 0, list.Count - 1);
 
         if (next != index)
+        {
             battleManager.SetCurrentTarget(list[next]);
+            battleManager.SetPreviewTarget(list[next]);
+        }
+           
+
 
     }
     //点击检测，切换目标
@@ -219,6 +228,7 @@ public class BattleTargetSelector : MonoBehaviour
             if (targetable != null && IsValidEnemyTarget(actor, targetable.controller))
             {
                 battleManager.SetCurrentTarget(targetable.controller);
+                battleManager.SetPreviewTarget(targetable.controller);
             }
         }
     }

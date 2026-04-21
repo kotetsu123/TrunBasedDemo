@@ -57,6 +57,8 @@ public class BattleManager : MonoBehaviour
     private BaseController _currentActor;
     //当前目标
     private  BaseController  _currentTarget;
+    //当前浏览目标
+    private BaseController _previewTarget;
     //当前目标类型
     private SkillTargetType _currentTargetType;
 
@@ -121,8 +123,9 @@ public class BattleManager : MonoBehaviour
     private SkillData _selectedSkill;
     private ItemData _selectedItem;
 
-    public BaseController CurrentActor=>_currentActor;
+    public BaseController CurrentActor => _currentActor;
     public BaseController CurrentTarget => _currentTarget;
+    public BaseController PreviewTarget => _previewTarget;
     public CommandType CurrentCommand=> _currentCommand;
    
     void Awake()
@@ -1080,6 +1083,23 @@ public class BattleManager : MonoBehaviour
         //OnInputStateChanged?.Invoke(playerTurn);
 
     }
+    public void SetPreviewTarget(BaseController target)
+    {
+        _previewTarget = target;
+        if (_currentActor != null && _previewTarget != null && _currentActor.data != null && _currentActor.data.Team == Team.Player)
+        {
+            if (_currentCommand == CommandType.Attack)
+            {
+                cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _previewTarget);
+            }else if (_currentCommand == CommandType.Skill && _selectedSkill != null)
+            {
+                if (_currentTargetType == SkillTargetType.EnemySingle)
+                {
+                    cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _previewTarget);
+                }
+            }
+        }
+    }
     private bool CanTargetSelect()
     {
         if (_currentActor == null || _currentActor.data == null)
@@ -1296,6 +1316,8 @@ public class BattleManager : MonoBehaviour
     {
         if(skillPanel==null||commandPanel==null) return;
 
+       
+
         //只在skillpanel 打开的时候处理
         if (!skillPanel.IsOpen) return;
         //右键或者esc键
@@ -1338,6 +1360,11 @@ public class BattleManager : MonoBehaviour
         //skill 目标选择中->回到skillpanel
         if (_currentCommand == CommandType.Skill && _selectedSkill != null)
         {
+            //浏览镜头返回
+            _previewTarget = null;
+            if (_currentActor != null)
+                cameraDirector?.FocusActorTurnShot(_currentActor);
+
             _selectedSkill = null;
             _currentCommand = CommandType.None;
             NotifyInputState();
@@ -1348,6 +1375,11 @@ public class BattleManager : MonoBehaviour
         //attack  目标选择中->返回commanPanel
         if (_currentCommand == CommandType.Attack)
         {
+            //浏览镜头返回
+            _previewTarget = null;
+            if (_currentActor != null)
+                cameraDirector?.FocusActorTurnShot(_currentActor);
+
             _currentCommand = CommandType.None;
             NotifyInputState();
 
@@ -1356,6 +1388,11 @@ public class BattleManager : MonoBehaviour
         }
         if (_currentCommand == CommandType.Item)
         {
+            //浏览镜头返回
+            _previewTarget = null;
+            if (_currentActor != null)
+                cameraDirector?.FocusActorTurnShot(_currentActor);
+
             _currentCommand = CommandType.None;
             NotifyInputState();
 
@@ -1383,6 +1420,11 @@ public class BattleManager : MonoBehaviour
     }
     public void CancelSkillSelection()
     {
+        //浏览镜头返回
+        _previewTarget = null;
+        if(_currentActor!=null)
+            cameraDirector?.FocusActorTurnShot(_currentActor);
+
         skillPanel.Hide();
         commandPanel.Show();
 
@@ -1391,6 +1433,11 @@ public class BattleManager : MonoBehaviour
     }
     public void CancelItemSelection()
     {
+        //浏览镜头返回
+        _previewTarget = null;
+        if (_currentActor != null)
+            cameraDirector?.FocusActorTurnShot(_currentActor);
+
         itemPanel.Hide();
         commandPanel.Show();
 
