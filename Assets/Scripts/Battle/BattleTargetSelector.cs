@@ -130,6 +130,7 @@ public class BattleTargetSelector : MonoBehaviour
 
         var list = formation.GetPlayersInSlotOrder();
         battleManager.SetCurrentTarget(list.Count > 0 ? list[0] : null);
+        battleManager.SetPreviewTarget(list.Count > 0 ? list[0] : null);
     }
     public void AutoPickDeadAllyTargetIfNeeded(BaseController actor)
     {

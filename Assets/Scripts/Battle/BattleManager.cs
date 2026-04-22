@@ -552,10 +552,12 @@ public class BattleManager : MonoBehaviour
         cameraDirector?.LockCamera();
 
         //根据确认时的targettype 决定镜头
-        if(_selectedSkill.targetType == SkillTargetType.Self||target==actor)
-            cameraDirector?.FocusActorTurnShot(actor);
-        else
-            cameraDirector?.FocusTargetHitShot(target);
+        /*  if(_selectedSkill.targetType == SkillTargetType.Self||target==actor)
+              cameraDirector?.FocusActorTurnShot(actor);
+          else
+              cameraDirector?.FocusTargetHitShot(target);*/
+        PlaySkillCamera(actor, target, skill, targetType);
+
         //给镜头一点时间
         yield return new WaitForSeconds(skillCameraLeadTime);
 
@@ -594,6 +596,38 @@ public class BattleManager : MonoBehaviour
         //给镜头一点时间看结果
         yield return new WaitForSeconds(skilllimpactHoldTime);
         cameraDirector?.UnlockCamera();
+    }
+    private void PlaySkillCamera(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
+    {
+        if (actor == null || skill == null)
+            return;
+
+        switch (targetType)
+        {
+            case SkillTargetType.Self:
+                cameraDirector?.FocusPlayerGroup();
+                break;
+
+            case SkillTargetType.EnemySingle:
+                //单体敌方技能，沿用浏览/交战镜头规则
+                if (target != null)
+                    cameraDirector?.FocusPlayerSideTargetPreviewShot(actor, target);
+                break;
+
+            case SkillTargetType.AllySingle:
+                
+                cameraDirector?.FocusPlayerGroup();
+                break;
+
+            case SkillTargetType.AllyDeadSingle:
+                
+                cameraDirector?.FocusPlayerGroup();
+                break;
+
+            default:
+                cameraDirector?.FocusActorTurnShot(actor);
+                break;
+        }
     }
     private SkillData ChooseEnemySkill(BaseController actor)
     {
@@ -1097,6 +1131,14 @@ public class BattleManager : MonoBehaviour
                 {
                     cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _previewTarget);
                 }
+                if (_currentTargetType == SkillTargetType.AllySingle)
+                {
+                    cameraDirector?.FocusPlayerGroup();
+                }
+                if (_currentTargetType == SkillTargetType.Self)
+                {
+                    cameraDirector?.FocusPlayerGroup();
+                }
             }
         }
     }
@@ -1291,7 +1333,12 @@ public class BattleManager : MonoBehaviour
         if (skill.targetType == SkillTargetType.AllySingle)
         {
             targetSelector.AutoPickAllyTargetIfNeeded(_currentActor);
-            OnTargetChanged?.Invoke(_currentTarget);
+            if (_currentTarget != null)
+            {
+                SetPreviewTarget(_currentTarget);
+                OnTargetChanged?.Invoke(_currentTarget);
+            }
+            
             NotifyInputState();           
             return;
         }
@@ -1305,7 +1352,11 @@ public class BattleManager : MonoBehaviour
         if (skill.targetType == SkillTargetType.Self)
         {
             targetSelector.AutoPickAllyTargetIfNeeded( _currentActor);
-            OnTargetChanged?.Invoke(_currentTarget);
+            if (_currentTarget != null)
+            {
+                 SetPreviewTarget(_currentTarget);
+                OnTargetChanged?.Invoke(_currentTarget);
+            }           
             NotifyInputState();
             return;
         }
