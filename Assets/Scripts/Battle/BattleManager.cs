@@ -561,7 +561,7 @@ public class BattleManager : MonoBehaviour
         //给镜头一点时间
         yield return new WaitForSeconds(skillCameraLeadTime);
 
-        yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
+        //yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
