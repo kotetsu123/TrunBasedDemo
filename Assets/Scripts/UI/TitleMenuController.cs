@@ -6,11 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class TitleMenuController : MonoBehaviour
 {
-    [SerializeField] private string battleSceneName = "BattleScene";
+    [SerializeField] private string fildSceneName = "FildScene";
     [SerializeField] private GameObject settingPanel;
     public void OnNewGameClicked()
     {
-        SceneManager.LoadScene(battleSceneName);
+        SceneManager.LoadScene(fildSceneName);
     }
     public void OnLoadGameClicked()
     {
