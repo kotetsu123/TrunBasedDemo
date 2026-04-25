@@ -8,6 +8,7 @@ public class ResultCharacterPanelController : BasePanel
 {
     [SerializeField] private BattleEndPanelController endPanel;
     [SerializeField] private GameObject buttonRoot;
+    [SerializeField] private string titleMenuName = "TitleScene";
     //settlepanel canvasGroup
    
     [SerializeField] private CharacterResultItemView[] items = new CharacterResultItemView[4];
@@ -105,6 +106,6 @@ public class ResultCharacterPanelController : BasePanel
     }
     public void OnClickBackToTile()
     {
-        Debug.Log($"TODO: Back To Title");
+        SceneManager.LoadScene(titleMenuName);
     }
 }
