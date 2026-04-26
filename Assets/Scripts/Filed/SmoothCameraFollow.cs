@@ -7,7 +7,7 @@ public class SmoothCameraFollow : MonoBehaviour
     [SerializeField] private Transform target;
 
     [Header("Position")]
-    [SerializeField]private Vector3 offset=new Vector3(0,5,-6);
+    [SerializeField]private Vector3 offset=new Vector3(0,2,-6);
     [SerializeField] private float smoothTime = 0.3f;//越大跟的越慢
     private Vector3 velocity ;
 
