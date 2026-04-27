@@ -9,6 +9,8 @@ public class SimplePlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private Vector3 moveInput;
 
+
+    public Vector3 MoveInput=> moveInput;
     private void Awake()
     {
         rb=GetComponent<Rigidbody>();
@@ -20,11 +22,26 @@ public class SimplePlayerMovement : MonoBehaviour
         float v = Input.GetAxis("Vertical");
         
         moveInput=new Vector3(h,0f,v).normalized;
+        
     }
 
     private void FixedUpdate()
     {
-        Vector3 move = moveInput * moveSpeed;
-        rb.velocity = new Vector3(move.x, rb.velocity.y, move.z);
+        if (moveInput.magnitude > 0.1f)
+        {
+            Vector3 move = moveInput * moveSpeed;
+            rb.velocity = new Vector3(move.x, rb.velocity.y, move.z);
+
+            Quaternion targetRot=Quaternion.LookRotation(moveInput);
+            Quaternion smoothRot=Quaternion.Slerp(
+                transform.rotation,
+                targetRot,
+                10f*Time.fixedDeltaTime);
+            rb.MoveRotation(smoothRot);
+        }
+        else
+        {// 停止水平移动，但保持垂直速度（如跳跃）不变
+            rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
+        }
     }
 }

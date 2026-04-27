@@ -8,16 +8,20 @@ public class SmoothCameraFollow : MonoBehaviour
 
     [Header("Position")]
     [SerializeField]private Vector3 offset=new Vector3(0,2,-6);
-    [SerializeField] private float smoothTime = 0.3f;//越大跟的越慢
-    private Vector3 velocity ;
+    [SerializeField] private float smoothTime = 0.05f;
 
-   // [Header("Mouse Rotation")]
+    private Vector3 velocity ;
 
     [Header("Look")]
     [SerializeField]private float rotaionSpeed = 10f;
 
+    [SerializeField] private SimplePlayerMovement player;
+
+
     private void LateUpdate()
     {
+        //根据玩家输入调整平滑时间，也就是动态平衡
+        //float currentSmooth = player.MoveInput.sqrMagnitude>0.01 ? 0.05f : 0.02f;
         if (target == null) return;
         //目标位置
         Vector3 targetPos=target.position + offset;

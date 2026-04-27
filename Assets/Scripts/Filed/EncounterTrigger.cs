@@ -12,9 +12,19 @@ public class EncounterTrigger : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (triggerd) return;
+       
         if (other.CompareTag("Player"))
         {
             triggerd = true;
+            SimplePlayerMovement playerController = other.gameObject.GetComponent<SimplePlayerMovement>();
+            Rigidbody playerRigidbody = other.gameObject.GetComponent<Rigidbody>();
+            if (playerController != null)
+            {
+                playerRigidbody.velocity = Vector3.zero; // Í£Ö¹Íæ¼ÒÒÆ¶¯
+                playerController.enabled = false;
+                
+            }
+
             if (transitionController != null)
             {
                 transitionController.StartBattleTransition(battleSceneName);
