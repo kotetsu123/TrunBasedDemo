@@ -317,6 +317,37 @@ MonoBehaviour:
   - {fileID: 176631505}
   - {fileID: 780948274}
   - {fileID: 1955776039}
+--- !u!1 &114564948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 114564949}
+  m_Layer: 0
+  m_Name: EnemyGroupPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &114564949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 114564948}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.08715578, y: -0, z: -0, w: 0.9961947}
+  m_LocalPosition: {x: 0, y: 1.5, z: -6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1195760078}
+  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!1 &134785978
 GameObject:
   m_ObjectHideFlags: 0
@@ -4111,6 +4142,8 @@ Transform:
   m_Children:
   - {fileID: 725639125}
   - {fileID: 1099619661}
+  - {fileID: 1230121006}
+  - {fileID: 114564949}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1195760079
@@ -4128,8 +4161,8 @@ MonoBehaviour:
   targetCamera: {fileID: 963194227}
   battle: {fileID: 1454933262}
   defaultBattleShot: {fileID: 1230121006}
-  playerGroupShot: {fileID: 1099619661}
-  enemyGroupShot: {fileID: 0}
+  playerGroupShot: {fileID: 114564949}
+  enemyGroupShot: {fileID: 114564949}
   moveDuration: 0.35
   moveCurve:
     serializedVersion: 2
@@ -4180,12 +4213,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1230121005}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalRotation: {x: 0.2588191, y: -0, z: -0, w: 0.9659258}
   m_LocalPosition: {x: 0, y: 4.01, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1195760078}
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!1 &1239386026
 GameObject:
@@ -7569,6 +7602,7 @@ MonoBehaviour:
   useInteraction: 1
   endPanel: {fileID: 464495826}
   buttonRoot: {fileID: 1060318743}
+  titleMenuName: TitleScene
   items:
   - {fileID: 1647487379}
   - {fileID: 2070858246}
@@ -8348,4 +8382,3 @@ SceneRoots:
   - {fileID: 1245465312}
   - {fileID: 640182439}
   - {fileID: 2434833920237821027}
-  - {fileID: 1230121006}

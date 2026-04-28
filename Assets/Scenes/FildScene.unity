@@ -301,6 +301,7 @@ GameObject:
   - component: {fileID: 755253183}
   - component: {fileID: 755253182}
   - component: {fileID: 755253185}
+  - component: {fileID: 755253186}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -389,15 +390,37 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755253181}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 979f172db2c9c1a4b9ae5df203a233d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1753244267}
   offset: {x: 0, y: 2, z: -6}
+  smoothTime: 0.05
   rotaionSpeed: 10
   player: {fileID: 1753244269}
+--- !u!114 &755253186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755253181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60aefa103117e7c44a6fc5f2e42f99d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1753244267}
+  distance: 6
+  height: 3
+  smoothTime: 0.05
+  yaw: 0
+  pitch: 25
+  rotateSpeed: 3
+  minPitch: -15
+  maxPitch: 60
 --- !u!1 &1126555607
 GameObject:
   m_ObjectHideFlags: 0
@@ -1065,6 +1088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  cameraTransform: {fileID: 755253184}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

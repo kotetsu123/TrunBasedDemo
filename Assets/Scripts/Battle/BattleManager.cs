@@ -117,8 +117,12 @@ public class BattleManager : MonoBehaviour
 
     private bool _timelineDirty = false;//需要刷新时间轴UI
 
+    private bool _battleStartSequencePlayed;
+
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
+
+    
 
     private SkillData _selectedSkill;
     private ItemData _selectedItem;
@@ -279,9 +283,26 @@ public class BattleManager : MonoBehaviour
         InitItemInventory();
         _lastLevelUpResults.Clear();
 
-        Debug.Log("[BattleManager] Battle Ready!");      
+        Debug.Log("[BattleManager] Battle Ready!");    
+        if(!_battleStartSequencePlayed)
+        {
+            _battleStartSequencePlayed = true;
+            StartCoroutine(BattleStartSequenceRountine());
+        }
     }
+    private IEnumerator BattleStartSequenceRountine()
+    {
+        //等一帧，等所有都准备好
+        yield return null;
+        BaseController firstPlayer= controllers.FirstOrDefault(c => c != null && c.data != null && c.data.Team == Team.Player);
 
+        BaseController firstEnemy = controllers.FirstOrDefault(c => c != null && c.data != null && c.data.Team == Team.Enemy);
+
+        if (cameraDirector != null && firstPlayer != null && firstEnemy != null)
+        {
+            yield return StartCoroutine(cameraDirector.PlayBattleStartSequence(firstPlayer, firstEnemy));
+        }
+    }
     //每次算出ordered，都统一走一个函数
     private void PublishOrdered(List<BaseController> ordered)
     {

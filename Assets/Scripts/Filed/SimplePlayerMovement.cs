@@ -5,6 +5,7 @@ using UnityEngine;
 public class SimplePlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private Transform cameraTransform;
 
     private Rigidbody rb;
     private Vector3 moveInput;
@@ -20,8 +21,16 @@ public class SimplePlayerMovement : MonoBehaviour
     {
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
-        
-        moveInput=new Vector3(h,0f,v).normalized;
+
+        Vector3 cameraForward = cameraTransform.forward;
+        cameraForward.y = 0f;
+        cameraForward.Normalize();
+
+        Vector3 cameraRight = cameraTransform.right;
+        cameraRight.y = 0f;
+        cameraRight.Normalize();
+
+        moveInput = (cameraForward * v + cameraRight * h).normalized;
         
     }
 

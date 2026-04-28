@@ -10,14 +10,19 @@ public class BattleCameraDirector : MonoBehaviour
     [Header("Global Shots")]
     [SerializeField] private Transform defaultBattleShot;
     [SerializeField] private Transform playerGroupShot;
-    [SerializeField]private Transform enemyGroupShot;
+    [SerializeField] private Transform enemyGroupShot;
 
     [Header("Move Settings")]
     [SerializeField]private float moveDuration = 0.35f;
     [SerializeField]private AnimationCurve moveCurve=AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField]private float startSequenceFirstDelay = 1.5f;
+    [SerializeField]private float startSequenceSecondDelay = 1.0f;
 
     //ÌØÊâ¾µÍ·µã
     [SerializeField] private Transform interactionShotPoint;
+
+    private BaseController _laseActor;
+    private BaseController _lastTarget;
 
     private Coroutine _cameraMoveRoutine;
     private bool _isLocked;
@@ -44,7 +49,7 @@ public class BattleCameraDirector : MonoBehaviour
     }
     public void LockCamera()
     {
-               _isLocked = true;
+        _isLocked = true;
     }
     public void UnlockCamera()
     {
@@ -56,7 +61,16 @@ public class BattleCameraDirector : MonoBehaviour
         if (_isLocked)
             return;
 
-        if (actor == null) return;
+        if (actor == null||actor.data==null) return;
+        if(actor.data.Team == Team.Player)
+        {
+            if (_laseActor != null && _lastTarget != null)
+            {
+                FocusDuelShot(_laseActor, _lastTarget);
+                Debug.Log($"[Camera] FocusDuelShot -> {_laseActor.data.Name} vs {_lastTarget.data.Name}");
+            }
+            return;
+        }
         FocusActorTurnShot(actor);
     }
     public void FocusActorTurnShot(BaseController actor)
@@ -68,6 +82,18 @@ public class BattleCameraDirector : MonoBehaviour
         {
             MoveToShot(anchor.TrunCameraPoint);
         }
+    }
+    public IEnumerator PlayBattleStartSequence(BaseController player,BaseController target)
+    {
+      //  LockCamera();
+       
+        FocusEnemyGroup();
+        yield return new WaitForSeconds(startSequenceFirstDelay);
+        
+        FocusPlayerSideInteractionSHot(player, target);
+        yield return new WaitForSeconds(startSequenceSecondDelay);
+         
+      //  UnlockCamera();
     }
     public  void FocusTargetHitShot(BaseController target)
     {
@@ -181,6 +207,15 @@ public class BattleCameraDirector : MonoBehaviour
 
         MoveToShot(interactionShotPoint);
 
+    }
+    public void FocusDuelShot(BaseController actor,BaseController target)
+    {
+        if (actor == null || target == null) return;
+
+        _laseActor = actor;
+        _lastTarget = target;
+        
+        FocusPlayerSideInteractionSHot(actor, target);
     }
     public void FocusPlayerGroup()
     {
