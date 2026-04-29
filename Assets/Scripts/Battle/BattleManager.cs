@@ -117,7 +117,7 @@ public class BattleManager : MonoBehaviour
 
     private bool _timelineDirty = false;//需要刷新时间轴UI
 
-    private bool _battleStartSequencePlayed;
+    private bool _battleStartSequencePlayed=false;
 
     private bool _timelineInitialized = false;
     private Tween _moveTween;//防止重入
@@ -286,12 +286,13 @@ public class BattleManager : MonoBehaviour
         Debug.Log("[BattleManager] Battle Ready!");    
         if(!_battleStartSequencePlayed)
         {
-            _battleStartSequencePlayed = true;
+            
             StartCoroutine(BattleStartSequenceRountine());
         }
     }
     private IEnumerator BattleStartSequenceRountine()
     {
+       
         //等一帧，等所有都准备好
         yield return null;
         BaseController firstPlayer= controllers.FirstOrDefault(c => c != null && c.data != null && c.data.Team == Team.Player);
@@ -302,6 +303,7 @@ public class BattleManager : MonoBehaviour
         {
             yield return StartCoroutine(cameraDirector.PlayBattleStartSequence(firstPlayer, firstEnemy));
         }
+        _battleStartSequencePlayed = true;
     }
     //每次算出ordered，都统一走一个函数
     private void PublishOrdered(List<BaseController> ordered)
@@ -421,6 +423,8 @@ public class BattleManager : MonoBehaviour
         //回合开始先自动选一个目标（如果当前目标无效的话）
        
        targetSelector.AutoPickTargetIfNeeded(actor);
+        if(_currentTarget!=null&&_battleStartSequencePlayed==true)
+            cameraDirector?.FocusBattlePreviewShot(actor, _currentTarget);
         if (commandPanel != null)
         {
             commandPanel.Show();
@@ -603,7 +607,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            cameraDirector?.FocusPlayerSideInteractionSHot(actor, target);
+            cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
         }
 
         //给镜头一点时间
@@ -646,7 +650,7 @@ public class BattleManager : MonoBehaviour
                 break;
 
             default:
-                cameraDirector?.FocusActorTurnShot(actor);
+                cameraDirector?.FocusBattlePreviewShot(actor,target);
                 break;
         }
     }
@@ -1435,7 +1439,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusActorTurnShot(_currentActor);
+                cameraDirector?.FocusBattlePreviewShot(_currentActor,_currentTarget);
 
             _selectedSkill = null;
             _currentCommand = CommandType.None;
@@ -1450,7 +1454,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusActorTurnShot(_currentActor);
+                cameraDirector?.FocusBattlePreviewShot(_currentActor,_currentTarget);
 
             _currentCommand = CommandType.None;
             NotifyInputState();
@@ -1463,7 +1467,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusActorTurnShot(_currentActor);
+                cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
 
             _currentCommand = CommandType.None;
             NotifyInputState();
@@ -1495,7 +1499,7 @@ public class BattleManager : MonoBehaviour
         //浏览镜头返回
         _previewTarget = null;
         if(_currentActor!=null)
-            cameraDirector?.FocusActorTurnShot(_currentActor);
+            cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
 
         skillPanel.Hide();
         commandPanel.Show();
@@ -1508,7 +1512,7 @@ public class BattleManager : MonoBehaviour
         //浏览镜头返回
         _previewTarget = null;
         if (_currentActor != null)
-            cameraDirector?.FocusActorTurnShot(_currentActor);
+            cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
 
         itemPanel.Hide();
         commandPanel.Show();

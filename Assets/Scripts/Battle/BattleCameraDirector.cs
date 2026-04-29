@@ -61,17 +61,11 @@ public class BattleCameraDirector : MonoBehaviour
         if (_isLocked)
             return;
 
-        if (actor == null||actor.data==null) return;
-        if(actor.data.Team == Team.Player)
+        if (actor == null || actor.data == null) return;
+        if (actor.data.Team == Team.Player)
         {
-            if (_laseActor != null && _lastTarget != null)
-            {
-                FocusDuelShot(_laseActor, _lastTarget);
-                Debug.Log($"[Camera] FocusDuelShot -> {_laseActor.data.Name} vs {_lastTarget.data.Name}");
-            }
-            return;
+            FocusBattlePreviewShot(_laseActor, _lastTarget);           
         }
-        FocusActorTurnShot(actor);
     }
     public void FocusActorTurnShot(BaseController actor)
     {
@@ -85,15 +79,15 @@ public class BattleCameraDirector : MonoBehaviour
     }
     public IEnumerator PlayBattleStartSequence(BaseController player,BaseController target)
     {
-      //  LockCamera();
-       
+         LockCamera();
+
         FocusEnemyGroup();
         yield return new WaitForSeconds(startSequenceFirstDelay);
         
-        FocusPlayerSideInteractionSHot(player, target);
+        FocusPlayerSideInteractionShot(player, target,2.0f);
         yield return new WaitForSeconds(startSequenceSecondDelay);
          
-      //  UnlockCamera();
+       UnlockCamera();
     }
     public  void FocusTargetHitShot(BaseController target)
     {
@@ -108,7 +102,7 @@ public class BattleCameraDirector : MonoBehaviour
     //双方镜头//在这个版本当中，会存在，如果是玩家攻击敌人，则镜头偏向玩家；如果是敌人攻击玩家，则镜头偏向敌人
     //所以需要需要规定一个 规则： 镜头偏向玩家
     //所以我们需要在外面封装一个新的方法，因此此方法为其底层函数
-    public void FocusInteractionShot(BaseController attacker,BaseController target)
+    public void FocusInteractionShot(BaseController attacker,BaseController target,float?durationOverride=null)
     {
         if(attacker==null||target==null||targetCamera==null) return;
         
@@ -140,10 +134,10 @@ public class BattleCameraDirector : MonoBehaviour
         interactionShotPoint.transform.position= camPos;
         interactionShotPoint.transform.rotation= Quaternion.LookRotation(lookAt - camPos);
 
-        MoveToShot(interactionShotPoint.transform);      
+        MoveToShot(interactionShotPoint.transform,durationOverride);      
     }
     //双方镜头，封装规则：镜头偏向玩家
-    public void FocusPlayerSideInteractionSHot(BaseController actor, BaseController target)
+    public void FocusPlayerSideInteractionShot(BaseController actor, BaseController target,float?durationOverride=null)
     {
         if (actor == null || target == null)
             return;
@@ -154,19 +148,19 @@ public class BattleCameraDirector : MonoBehaviour
         if (actor.data.Team == Team.Player)
         {
             //玩家出手：正常顺序
-            FocusInteractionShot(actor, target);
+            FocusInteractionShot(actor, target, durationOverride);
             return;
         }
         if (target.data.Team == Team.Player)
         {
             //敌人出手，镜头偏向玩家，所以颠倒顺序
-            FocusInteractionShot(target, actor);
+            FocusInteractionShot(target, actor, durationOverride);
              return;
         }
         //都不是玩家，则默认规则
-        FocusInteractionShot(actor, target);
+        FocusInteractionShot(actor, target,durationOverride);
     }
-    public void FocusPlayerSideTargetPreviewShot(BaseController actor,BaseController target)
+    public void FocusPlayerSideTargetPreviewShot(BaseController actor,BaseController target, float? durationOverride = null)
     {
         if (actor == null || target == null || targetCamera == null || interactionShotPoint == null)
             return;
@@ -205,17 +199,15 @@ public class BattleCameraDirector : MonoBehaviour
         interactionShotPoint.position= camPos;
         interactionShotPoint.rotation= Quaternion.LookRotation(lookAt-camPos);
 
-        MoveToShot(interactionShotPoint);
+        MoveToShot(interactionShotPoint, durationOverride);
 
     }
-    public void FocusDuelShot(BaseController actor,BaseController target)
+    public void FocusBattlePreviewShot(BaseController actor,BaseController target)
     {
         if (actor == null || target == null) return;
 
-        _laseActor = actor;
-        _lastTarget = target;
-        
-        FocusPlayerSideInteractionSHot(actor, target);
+       
+        FocusPlayerSideTargetPreviewShot(actor, target);
     }
     public void FocusPlayerGroup()
     {
@@ -236,16 +228,18 @@ public class BattleCameraDirector : MonoBehaviour
         targetCamera.transform.position = shot.position;
         targetCamera.transform.rotation = shot.rotation;
     }
-    public void MoveToShot(Transform shot)
+    public void MoveToShot(Transform shot,float?durationOverride=null)
     {
         if(targetCamera==null||shot==null) return;
 
         if (_cameraMoveRoutine != null)
             StopCoroutine(_cameraMoveRoutine);
 
-        _cameraMoveRoutine = StartCoroutine(MoveRoutine(shot));
+        float duration= durationOverride ?? moveDuration;
+
+        _cameraMoveRoutine = StartCoroutine(MoveRoutine(shot,duration));
     }
-    private IEnumerator MoveRoutine(Transform shot)
+    private IEnumerator MoveRoutine(Transform shot,float duration)
     {
         Vector3 startPos = targetCamera.transform.position;
         Quaternion startRot = targetCamera.transform.rotation;
@@ -254,10 +248,10 @@ public class BattleCameraDirector : MonoBehaviour
         Quaternion targetRot = shot.rotation;
 
         float elasped = 0f;
-        while (elasped < moveDuration)
+        while (elasped < duration)
         {
             elasped += Time.deltaTime;
-            float t = Mathf.Clamp01(elasped / moveDuration);
+            float t = Mathf.Clamp01(elasped / duration);
             t = moveCurve.Evaluate(t);
 
             targetCamera.transform.position = Vector3.Lerp(startPos, targetPos, t);

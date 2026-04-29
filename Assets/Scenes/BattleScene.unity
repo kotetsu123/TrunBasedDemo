@@ -4161,7 +4161,7 @@ MonoBehaviour:
   targetCamera: {fileID: 963194227}
   battle: {fileID: 1454933262}
   defaultBattleShot: {fileID: 1230121006}
-  playerGroupShot: {fileID: 114564949}
+  playerGroupShot: {fileID: 1099619661}
   enemyGroupShot: {fileID: 114564949}
   moveDuration: 0.35
   moveCurve:
@@ -4188,6 +4188,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  startSequenceFirstDelay: 1
+  startSequenceSecondDelay: 2
   interactionShotPoint: {fileID: 725639125}
 --- !u!1 &1230121005
 GameObject:
