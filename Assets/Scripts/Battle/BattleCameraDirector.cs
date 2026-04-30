@@ -206,7 +206,7 @@ public class BattleCameraDirector : MonoBehaviour
     {
         if (actor == null || target == null) return;
 
-       
+            
         FocusPlayerSideTargetPreviewShot(actor, target);
     }
     public void FocusPlayerGroup()

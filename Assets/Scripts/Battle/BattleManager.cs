@@ -1296,6 +1296,14 @@ public class BattleManager : MonoBehaviour
             return null;
         return list[UnityEngine.Random.Range(0, list.Count)];
     }
+    private BaseController GetFirstAliveTargetByTeam(Team team)
+    {
+        return controllers.FirstOrDefault(c =>
+        c != null &&
+        c.data != null &&
+        !c.isDead && 
+        c.data.Team == team);
+    }
   
    //战斗指令菜单相关
     private void HandleCommandSelected(CommandType cmd)
@@ -1439,7 +1447,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusBattlePreviewShot(_currentActor,_currentTarget);
+                ReturnToBattlePreviewCamera();
 
             _selectedSkill = null;
             _currentCommand = CommandType.None;
@@ -1454,7 +1462,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusBattlePreviewShot(_currentActor,_currentTarget);
+                ReturnToBattlePreviewCamera();
 
             _currentCommand = CommandType.None;
             NotifyInputState();
@@ -1467,7 +1475,7 @@ public class BattleManager : MonoBehaviour
             //浏览镜头返回
             _previewTarget = null;
             if (_currentActor != null)
-                cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
+                ReturnToBattlePreviewCamera();
 
             _currentCommand = CommandType.None;
             NotifyInputState();
@@ -1475,6 +1483,23 @@ public class BattleManager : MonoBehaviour
             itemPanel.Show();
             return;
         }
+    }
+    private void ReturnToBattlePreviewCamera()
+    {
+        if (_currentActor == null || _currentActor.data == null)
+            return;
+        BaseController previewTarget = _currentTarget;
+
+        //如果当前目标为空，或当前目标是我方，改成一个敌人当作对峙目标
+        if (previewTarget == null ||
+            previewTarget.data == null ||
+            previewTarget.data.Team == _currentActor.data.Team)
+        {
+            previewTarget = GetFirstAliveTargetByTeam(Team.Enemy);
+        }
+        if (previewTarget == null)
+            return;
+        cameraDirector?.FocusBattlePreviewShot(_currentActor, previewTarget);
     }
     private void HandleCharacterRevived(BaseController ctrl) 
     {
@@ -1498,8 +1523,8 @@ public class BattleManager : MonoBehaviour
     {
         //浏览镜头返回
         _previewTarget = null;
-        if(_currentActor!=null)
-            cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
+        if (_currentActor != null)
+            ReturnToBattlePreviewCamera();
 
         skillPanel.Hide();
         commandPanel.Show();
@@ -1512,7 +1537,7 @@ public class BattleManager : MonoBehaviour
         //浏览镜头返回
         _previewTarget = null;
         if (_currentActor != null)
-            cameraDirector?.FocusBattlePreviewShot(_currentActor, _currentTarget);
+            ReturnToBattlePreviewCamera();
 
         itemPanel.Hide();
         commandPanel.Show();
