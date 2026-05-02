@@ -421,10 +421,11 @@ public class BattleManager : MonoBehaviour
         Debug.Log("press the space key attack the enemy");
         _currentCommand = CommandType.None;
         //回合开始先自动选一个目标（如果当前目标无效的话）
-       
-       targetSelector.AutoPickTargetIfNeeded(actor);
+        //进入玩家决策状态时，刷新到默认对峙镜头
+        targetSelector.AutoPickTargetIfNeeded(actor);
         if(_currentTarget!=null&&_battleStartSequencePlayed==true)
             cameraDirector?.FocusBattlePreviewShot(actor, _currentTarget);
+
         if (commandPanel != null)
         {
             commandPanel.Show();
@@ -1164,6 +1165,10 @@ public class BattleManager : MonoBehaviour
                 {
                     cameraDirector?.FocusPlayerGroup();
                 }
+                if (_currentTargetType == SkillTargetType.AllyDeadSingle)
+                {
+                    cameraDirector?.FocusPlayerGroup();
+                }
             }
         }
     }
@@ -1378,7 +1383,11 @@ public class BattleManager : MonoBehaviour
         if (skill.targetType == SkillTargetType.AllyDeadSingle)
         {
             targetSelector.AutoPickDeadAllyTargetIfNeeded(_currentActor);
-            OnTargetChanged?.Invoke(_currentTarget);
+            if (_currentTarget != null)
+            {
+                SetPreviewTarget(_currentTarget);
+                OnTargetChanged?.Invoke(_currentTarget);
+            }
             NotifyInputState();
             return;
         }
