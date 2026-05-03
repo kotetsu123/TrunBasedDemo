@@ -87,7 +87,7 @@ public class ResultCharacterPanelController : BasePanel
             {
                 levelUpPopup.Play(result);
 
-                yield return new WaitForSeconds( levelUpPopup.GetTotalDuration());
+                yield return new WaitForSeconds(levelUpPopup.GetTotalDuration());
             }
         }
     }

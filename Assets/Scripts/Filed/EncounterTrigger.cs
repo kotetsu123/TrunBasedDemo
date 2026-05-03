@@ -9,13 +9,27 @@ public class EncounterTrigger : MonoBehaviour
 
     private bool triggerd;
 
+    private void Awake()
+    {
+        if (transitionController == null)
+        {
+            transitionController = FindObjectOfType<SceneTransitionController>();
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
+        
     {
         if (triggerd) return;
        
         if (other.CompareTag("Player"))
         {
             triggerd = true;
+
+            FieldBattleContext.SaveFieldReturnData(SceneManager.GetActiveScene().name,
+                other.transform.position,
+                other.transform.rotation);
+
             SimplePlayerMovement playerController = other.gameObject.GetComponent<SimplePlayerMovement>();
             Rigidbody playerRigidbody = other.gameObject.GetComponent<Rigidbody>();
             if (playerController != null)
