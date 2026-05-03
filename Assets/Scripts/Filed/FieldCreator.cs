@@ -12,14 +12,27 @@ public class FieldCreator : MonoBehaviour
     {
         SetupPlayer();
         SpwanEnemies();
+        if (FieldBattleContext.HasFieldReturnData)
+        {
+            FieldBattleContext.Clear();
+        }
     }
     private void SetupPlayer()
     {
         if (player == null || playerStartPoint == null)
             return;
-
-        player.position = playerStartPoint.position;
-        player.rotation= playerStartPoint.rotation;
+        if (FieldBattleContext.HasFieldReturnData)
+        {
+            player.position = FieldBattleContext.PlayerPositionBeforeBattle;
+            player.rotation = FieldBattleContext.PlayerRotationBeforeBattle;
+            return;
+        }
+        if (playerStartPoint != null)
+        {
+            player.position = playerStartPoint.position;
+            player.rotation = playerStartPoint.rotation;
+        }
+       
     }
 
     private void SpwanEnemies()

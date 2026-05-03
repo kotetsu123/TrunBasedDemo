@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,10 +26,14 @@ public class EncounterTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             triggerd = true;
+            
+            EnemyFieldController fieldEnemy= GetComponent<EnemyFieldController>();
+            string spawnId = fieldEnemy != null ? fieldEnemy.SpawnId : null;
 
-            FieldBattleContext.SaveFieldReturnData(SceneManager.GetActiveScene().name,
+            FieldBattleContext.SaveFieldReturnData(SceneManager.GetActiveScene().name,        
                 other.transform.position,
-                other.transform.rotation);
+                other.transform.rotation,
+                spawnId);
 
             SimplePlayerMovement playerController = other.gameObject.GetComponent<SimplePlayerMovement>();
             Rigidbody playerRigidbody = other.gameObject.GetComponent<Rigidbody>();

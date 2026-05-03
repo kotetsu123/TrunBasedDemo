@@ -13,6 +13,12 @@ public class EnemySpawnManager : MonoBehaviour
             if (point == null || point.EnemyPrefab == null)
                 continue;
 
+            if (FieldBattleContext.HasFieldReturnData && point.SpawnId == FieldBattleContext.TriggeredSpawnId)
+            {
+                Debug.Log($"Skipping spawn for {point.SpawnId} due to field return context.");
+                continue;
+            }
+
             GameObject enemy = Instantiate(
                 point.EnemyPrefab,
                 point.transform.position,
@@ -22,7 +28,8 @@ public class EnemySpawnManager : MonoBehaviour
 
             if (fieldEnemy != null)
             {
-                fieldEnemy.SetWanderCenter(
+                fieldEnemy.Init(
+                    point.SpawnId,
                     point.transform.position,
                     point.WanderRadius);
             }

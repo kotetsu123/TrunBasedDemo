@@ -694,6 +694,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0876294da4eb3f24698bb06b70e41dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnId: 04
   enmeyPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   wanderRadius: 3
 --- !u!1 &913506890
@@ -740,6 +741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0876294da4eb3f24698bb06b70e41dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnId: 02
   enmeyPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   wanderRadius: 3
 --- !u!1 &951993407
@@ -1167,6 +1169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0876294da4eb3f24698bb06b70e41dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnId: 01
   enmeyPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   wanderRadius: 3
 --- !u!1 &1336090047
@@ -1658,6 +1661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0876294da4eb3f24698bb06b70e41dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spawnId: 03
   enmeyPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   wanderRadius: 3
 --- !u!1 &1596119773
@@ -1966,7 +1970,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1818626006}
-  - component: {fileID: 1818626005}
   m_Layer: 0
   m_Name: SpawnPoints
   m_TagString: Untagged
@@ -1974,20 +1977,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1818626005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1818626004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0876294da4eb3f24698bb06b70e41dbc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enmeyPrefab: {fileID: 0}
-  wanderRadius: 3
 --- !u!4 &1818626006
 Transform:
   m_ObjectHideFlags: 0

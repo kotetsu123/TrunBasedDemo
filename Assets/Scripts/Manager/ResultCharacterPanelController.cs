@@ -13,7 +13,10 @@ public class ResultCharacterPanelController : BasePanel
    
     [SerializeField] private CharacterResultItemView[] items = new CharacterResultItemView[4];
 
-    [SerializeField]private LevelUpPopController levelUpPopup;  
+    [SerializeField] private LevelUpPopController levelUpPopup;
+
+    [SerializeField] private float returnFieldDelay = 2.0f;
+    [SerializeField] private string fieldSceneName = "FieldScene";
 
     protected override void Awake()
     {
@@ -83,6 +86,7 @@ public class ResultCharacterPanelController : BasePanel
         {
             if (!result.DidLevelUp)
                 continue;
+
             if (levelUpPopup != null)
             {
                 levelUpPopup.Play(result);
@@ -90,8 +94,22 @@ public class ResultCharacterPanelController : BasePanel
                 yield return new WaitForSeconds(levelUpPopup.GetTotalDuration());
             }
         }
-    }
+        yield return new WaitForSeconds(returnFieldDelay);
 
+        ReturnToField();
+    }
+   
+    private void ReturnToField()
+    {
+        if (FieldBattleContext.HasFieldReturnData)
+        {
+            SceneManager.LoadScene(FieldBattleContext.LastFieldSceneName);
+        }
+        else
+        {
+            SceneManager.LoadScene(fieldSceneName);
+        }
+    }
     private void HandleEndPanelClosed(BattleResultPayload payload)
     {
         if (payload == null) return;    
