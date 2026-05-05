@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 369970dfd0a321349887fcc2a43ecf25, type: 3}
+  m_Name: EnemyFieldData_001
+  m_EditorClassIdentifier: 
+  enemyId: 001
+  fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+  battleCharacterData:
+    Team: 1
+    Name: e0
+    MaxHp: 120
+    Hp: 120
+    MaxMp: 0
+    Mp: 0
+    Level: 1
+    Exp: 0
+    Attack: 30
+    Speed: 80
+    ActionValue: 0
+    MaxActionValue: 200
+    isOnField: 0
+    isActing: 0
+    isDead: 0
+    isPlayer: 0
+    battleEnded: 0
+    intent: 0
+  wanderRadius: 3

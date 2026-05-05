@@ -5,12 +5,13 @@ using UnityEngine;
 public class EnemySpawnManager : MonoBehaviour
 {
     [SerializeField] private EnemySpawnPoint[] spawnPoints;
+    [SerializeField] private EnemyDataBase enemyDataBase;
 
     public void SpawnAll()
     {
         foreach (var point in spawnPoints)
         {
-            if (point == null || point.EnemyPrefab == null)
+            if (point == null)
                 continue;
 
             if (FieldBattleContext.IsSpawnCleard(point.SpawnId))
@@ -18,9 +19,14 @@ public class EnemySpawnManager : MonoBehaviour
                 Debug.Log($"Skipping spawn for {point.SpawnId} due to field return context.");
                 continue;
             }
+            EnemyFieldData enemyData = enemyDataBase.FindById(point.EnemyId);
 
+            if (enemyData == null || enemyData.FieldPrefab == null)         
+                continue;
+
+            
             GameObject enemy = Instantiate(
-                point.EnemyPrefab,
+                enemyData.FieldPrefab,
                 point.transform.position,
                 point.transform.rotation);
 
@@ -31,7 +37,7 @@ public class EnemySpawnManager : MonoBehaviour
                 fieldEnemy.Init(
                     point.SpawnId,
                     point.transform.position,
-                    point.WanderRadius);
+                    enemyData.WanderRadius);
             }
         }
     }
