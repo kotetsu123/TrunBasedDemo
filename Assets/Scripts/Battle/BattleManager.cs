@@ -790,6 +790,8 @@ public class BattleManager : MonoBehaviour
         //胜利时发经验
         if (result == BattleResult.Win)
         {
+            FieldBattleContext.MarkTriggerdEnemyCleared();
+
             const int rewardExp = 120;
             _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
         }

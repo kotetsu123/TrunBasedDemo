@@ -13,7 +13,7 @@ public class EnemySpawnManager : MonoBehaviour
             if (point == null || point.EnemyPrefab == null)
                 continue;
 
-            if (FieldBattleContext.HasFieldReturnData && point.SpawnId == FieldBattleContext.TriggeredSpawnId)
+            if (FieldBattleContext.IsSpawnCleard(point.SpawnId))
             {
                 Debug.Log($"Skipping spawn for {point.SpawnId} due to field return context.");
                 continue;

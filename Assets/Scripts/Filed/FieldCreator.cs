@@ -14,7 +14,7 @@ public class FieldCreator : MonoBehaviour
         SpwanEnemies();
         if (FieldBattleContext.HasFieldReturnData)
         {
-            FieldBattleContext.Clear();
+            FieldBattleContext.ClearReturnData();
         }
     }
     private void SetupPlayer()
