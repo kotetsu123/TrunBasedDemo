@@ -15,6 +15,7 @@ public static class FieldBattleContext
     private static readonly HashSet<string> clearedSpawnIds= new HashSet<string>();
 
     public static IReadOnlyCollection<string> ClearedSpawnIds => clearedSpawnIds;
+    //保存进入战斗前的FieldScene名称，玩家位置朝向
     public static void SaveFieldReturnData(string fieldSceneName,Vector3 playerPos,Quaternion playerRot,string triggeredSpawnId)
     {
         LastFieldSceneName = fieldSceneName;
@@ -42,6 +43,7 @@ public static class FieldBattleContext
 
         return clearedSpawnIds.Contains(spawnId);
     }
+    //只清理本次返回数据，不清理已击败敌人记录
     public static void ClearReturnData()
     {
         LastFieldSceneName = null;
@@ -50,6 +52,7 @@ public static class FieldBattleContext
         TriggeredSpawnId = null;
         HasFieldReturnData = false;
     }
+    //用于重新开始流程或返回标题时完全情路
     public static void ClearAll()
     {
         ClearReturnData();
