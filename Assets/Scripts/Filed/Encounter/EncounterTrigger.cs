@@ -29,11 +29,13 @@ public class EncounterTrigger : MonoBehaviour
             
             EnemyFieldController fieldEnemy= GetComponent<EnemyFieldController>();
             string spawnId = fieldEnemy != null ? fieldEnemy.SpawnId : null;
+            string encounterId = fieldEnemy != null ? fieldEnemy.EncounterId : null;
 
             FieldBattleContext.SaveFieldReturnData(SceneManager.GetActiveScene().name,        
                 other.transform.position,
                 other.transform.rotation,
-                spawnId);
+                spawnId,
+                encounterId);
 
             SimplePlayerMovement playerController = other.gameObject.GetComponent<SimplePlayerMovement>();
             Rigidbody playerRigidbody = other.gameObject.GetComponent<Rigidbody>();

@@ -21,6 +21,10 @@ public class BattleSpawner : MonoBehaviour
     [SerializeField] private bool spawnOnStart = true;
     [SerializeField] private Canvas worldUICanvas;
 
+
+    [SerializeField] private EncounterDataBase encounterDatabase;
+    [SerializeField] private GameObject enemyPrefab;
+
     private bool _spawnInitialDone = false;
 
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
@@ -40,7 +44,7 @@ public class BattleSpawner : MonoBehaviour
             SpawnInitial();
         }
     }
-    private void OnDestory()
+    private void OnDestroy()
     {
         formation.OnSlotChanged -= HandleSlotChanged;
     }
@@ -131,16 +135,24 @@ public class BattleSpawner : MonoBehaviour
         _enemyReserve.Clear();
 
         Debug.Log($"[SpawnInitial] called frame={Time.frameCount} queue={_enemyReserve.Count}");
-        //Player: 按顺序塞（0-3）
+        //Player: 按顺序塞（0-3）//原先的测试配置
         for (int i=0; i < initialPlayers.Count; i++)
         {
             if (i >= 4) break;
             SpawnInToSlot(initialPlayers[i], i);
         }
-        //Enemy:
-        foreach(var req in initialEnemies)
+        /* //Enemy:
+         foreach(var req in initialEnemies)
+         {
+             EnqueueOrSpawn(req);
+         }*/
+        //Enemy:优先使用EncounterData
+        if (!TrySpawnEnemiesFromEncounter())
         {
-            EnqueueOrSpawn(req);
+            foreach(var req in initialEnemies)
+            {
+                EnqueueOrSpawn(req);
+            }
         }
     }
    public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
@@ -149,5 +161,48 @@ public class BattleSpawner : MonoBehaviour
         {
             SpawnInToSlot(playerTeam[i], i);
         }
+    }
+    private bool TrySpawnEnemiesFromEncounter()
+    {
+        if (encounterDatabase == null)
+        {
+            Debug.LogWarning($"[BattleSpawner] EncounterDataBase is null.use InitialEnemies fallback");
+            return false;
+        }
+        string encounterId = FieldBattleContext.CurrentEncounterId;
+        if (string.IsNullOrEmpty(encounterId))
+        {
+            Debug.Log("[BattleSpawner no CurrentEncoutnerId. use InitialEnemies fallback]");
+            return false;
+        }
+        EncounterData encounterData = encounterDatabase.FindeById(encounterId);
+
+        if (encounterData == null)
+        {
+            Debug.LogWarning($"[BattleSpawner] EncounterData not found: {encounterId}. Use initialEnemies fallback.");
+            return false;
+        }
+        if (enemyPrefab == null)
+        {
+            Debug.LogWarning("[BattleSpawner] enemyPrefab is null. Use initialEnemies fallback.");
+            return false;
+        }
+        foreach(var enemyCharacter in encounterData.EnemyChatacters)
+        {
+            if (enemyCharacter == null)
+                continue;
+
+            SpawnRequest req = new SpawnRequest()
+            {
+                team = Team.Enemy,
+                prefabs = enemyPrefab,
+                characterData = enemyCharacter
+            };
+            
+            EnqueueOrSpawn(req);
+        }
+        Debug.Log($"[BattleSpawner] Spawned encounter enemies: {encounterId}");
+
+        return true;
     }
 }

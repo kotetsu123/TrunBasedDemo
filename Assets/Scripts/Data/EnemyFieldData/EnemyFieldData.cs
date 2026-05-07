@@ -10,8 +10,12 @@ public class EnemyFieldData : ScriptableObject
     [SerializeField] private Character battleCharacterData;
     [SerializeField] private float wanderRadius = 3f;
 
+    [Header("Encounter")]
+    [SerializeField] private string encounterId;
     public string EnemyId=>enemyId;
     public GameObject FieldPrefab =>fieldPrefab;
     public Character BattleCharacterData =>battleCharacterData;
     public float WanderRadius => wanderRadius;  
+
+    public string EncounterId=>encounterId;
 }

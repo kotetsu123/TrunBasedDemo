@@ -36,6 +36,7 @@ public class EnemySpawnManager : MonoBehaviour
             {
                 fieldEnemy.Init(
                     point.SpawnId,
+                    enemyData.EncounterId,
                     point.transform.position,
                     enemyData.WanderRadius);
             }

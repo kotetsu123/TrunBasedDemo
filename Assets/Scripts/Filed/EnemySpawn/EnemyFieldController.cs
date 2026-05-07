@@ -11,8 +11,10 @@ public class EnemyFieldController : MonoBehaviour
     private Vector3 wanderCenter;
     private float wanderRadius = 3f;
     private string spawnId;
+    private string encounterId;
 
     public string SpawnId=> spawnId;
+    public string EncounterId => encounterId;   
     public void SetWanderCenter(Vector3 center,float radius)
     {
         wanderCenter= center;
@@ -21,9 +23,10 @@ public class EnemyFieldController : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(WanderRoutine());
     }
-    public void Init(string id,Vector3 center,float radius)
+    public void Init(string id,string encounter,Vector3 center,float radius)
     {
         spawnId= id;
+        encounterId= encounter;
         wanderCenter= center;
         wanderRadius= radius;
 

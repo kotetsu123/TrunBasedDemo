@@ -2449,6 +2449,8 @@ MonoBehaviour:
       intent: 0
   spawnOnStart: 1
   worldUICanvas: {fileID: 364944995}
+  encounterDatabase: {fileID: 11400000, guid: 9201cc78d47f18d45bf670e77b37561e, type: 2}
+  enemyPrefab: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
 --- !u!4 &629646182
 Transform:
   m_ObjectHideFlags: 0
@@ -7611,6 +7613,8 @@ MonoBehaviour:
   - {fileID: 1506446202}
   - {fileID: 1880178882}
   levelUpPopup: {fileID: 1427258972}
+  returnFieldDelay: 2
+  fieldSceneName: FieldScene
 --- !u!1 &2018218463
 GameObject:
   m_ObjectHideFlags: 0
