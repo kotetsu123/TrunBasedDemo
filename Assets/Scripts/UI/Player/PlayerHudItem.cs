@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Experimental.GraphView;
@@ -26,7 +26,9 @@ public class PlayerHudItem : MonoBehaviour
     private Tween _hpTween;
     private Tween _mpTween;
 
-    //debug ÓÃµÄ´úÂë
+    private Character _boundData;
+
+    //debug ç—°ë¨ëœì¯¤
     // private bool _printedOnce = false;
 
     private void Awake()
@@ -43,12 +45,36 @@ public class PlayerHudItem : MonoBehaviour
 
     public void Bind(BaseController ctrl)
     {
-        if (_ctrl == ctrl) {
-            if (_ctrl == null)
-            { gameObject.SetActive(false); ; return; }      
+        if (_ctrl == ctrl && _ctrl != null && _ctrl.data != null)
+        {
+            gameObject.SetActive(false);
             Refresh();
-            return; }//°ó¶¨Ã»±ä¾Í±ğÖØ¸´¶©ÔÄ
-        // ½â°óÖ®Ç°µÄÊÂ¼ş
+            return;
+        }//ê³¬ë•ì²­ê¸´ì•ê¹è·¯ë¦¿ë•æ•¦
+
+        //ç»‘å®šæ–°è§’è‰²å‰ï¼Œå…ˆè§£ç»‘æ—§Characterçš„äº‹ä»¶
+        Unbind();
+        _ctrl = ctrl;
+
+        //æ²¡æœ‰è§’è‰²/æ²¡æœ‰æ•°æ®æ—¶ï¼Œéšè—è¿™ä¸ªHudItem
+        if (_ctrl == null || _ctrl.data == null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+        
+        gameObject.SetActive(true);
+        //è®°å½•å½“å‰çœŸæ­£è®¢é˜…çš„Character æ•°æ®
+        _boundData=_ctrl.data;
+        _boundData.OnHpChanged += HandleHpChanged;
+        _boundData.OnMpChanged += HandleMpChanged;
+        //ç»‘å®šå¤´åƒ
+        if (Portrait != null && _ctrl.portrait != null)
+        {
+            Portrait.sprite= _ctrl.portrait;
+        }
+        Refresh(); 
+       /* // ì©ê³¬è£‚í’ˆë¨æ…¤ìˆ­
         if (_ctrl != null && _ctrl.data != null)
         {
             _ctrl.data.OnHpChanged -= HandleHpChanged;
@@ -62,14 +88,14 @@ public class PlayerHudItem : MonoBehaviour
         }
         gameObject.SetActive(true);
 
-        // °ó¶¨ĞÂµÄÊÂ¼ş
+        // ê³¬ë•åŠ¤ë¨æ…¤ìˆ­
         if (_ctrl != null && _ctrl.data != null) {
             _ctrl.data.OnHpChanged += HandleHpChanged;
             _ctrl.data.OnMpChanged += HandleMpChanged;
         }
             
 
-        //¹Ì¶¨×Ê²ú£ºÍ·Ïñ/Ãû×Ö
+        //ë¯¸ë•æ —ë“ï¼šåº«ç—/ì¸°ä¿š
         if(Portrait != null)
         {
             if(_ctrl.portrait != null)
@@ -77,8 +103,8 @@ public class PlayerHudItem : MonoBehaviour
                 Portrait.sprite = _ctrl.portrait;
             }           
         }
-        //Á¢¼´Ë¢ĞÂÒ»´Î
-        Refresh();
+        //ì ‘ì„¦å²¬åŠ¤å¯§ëŠ´
+        Refresh();*/
     }
     public void Refresh()
     {
@@ -96,16 +122,16 @@ public class PlayerHudItem : MonoBehaviour
         gameObject.SetActive(true);
         float alpha=downed?0.5f:1f;
         //if(nameText!=null)nameText.text = _ctrl.data.Name;
-        //ÎÄ×Ö ÑªÌõÎÄ×Ö
+        //åŒ¡ä¿š æ²‚ä¿‚åŒ¡ä¿š
         if(hpText!=null)hpText.text = $" {_ctrl.data.Hp}/{_ctrl.data.MaxHp}";
-        //»Òµô
+        //ë¿ë”œ
         if (Portrait != null)
         {
             var c = Portrait.color;
             c.a = alpha;
             Portrait.color = c;
         }
-        //ÑªÌõImage
+        //æ²‚ä¿‚Image
         if (hpFill != null)
         {         
             _hpTween?.Kill();
@@ -119,16 +145,16 @@ public class PlayerHudItem : MonoBehaviour
             }
             else if (lowHP)
             {
-                hpFill.color = new Color(1f, 0.3f, 0.3f, 1f);//ÈáºÍµÄºìÉ«
+                hpFill.color = new Color(1f, 0.3f, 0.3f, 1f);//íœ¼ëµ¨ë¨ë¸î€Š
             }
             else
             {
                 hpFill.color = _hpFillDefaultColor;
             }
         }
-        //ÎÄ×Ö À¶ÌõÎÄ×Ö
+        //åŒ¡ä¿š ìœµä¿‚åŒ¡ä¿š
         if (mpText != null) mpText.text = $"{_ctrl.data.Mp}/ {_ctrl.data.MaxMp}";
-        //À¶Ìõimage
+        //ìœµä¿‚image
         if (mpFill != null)
         {
             _mpTween?.Kill();
@@ -153,11 +179,24 @@ public class PlayerHudItem : MonoBehaviour
     }
     private void OnDestroy()
     {
-        // ·ÀÖ¹¶ÔÏóÏú»ÙÊ±»¹¹Ò×Å¶©ÔÄ
+        // ë å²ºëš¤è¹¶é¥‹ì‘ç‚ë»˜ë°ˆæ·ªë•æ•¦
         if (_ctrl != null && _ctrl.data != null)
         {
             _ctrl.data.OnHpChanged -= HandleHpChanged;
             _ctrl.data.OnMpChanged -= HandleMpChanged;  
         }
+        Unbind();
+        _hpTween?.Kill();
+        _mpTween?.Kill();
+    }
+
+    private void Unbind()
+    {
+        if (_boundData == null)
+            return;
+        _boundData.OnHpChanged += HandleHpChanged;
+        _boundData.OnMpChanged += HandleMpChanged;
+
+        _boundData = null;
     }
 }
