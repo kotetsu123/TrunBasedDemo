@@ -795,6 +795,9 @@ public class BattleManager : MonoBehaviour
             const int rewardExp = 120;
             _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
         }
+        //回写状态
+        PartyRuntimeState.UpdateFromBattleController(controllers);
+
         //结算快照
         var snapshots = BuildPartySnapShots();
         var payload = new BattleResultPayload(result, snapshots);
@@ -1573,6 +1576,11 @@ public class BattleManager : MonoBehaviour
             itemPanel.Hide();
 
         NotifyInputState();
+
+        //Escape 不发经验，不标记敌人已击败
+        //但是回写当前玩家状态，例如Hp/Mp
+        PartyRuntimeState.UpdateFromBattleController(controllers);
+
 
         ShowSkillName("Run");
 

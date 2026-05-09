@@ -136,11 +136,8 @@ public class BattleSpawner : MonoBehaviour
 
         Debug.Log($"[SpawnInitial] called frame={Time.frameCount} queue={_enemyReserve.Count}");
         //Player: ∞¥À≥–Ú»˚£®0-3£©//‘≠œ»µƒ≤‚ ‘≈‰÷√
-        for (int i=0; i < initialPlayers.Count; i++)
-        {
-            if (i >= 4) break;
-            SpawnInToSlot(initialPlayers[i], i);
-        }
+        SpawnPlayers();
+       
         /* //Enemy:
          foreach(var req in initialEnemies)
          {
@@ -155,13 +152,46 @@ public class BattleSpawner : MonoBehaviour
             }
         }
     }
-   public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
+    private void SpawnPlayers()
+    {
+        List<Character> initialPartyChracters = new List<Character>();
+
+        foreach (var req in initialPlayers)
+        {
+            if (req == null || req.characterData == null)
+                continue;
+            initialPartyChracters.Add(req.characterData);
+        }
+        PartyRuntimeState.InitializeIfEmpty(initialPartyChracters);
+
+        int count = Mathf.Min(
+     Mathf.Min(PartyRuntimeState.PartyMembers.Count, initialPlayers.Count),
+     4);
+
+        for (int i = 0; i < count; i++)
+        {
+            Character character=PartyRuntimeState.PartyMembers[i];
+            if (character == null)
+                continue;
+
+            SpawnRequest req = new SpawnRequest
+            {
+                team = Team.Player,
+                prefabs = initialPlayers[i].prefabs,
+                characterData = character
+            };
+       
+            SpawnInToSlot(req, i);
+        }
+
+    }
+   /* public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
     {
         for(int i = 0; i < playerTeam.Count; i++)
         {
             SpawnInToSlot(playerTeam[i], i);
         }
-    }
+    }*/
     private bool TrySpawnEnemiesFromEncounter()
     {
         if (encounterDatabase == null)
