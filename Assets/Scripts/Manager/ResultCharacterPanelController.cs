@@ -36,8 +36,11 @@ public class ResultCharacterPanelController : BasePanel
     public  void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots,BattleResult result)
     {
         bool isVictory = result == BattleResult.Win;
+        bool isEscape= result== BattleResult.Escape;
+        bool isLose=result== BattleResult.Lose;
+
         if(buttonRoot!=null)
-       buttonRoot.SetActive(!isVictory);
+       buttonRoot.SetActive(isLose);
 
         Debug.Log($"[SettlePanel] Show snapshots={(partySnapShots == null ? "NULL" : partySnapShots.Count.ToString())}");
         if (partySnapShots != null)
@@ -45,7 +48,7 @@ public class ResultCharacterPanelController : BasePanel
             for (int i = 0; i < partySnapShots.Count; i++)
                 Debug.Log($"[SettlePanel] snap[{i}] name={partySnapShots[i]?.Name} hp={partySnapShots[i]?.hp}/{partySnapShots[i]?.maxhp}");
         }
-        if (isVictory)
+        if (isVictory||isEscape)
         {          
             //胜利：正常显示角色结算
             for (int i = 0; i < items.Length; i++)
@@ -114,9 +117,16 @@ public class ResultCharacterPanelController : BasePanel
     {
         if (payload == null) return;    
 
-        Show(payload.PartySnapshots,payload.Result);   
-        if(payload.Result==BattleResult.Win)
-        StartCoroutine(PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList()));
+        Show(payload.PartySnapshots,payload.Result);
+        if (payload.Result == BattleResult.Win)
+        {
+            StartCoroutine(PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList()));
+            return;
+        }
+        if (payload.Result == BattleResult.Escape)
+        {
+            StartCoroutine(AutoReturnFieldAfterDelay());
+        }
     }
     public void OnClickRetry()
     {
@@ -125,5 +135,11 @@ public class ResultCharacterPanelController : BasePanel
     public void OnClickBackToTile()
     {
         SceneManager.LoadScene(titleMenuName);
+    }
+    private IEnumerator AutoReturnFieldAfterDelay()
+    {
+        yield return new WaitForSeconds(returnFieldDelay);
+
+        ReturnToField();
     }
 }

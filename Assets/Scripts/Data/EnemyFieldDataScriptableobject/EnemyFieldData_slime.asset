@@ -16,7 +16,7 @@ MonoBehaviour:
   fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   battleCharacterData:
     Team: 1
-    Name: 
+    Name: slime
     MaxHp: 100
     Hp: 0
     MaxMp: 0
