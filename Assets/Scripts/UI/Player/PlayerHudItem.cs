@@ -28,7 +28,7 @@ public class PlayerHudItem : MonoBehaviour
 
     private Character _boundData;
 
-    //debug 痰돨덜쯤
+   
     // private bool _printedOnce = false;
 
     private void Awake()
@@ -40,6 +40,7 @@ public class PlayerHudItem : MonoBehaviour
     }
 
     private BaseController _ctrl;
+    //private Character _boundData;
 
     public BaseController Bount=> _ctrl;
 
@@ -50,10 +51,11 @@ public class PlayerHudItem : MonoBehaviour
             gameObject.SetActive(false);
             Refresh();
             return;
-        }//곬땍청긴앎깎路릿땐敦
+        }
 
         //绑定新角色前，先解绑旧Character的事件
         Unbind();
+
         _ctrl = ctrl;
 
         //没有角色/没有数据时，隐藏这个HudItem
@@ -73,38 +75,9 @@ public class PlayerHudItem : MonoBehaviour
         {
             Portrait.sprite= _ctrl.portrait;
         }
+        //刷新
         Refresh(); 
-       /* // 썩곬裂품돨慤숭
-        if (_ctrl != null && _ctrl.data != null)
-        {
-            _ctrl.data.OnHpChanged -= HandleHpChanged;
-            _ctrl.data.OnMpChanged-=HandleMpChanged;
-        }
-        _ctrl = ctrl;
-        if (_ctrl == null || _ctrl.data == null)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
-        gameObject.SetActive(true);
-
-        // 곬땍劤돨慤숭
-        if (_ctrl != null && _ctrl.data != null) {
-            _ctrl.data.OnHpChanged += HandleHpChanged;
-            _ctrl.data.OnMpChanged += HandleMpChanged;
-        }
-            
-
-        //미땍栗끓：庫獗/츰俚
-        if(Portrait != null)
-        {
-            if(_ctrl.portrait != null)
-            {
-                Portrait.sprite = _ctrl.portrait;
-            }           
-        }
-        //접섦岬劤寧늴
-        Refresh();*/
+      
     }
     public void Refresh()
     {
@@ -122,16 +95,16 @@ public class PlayerHudItem : MonoBehaviour
         gameObject.SetActive(true);
         float alpha=downed?0.5f:1f;
         //if(nameText!=null)nameText.text = _ctrl.data.Name;
-        //匡俚 沂係匡俚
+        //文字显示
         if(hpText!=null)hpText.text = $" {_ctrl.data.Hp}/{_ctrl.data.MaxHp}";
-        //뿍딜
+        //头像
         if (Portrait != null)
         {
             var c = Portrait.color;
             c.a = alpha;
             Portrait.color = c;
         }
-        //沂係Image
+        //血条Image
         if (hpFill != null)
         {         
             _hpTween?.Kill();
@@ -145,16 +118,16 @@ public class PlayerHudItem : MonoBehaviour
             }
             else if (lowHP)
             {
-                hpFill.color = new Color(1f, 0.3f, 0.3f, 1f);//휼뵨돨븐
+                hpFill.color = new Color(1f, 0.3f, 0.3f, 1f);//修改颜色为红色
             }
             else
             {
                 hpFill.color = _hpFillDefaultColor;
             }
         }
-        //匡俚 융係匡俚
+        //mp文字显示
         if (mpText != null) mpText.text = $"{_ctrl.data.Mp}/ {_ctrl.data.MaxMp}";
-        //융係image
+        //mpimage
         if (mpFill != null)
         {
             _mpTween?.Kill();
@@ -179,7 +152,7 @@ public class PlayerHudItem : MonoBehaviour
     }
     private void OnDestroy()
     {
-        // 렝岺뚤蹶饋쁑珂뻘밈淪땐敦
+        
         if (_ctrl != null && _ctrl.data != null)
         {
             _ctrl.data.OnHpChanged -= HandleHpChanged;
@@ -194,8 +167,8 @@ public class PlayerHudItem : MonoBehaviour
     {
         if (_boundData == null)
             return;
-        _boundData.OnHpChanged += HandleHpChanged;
-        _boundData.OnMpChanged += HandleMpChanged;
+        _boundData.OnHpChanged -= HandleHpChanged;
+        _boundData.OnMpChanged -= HandleMpChanged;
 
         _boundData = null;
     }
