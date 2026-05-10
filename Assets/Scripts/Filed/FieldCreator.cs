@@ -8,10 +8,22 @@ public class FieldCreator : MonoBehaviour
     [SerializeField] private Transform playerStartPoint;
     [SerializeField] private EnemySpawnManager enemySpawnManager;
 
+
+    [SerializeField] private List<Character> InitialPartyMembers = new();
+    [SerializeField] private PartyInitialData initialPartyData;
+
+    [SerializeField]private FieldPartyHudController partyHudController;
     private void Start()
     {
+        if (initialPartyData != null)
+        {
+            PartyRuntimeState.InitializeIfEmpty(initialPartyData.Members);
+        }
         SetupPlayer();
         SpwanEnemies();
+
+        partyHudController?.Refresh();
+
         if (FieldBattleContext.HasFieldReturnData)
         {
             FieldBattleContext.ClearReturnData();

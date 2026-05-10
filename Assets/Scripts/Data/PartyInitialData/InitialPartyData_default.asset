@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4591261081c33249bf1c55ef728e390, type: 3}
+  m_Name: InitialPartyData_default
+  m_EditorClassIdentifier: 
+  members:
+  - Team: 0
+    Name: Player0
+    MaxHp: 200
+    Hp: 200
+    MaxMp: 100
+    Mp: 100
+    Level: 1
+    Exp: 0
+    Attack: 100
+    Speed: 100
+    ActionValue: 0
+    MaxActionValue: 200
+    isOnField: 0
+    isActing: 0
+    isDead: 0
+    isPlayer: 1
+    battleEnded: 0
+    intent: 0
+  - Team: 0
+    Name: Player1
+    MaxHp: 200
+    Hp: 200
+    MaxMp: 100
+    Mp: 100
+    Level: 1
+    Exp: 0
+    Attack: 100
+    Speed: 100
+    ActionValue: 0
+    MaxActionValue: 200
+    isOnField: 0
+    isActing: 0
+    isDead: 0
+    isPlayer: 1
+    battleEnded: 0
+    intent: 0
