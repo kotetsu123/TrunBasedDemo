@@ -12,14 +12,17 @@ public class FiledPartyHudItem : MonoBehaviour
 
     private Character _boundData;
 
-    private void Start()
+    private void Awake()
     {
         if (hpfill != null)
         {
             _hpFillDefaultColor = hpfill.color;
-            _hpFillDefaultColor.a = 1f; //确保默认颜色的alpha为1
-          
+             _hpFillDefaultColor.a = 1f; //确保默认颜色的alpha为1
         }
+    }
+    private void Start()
+    {
+
     }
 
 
@@ -52,7 +55,12 @@ public class FiledPartyHudItem : MonoBehaviour
         if(lowHP)
             hpfill.color = new Color(1f, 0.3f, 0.3f, 1f);//修改颜色为红色
         else
-            hpfill.color = _hpFillDefaultColor;//恢复默认颜色
+        {
+            Color c = _hpFillDefaultColor;
+            c.a = 1f; //确保颜色的alpha为1
+            hpfill.color = c;//恢复默认颜色
+        }
+            
         if (portraitImage != null)
         {
             portraitImage.sprite = _boundData.Portrait;
