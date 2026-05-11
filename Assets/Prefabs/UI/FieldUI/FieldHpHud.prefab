@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4704728203686788982
 RectTransform:
   m_ObjectHideFlags: 0
@@ -74,6 +74,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hpfill: {fileID: 5108886424872099982}
   _hpFillDefaultColor: {r: 0, g: 0, b: 0, a: 0}
+  portraitImage: {fileID: 6195797896259401062}
 --- !u!1 &5611517561844262455
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FieldPartyHudController : MonoBehaviour
 {
     [SerializeField]private FiledPartyHudItem[] items;
+   
 
     private void Start()
     {

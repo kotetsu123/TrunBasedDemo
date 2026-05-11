@@ -7,6 +7,7 @@ public class FiledPartyHudItem : MonoBehaviour
 {
     [SerializeField] private Image hpfill;
     [SerializeField] private Color _hpFillDefaultColor;
+    [SerializeField] private Image portraitImage;
     // [SerializeField]
 
     private Character _boundData;
@@ -16,6 +17,8 @@ public class FiledPartyHudItem : MonoBehaviour
         if (hpfill != null)
         {
             _hpFillDefaultColor = hpfill.color;
+            _hpFillDefaultColor.a = 1f; //确保默认颜色的alpha为1
+          
         }
     }
 
@@ -50,6 +53,11 @@ public class FiledPartyHudItem : MonoBehaviour
             hpfill.color = new Color(1f, 0.3f, 0.3f, 1f);//修改颜色为红色
         else
             hpfill.color = _hpFillDefaultColor;//恢复默认颜色
+        if (portraitImage != null)
+        {
+            portraitImage.sprite = _boundData.Portrait;
+            portraitImage.enabled=_boundData.Portrait != null;
+        }
     }
     private void HandleHpChanged(int prev,int cur)
     {

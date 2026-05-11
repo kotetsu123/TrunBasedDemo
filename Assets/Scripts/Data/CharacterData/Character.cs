@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.UI;
 
 
 [Serializable]
@@ -29,6 +30,8 @@ public class Character
     public float Speed;
     public float ActionValue;//行动值
     public float MaxActionValue = 200f;//最大行动值//初始行动值
+
+    public Sprite Portrait;
 
     public bool isOnField;
     public bool isActing;
