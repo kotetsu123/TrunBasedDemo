@@ -70,10 +70,11 @@ public class PlayerHudItem : MonoBehaviour
         _boundData=_ctrl.data;
         _boundData.OnHpChanged += HandleHpChanged;
         _boundData.OnMpChanged += HandleMpChanged;
-        //绑定头像
+        //绑定头像//统一从character数据里取头像，避免ctrl切换时忘了更新头像
         if (Portrait != null && _ctrl.portrait != null)
         {
-            Portrait.sprite= _ctrl.portrait;
+            Portrait.sprite= _boundData.Portrait;
+            Portrait.enabled=_boundData.Portrait != null;
         }
         //刷新
         Refresh(); 

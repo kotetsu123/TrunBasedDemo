@@ -868,7 +868,8 @@ public class BattleManager : MonoBehaviour
 
             list.Add(new CharacterResultSnapshot
             {
-                portrait=c.portrait,//只有这个是走basecontroller 拿数据。下面的都是从character拿的数据
+                //portrait=c.portrait,//只有这个是走basecontroller 拿数据。下面的都是从character拿的数据
+                portrait= c.data.Portrait,//因为现在角色数据里也有头像了，所以直接从数据里拿
                 Name = c.data.Name,
                 hp = c.data.Hp,
                 maxhp = c.data.MaxHp,

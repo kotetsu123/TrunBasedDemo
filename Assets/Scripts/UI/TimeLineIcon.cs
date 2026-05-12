@@ -32,7 +32,13 @@ public class TimeLineIcon : MonoBehaviour
         owner = character;
         if (portImage!=null)
         {
-            portImage.sprite = owner.portrait;
+            //统一从character数据里取头像，避免ctrl切换时忘了更新头像
+            //但是目前问题是。enemy data里没有头像，所以先放在ctrl里了，等数据里加了头像再改回来
+            //也就是暂时只有player从character当中取得头像
+            if (owner.data.Team == Team.Player)
+                portImage.sprite = owner.data.Portrait;
+            else
+                portImage.sprite = owner.portrait;
         }
     }
    public void SetHighLight(bool on)

@@ -17,16 +17,17 @@ MonoBehaviour:
   - Team: 1
     Name: test_001_A
     MaxHp: 120
-    Hp: 0
+    Hp: 80
     MaxMp: 0
     Mp: 0
     Level: 1
     Exp: 0
-    Attack: 30
+    Attack: 90
     Speed: 80
-    ActionValue: 0
+    ActionValue: -13.333331
     MaxActionValue: 200
-    isOnField: 0
+    Portrait: {fileID: 0}
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 0
@@ -35,16 +36,17 @@ MonoBehaviour:
   - Team: 1
     Name: test_001_B
     MaxHp: 120
-    Hp: 0
+    Hp: 80
     MaxMp: 0
     Mp: 0
     Level: 1
     Exp: 0
-    Attack: 30
+    Attack: 90
     Speed: 80
-    ActionValue: 0
+    ActionValue: -13.333331
     MaxActionValue: 200
-    isOnField: 0
+    Portrait: {fileID: 0}
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 0
@@ -53,16 +55,17 @@ MonoBehaviour:
   - Team: 1
     Name: test_001_C
     MaxHp: 120
-    Hp: 0
+    Hp: 120
     MaxMp: 0
     Mp: 0
     Level: 1
     Exp: 0
     Attack: 30
     Speed: 80
-    ActionValue: 0
+    ActionValue: -13.333331
     MaxActionValue: 200
-    isOnField: 0
+    Portrait: {fileID: 0}
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 0
@@ -71,16 +74,17 @@ MonoBehaviour:
   - Team: 1
     Name: test_001_D
     MaxHp: 120
-    Hp: 0
+    Hp: 120
     MaxMp: 0
     Mp: 0
     Level: 1
     Exp: 0
     Attack: 30
     Speed: 80
-    ActionValue: 0
+    ActionValue: -13.333331
     MaxActionValue: 200
-    isOnField: 0
+    Portrait: {fileID: 0}
+    isOnField: 1
     isActing: 0
     isDead: 0
     isPlayer: 0

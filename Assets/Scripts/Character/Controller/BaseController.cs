@@ -11,6 +11,10 @@ public abstract class BaseController : MonoBehaviour
 
     public int healUsedCount = 0;
 
+
+    /// <summary>
+    /// TODO:逐渐取消这个，改成纯数据驱动，Controller只负责表现和调用技能逻辑，数据都放在Character里，方便后续脱离Unity做纯逻辑测试
+    /// </summary>
     [Header("Visual")]
     public Sprite portrait;//角色肖像
 
