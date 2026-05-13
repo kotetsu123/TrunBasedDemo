@@ -37,8 +37,6 @@ public class BattleSpawner : MonoBehaviour
     }
     private void Start()
     {
-       
-
         if (spawnOnStart)
         {
             SpawnInitial();
@@ -148,7 +146,15 @@ public class BattleSpawner : MonoBehaviour
         {
             foreach(var req in initialEnemies)
             {
-                EnqueueOrSpawn(req);
+                if (req == null)
+                    continue;
+                SpawnRequest copiedRq = new SpawnRequest
+                {
+                    team = req.team,
+                    prefabs = req.prefabs,
+                    characterData = req.characterData!= null ? req.characterData.Copy() : null
+                };
+                EnqueueOrSpawn(copiedRq);
             }
         }
     }
@@ -170,30 +176,38 @@ public class BattleSpawner : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            Character character=PartyRuntimeState.PartyMembers[i];
-            if (character == null)
+            Character sourceCharacter = PartyRuntimeState.PartyMembers[i];
+
+            Debug.Log(
+    $"[SpawnPlayers] name={sourceCharacter.Name}, hp={sourceCharacter.Hp}/{sourceCharacter.MaxHp}, portrait={(sourceCharacter.Portrait == null ? "NULL" : sourceCharacter.Portrait.name)}"
+);
+
+            if (sourceCharacter == null)
                 continue;
+
+            Character battleCharacter = sourceCharacter.Copy();
 
             SpawnRequest req = new SpawnRequest
             {
                 team = Team.Player,
                 prefabs = initialPlayers[i].prefabs,
-                characterData = character
+                characterData = battleCharacter
             };
-       
+
             SpawnInToSlot(req, i);
         }
 
     }
-   /* public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
-    {
-        for(int i = 0; i < playerTeam.Count; i++)
-        {
-            SpawnInToSlot(playerTeam[i], i);
-        }
-    }*/
+    /* public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
+     {
+         for(int i = 0; i < playerTeam.Count; i++)
+         {
+             SpawnInToSlot(playerTeam[i], i);
+         }
+     }*/
     private bool TrySpawnEnemiesFromEncounter()
     {
+        Debug.Log($"[BattleSpawner] TrySpawnEnemiesFromEncounter encounterId={FieldBattleContext.CurrentEncounterId}");
         if (encounterDatabase == null)
         {
             Debug.LogWarning($"[BattleSpawner] EncounterDataBase is null.use InitialEnemies fallback");
@@ -226,7 +240,7 @@ public class BattleSpawner : MonoBehaviour
             {
                 team = Team.Enemy,
                 prefabs = enemyPrefab,
-                characterData = enemyCharacter
+                characterData = enemyCharacter.Copy()
             };
             
             EnqueueOrSpawn(req);

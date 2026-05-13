@@ -28,6 +28,8 @@ public class PartyRuntimeState
 
     public static void UpdateFromBattleController(IEnumerable<BaseController> controllers)
     {
+        List<Character> oldMembers = new List<Character>(partyMembers);
+
         partyMembers.Clear();
 
         if (controllers == null)
@@ -38,6 +40,18 @@ public class PartyRuntimeState
                 continue;
             if (ctrl.data.Team != Team.Player)
                 continue;
+
+            Character updateData = ctrl.data;
+
+            //如果战斗后的数据没有头像
+            //而旧数据里有头像
+            //那就把旧头像复制给新数据
+            Character oldData = oldMembers.Find(x => x != null && x.Name == updateData.Name);
+
+            if (updateData.Portrait == null && oldData != null && oldData.Portrait != null)
+            {
+                updateData.Portrait = oldData.Portrait;
+            }
 
             partyMembers.Add(ctrl.data);
         }

@@ -100,5 +100,37 @@ public class Character
     {
         return Level * 100;
     }
+    //这个是为了使用copy在battle 当中的数据。
+    public Character Copy()
+    {
+        return new Character
+        {
+            Team = this.Team,
 
+            Name = this.Name,
+
+            MaxHp = this.MaxHp,
+            Hp = this.Hp,
+
+            MaxMp = this.MaxMp,
+            Mp = this.Mp,
+
+            Level = this.Level,
+            Exp = this.Exp,
+
+            Attack = this.Attack,
+            Speed = this.Speed,
+            ActionValue = this.ActionValue,
+            MaxActionValue = this.MaxActionValue,
+
+            Portrait = this.Portrait,
+
+            isOnField = this.isOnField,
+            isActing = this.isActing,
+            isDead = this.isDead,
+            isPlayer = this.isPlayer,
+            battleEnded = this.battleEnded,
+            intent = this.intent
+        };
+    }
 }

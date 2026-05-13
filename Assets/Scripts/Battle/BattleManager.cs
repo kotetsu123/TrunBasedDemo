@@ -794,9 +794,13 @@ public class BattleManager : MonoBehaviour
 
             const int rewardExp = 120;
             _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
+
+            //胜利后: 经验，等级，hp/mp回写状态
+            PartyRuntimeState.UpdateFromBattleController(controllers);
         }
-        //回写状态
-        PartyRuntimeState.UpdateFromBattleController(controllers);
+       
+        //Lose 不回写
+        //retry 是继续使用进入战斗前的partyruntimestate
 
         //结算快照
         var snapshots = BuildPartySnapShots();

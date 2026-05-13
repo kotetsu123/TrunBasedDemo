@@ -118,6 +118,11 @@ public abstract class BaseController : MonoBehaviour
             this.data.MaxHp = 100;
         if(this.data.Hp<=0)
             this.data.Hp=this.data.MaxHp;
+        if (this.data.Portrait == null && portrait != null)
+        {
+            this.data.Portrait = portrait;
+        }
+
     }
 
     public virtual void SetTargeted(bool targetd)
