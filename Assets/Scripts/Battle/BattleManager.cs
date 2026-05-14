@@ -600,9 +600,18 @@ public class BattleManager : MonoBehaviour
             yield break;
         if (target == null || target.data == null || target.data.isDead)
             yield break;
-        cameraDirector? .LockCamera();
+
+        bool isSelfSkill=skill.targetType == SkillTargetType.Self || target == actor;
+        bool isEnemyToEnemySkill=actor.data.Team == Team.Enemy && target.data.Team==Team.Enemy;
+
+        cameraDirector?.LockCamera();
+
+        if (isEnemyToEnemySkill)
+        {
+            cameraDirector?.FocusEnemyGroup();
+        }
         //自身技能看自己
-        if (skill.targetType == SkillTargetType.Self || target == actor)
+        else if (isSelfSkill)
         {
             cameraDirector?.FocusActorTurnShot(actor);
         }
