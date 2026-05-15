@@ -280,7 +280,7 @@ public class BattleManager : MonoBehaviour
         isBattleReady = true;
         //开局就刷新一次 UI 排列
         RequestReorder();
-        InitItemInventory();
+       // InitItemInventory();
         _lastLevelUpResults.Clear();
 
         Debug.Log("[BattleManager] Battle Ready!");    
@@ -852,6 +852,12 @@ public class BattleManager : MonoBehaviour
             Debug.Log($"[Item]{item.itemName}is out of stock");
             return;
         }
+
+        if (!ConsumeItem(item))
+        {
+            Debug.Log($"[Item] failed to consume {item.itemName}");
+            return;
+        }
         ShowSkillName(item.itemName);
 
         switch (item.itemtype)
@@ -861,7 +867,7 @@ public class BattleManager : MonoBehaviour
                 Debug.Log($"[ItemHeal]{_currentActor.name} used item {_currentTarget.name} has healed {item.power}HP {_currentTarget.name} current HP={_currentTarget.data.Hp} ");
                 break;
         }
-       ConsumeItem(item);
+      
     }
     private List<CharacterResultSnapshot> BuildPartySnapShots()
     {
@@ -1606,21 +1612,22 @@ public class BattleManager : MonoBehaviour
     //道具使用相关
     public List<ItemData> GetAvailableItems()
     {
-        List<ItemData> result=new List<ItemData>();
-
-        for(int i = 0; i < startingItems.Count; i++)
+        List<ItemData> result = new List<ItemData>();
+/*
+        for (int i = 0; i < startingItems.Count; i++)
         {
-            var item=startingItems[i];
+            var item = startingItems[i];
             if (item == null) continue;
             if (result.Contains(item)) continue;
 
             result.Add(item);
         }
-        return result;
+        return result;*/
+        return InventoryRuntimeState.GetAvailableItems();
     }
     private void InitItemInventory()
     {
-        _itemCounts.Clear();
+       /* _itemCounts.Clear();
 
         int count = Mathf.Min(startingItems.Count, startItemCounts.Count);
         for(int i=0;i<count; i++)
@@ -1631,28 +1638,34 @@ public class BattleManager : MonoBehaviour
             if (item == null) continue;
 
             _itemCounts[item] = Mathf.Max(0, itemCount);
-        }
+        }*/
+       
     }
     //读取道具数量
     public int GetItemCount(ItemData item)
     {
-        if (item == null) return 0;
-        return _itemCounts.TryGetValue(item, out int count) ? count : 0;
+       /* if (item == null) return 0;
+        return _itemCounts.TryGetValue(item, out int count) ? count : 0;*/
+       return InventoryRuntimeState.GetItemCount(item);
     }
     //是否可以使用
     public bool CanUseItem(ItemData item)
     {
-        return GetItemCount(item) > 0;
+        /*return GetItemCount(item) > 0;*/
+        return InventoryRuntimeState.CanUseItem(item);
     }
     //使用消耗道具
-    private void ConsumeItem(ItemData item)
+    private bool ConsumeItem(ItemData item)
     {
-        if (item == null) return;
-        if (!_itemCounts.ContainsKey(item)) return;
+ 
+        bool consumed = InventoryRuntimeState.ConsumeItem(item);
 
-        _itemCounts[item]=Mathf.Max(0, _itemCounts[item] - 1);
-
-        OnItemCountChanged?.Invoke(item, _itemCounts[item]);
+        if (consumed)
+        {
+            int newCount = InventoryRuntimeState.GetItemCount(item);
+            OnItemCountChanged?.Invoke(item, newCount);
+        }
+       return consumed;
     }
 }
 

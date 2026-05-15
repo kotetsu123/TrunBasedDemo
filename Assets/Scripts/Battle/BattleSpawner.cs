@@ -168,7 +168,7 @@ public class BattleSpawner : MonoBehaviour
                 continue;
             initialPartyChracters.Add(req.characterData);
         }
-        PartyRuntimeState.InitializeIfEmpty(initialPartyChracters);
+       // PartyRuntimeState.InitializeIfEmpty(initialPartyChracters);
 
         int count = Mathf.Min(
      Mathf.Min(PartyRuntimeState.PartyMembers.Count, initialPlayers.Count),

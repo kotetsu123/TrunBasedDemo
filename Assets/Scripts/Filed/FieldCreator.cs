@@ -9,10 +9,12 @@ public class FieldCreator : MonoBehaviour
     [SerializeField] private EnemySpawnManager enemySpawnManager;
 
 
-    [SerializeField] private List<Character> InitialPartyMembers = new();
+   
     [SerializeField] private PartyInitialData initialPartyData;
 
     [SerializeField]private FieldPartyHudController partyHudController;
+
+    [SerializeField] private List<InitialItemStack> initialItems = new();
     private void Start()
     {
         if (initialPartyData != null)
@@ -27,6 +29,14 @@ public class FieldCreator : MonoBehaviour
         if (FieldBattleContext.HasFieldReturnData)
         {
             FieldBattleContext.ClearReturnData();
+        }
+
+        foreach (var stack in initialItems)
+        {
+            if (stack == null)
+                continue;
+            
+            InventoryRuntimeState.AddItem(stack.item, stack.count);
         }
     }
     private void SetupPlayer()
