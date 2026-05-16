@@ -9,4 +9,9 @@ public class ItemData : ScriptableObject
     public string itemName;
     public ItemType itemtype;
     public int power;
+
+    public Sprite icon;
+
+    [TextArea]
+    public string description;
 }

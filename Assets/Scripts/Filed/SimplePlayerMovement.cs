@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +19,10 @@ public class SimplePlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        //æš‚åœåˆ¤æ–­
+        if (FieldPauseState.IsPaused)
+            return;
+
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -49,7 +53,7 @@ public class SimplePlayerMovement : MonoBehaviour
             rb.MoveRotation(smoothRot);
         }
         else
-        {// Í£Ö¹Ë®Æ½ÒÆ¶¯£¬µ«±£³Ö´¹Ö±ËÙ¶È£¨ÈçÌøÔ¾£©²»±ä
+        {// ç•Œå²ºå½Ší‹±ï¤³ë•¡ï¼Œëƒê´ë„£ë‰©æ®®é†µë˜‘ï¼ˆí”å¥‘ç¦¿ï¼‰ê¼‡ê¸´
             rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
         }
     }

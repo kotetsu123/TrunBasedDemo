@@ -22,6 +22,9 @@ public class EncounterTrigger : MonoBehaviour
         
     {
         if (triggerd) return;
+
+        if (FieldPauseState.IsPaused)
+            return;
        
         if (other.CompareTag("Player"))
         {

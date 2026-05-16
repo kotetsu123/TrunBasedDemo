@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,21 +37,33 @@ public class EnemyFieldController : MonoBehaviour
     {
         while (true)
         {
+            //暂停逻辑  选择新目标前
+            if (FieldPauseState.IsPaused)
             {
-                Vector3 target = GetRandomPoint();
-                while (Vector3.Distance(transform.position, target) > 0.1f)
-                {
-                    Vector3 dir = (target - transform.position).normalized;
-
-                    transform.position += dir * moveSpeed * Time.deltaTime;
-                    if (dir.sqrMagnitude > 0.01f)
-                    {
-                        transform.rotation = Quaternion.LookRotation(dir);
-                    }
-                    yield return null;
-                }
-                yield return new WaitForSeconds(waitTime);
+                yield return null;
+                continue;
             }
+
+            Vector3 target = GetRandomPoint();
+            while (Vector3.Distance(transform.position, target) > 0.1f)
+            {
+                //目标移动途中
+                if (FieldPauseState.IsPaused)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                Vector3 dir = (target - transform.position).normalized;
+
+                transform.position += dir * moveSpeed * Time.deltaTime;
+                if (dir.sqrMagnitude > 0.01f)
+                {
+                    transform.rotation = Quaternion.LookRotation(dir);
+                }
+                yield return null;
+            }
+            yield return new WaitForSeconds(waitTime);
         }
     }
 

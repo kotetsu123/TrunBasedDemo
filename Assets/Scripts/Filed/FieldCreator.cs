@@ -17,6 +17,8 @@ public class FieldCreator : MonoBehaviour
     [SerializeField] private List<InitialItemStack> initialItems = new();
     private void Start()
     {
+        FieldPauseState.Clear();
+
         if (initialPartyData != null)
         {//第一次进入没有初始化。所以添加初始化道具
             PartyRuntimeState.InitializeIfEmpty(initialPartyData.Members);
