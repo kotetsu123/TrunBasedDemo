@@ -20,6 +20,7 @@ public static class InventoryRuntimeState
     {
         if (IsInitialized)
             return;
+
         Clear();
         if(initialItems!=null)
         {

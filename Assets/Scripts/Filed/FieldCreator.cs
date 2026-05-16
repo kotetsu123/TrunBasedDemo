@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,9 +18,12 @@ public class FieldCreator : MonoBehaviour
     private void Start()
     {
         if (initialPartyData != null)
-        {
+        {//第一次进入没有初始化。所以添加初始化道具
             PartyRuntimeState.InitializeIfEmpty(initialPartyData.Members);
         }
+        //之后返回 已经初始化过。跳过初始化。
+        InventoryRuntimeState.InitializeIfEmpty(initialItems);
+
         SetupPlayer();
         SpwanEnemies();
 
@@ -31,13 +34,7 @@ public class FieldCreator : MonoBehaviour
             FieldBattleContext.ClearReturnData();
         }
 
-        foreach (var stack in initialItems)
-        {
-            if (stack == null)
-                continue;
-            
-            InventoryRuntimeState.AddItem(stack.item, stack.count);
-        }
+       
     }
     private void SetupPlayer()
     {
