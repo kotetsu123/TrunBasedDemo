@@ -15,6 +15,27 @@ public class FieldInventoryItemView : MonoBehaviour
     private ItemData _item;
     private Action<ItemData> _onSelected;
 
+    public void BindEmpty(Action<ItemData> onSelected)
+    {
+        _item = null;
+        _onSelected = onSelected;
+
+        if (itemCountText != null)
+        {
+            itemCountText.text = "";
+        }
+        if (itemIconImage != null)
+        {
+            itemIconImage.sprite = null;
+            itemIconImage.enabled = false;
+        }
+        if (button != null)
+        {
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(HandleClick);
+        }
+    }
+
     public void Bind(ItemData item,int count,Action<ItemData> onSelected)
     {
         _item = item;
@@ -45,8 +66,6 @@ public class FieldInventoryItemView : MonoBehaviour
     }
     private void HandleClick()
     {
-        if (_item == null)
-            return;
         _onSelected?.Invoke(_item);
     }
 }

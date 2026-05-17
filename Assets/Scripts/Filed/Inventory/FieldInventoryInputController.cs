@@ -20,7 +20,9 @@ public class FieldInventoryInputController : MonoBehaviour
     {
         if (inventorypanel == null)
             return;
+
         isOpen = !isOpen;
+
         if (isOpen)
         {
             inventorypanel.Show();

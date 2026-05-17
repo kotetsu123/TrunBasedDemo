@@ -16,4 +16,6 @@ MonoBehaviour:
   itemtype: 1
   power: 100
   icon: {fileID: 21300000, guid: e9fd5d246e1b4594e839c3ceb864d699, type: 3}
-  description: 
+  description: 'it''s just a potion
+
+'

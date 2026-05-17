@@ -8,8 +8,10 @@ public class FieldInventoryPanelController : BasePanel
     [Header("Item List")]
     [SerializeField] private Transform contentRoot;
     [SerializeField] private FieldInventoryItemView itemViewPrefab;
+    [SerializeField] private int slotCount = 20;
 
     [Header("Description")]
+    [SerializeField] private CanvasGroup descriptionPanel;
     [SerializeField] private TMP_Text selectedItemNameText;
     [SerializeField] private TMP_Text selectedItemDescriptionText;
 
@@ -21,6 +23,7 @@ public class FieldInventoryPanelController : BasePanel
         HideImmediate();
         //还需要一个清楚描述的东西
         ClearDescription();
+        HideDescription();
     }
     public override void Show()
     {
@@ -33,7 +36,10 @@ public class FieldInventoryPanelController : BasePanel
         ClearDescription();
         if (contentRoot == null || itemViewPrefab == null)
             return;
-        foreach(var pair in InventoryRuntimeState.Items)
+
+        List<KeyValuePair<ItemData, int>> itemStacks = new List<KeyValuePair<ItemData, int>>();
+
+        foreach (var pair in InventoryRuntimeState.Items)
         {
             ItemData item = pair.Key;
             int count = pair.Value;
@@ -41,23 +47,62 @@ public class FieldInventoryPanelController : BasePanel
             if (item == null || count <= 0)
                 continue;
 
+            itemStacks.Add(pair);
+        }
+
+        int requiredSlotCount = Mathf.Max(slotCount, itemStacks.Count);
+
+        for (int i = 0; i < requiredSlotCount; i++)
+        {
             FieldInventoryItemView view = Instantiate(itemViewPrefab, contentRoot);
-            view.Bind(item, count, HandleSelected);
+
+            if (i < itemStacks.Count)
+            {
+                var stack = itemStacks[i];
+                view.Bind(stack.Key, stack.Value, HandleSelected);
+            }
+            else
+            {
+                view.BindEmpty(HandleSelected);
+            }
+
             spawnedItems.Add(view);
         }
     }
     private void HandleSelected(ItemData item)
     {
+        if (descriptionPanel == null)
+            return;
+
         if (item == null)
         {
-            ClearDescription();
+            HideDescription();
             return;
         }
-        if (selectedItemNameText != null)
-            selectedItemNameText.text = item.name;
-        if (selectedItemDescriptionText != null)
-            selectedItemDescriptionText.text = item.description;
-       
+        
+        ShowDescription(item);
+    }
+    private void ShowDescription(ItemData item)
+    {
+        if(descriptionPanel != null)
+        {
+            descriptionPanel.alpha = 1f;
+            descriptionPanel.interactable = true;
+            descriptionPanel.blocksRaycasts = true;
+        }
+
+        selectedItemNameText.text = item.itemName;
+        selectedItemDescriptionText.text = item.description;
+    }
+    private void HideDescription()
+    {
+        if (descriptionPanel != null)
+        {
+            descriptionPanel.alpha = 0f;
+            descriptionPanel.interactable = false;
+            descriptionPanel.blocksRaycasts = false;
+        }
+        ClearDescription();
     }
     public void ClearDescription()
     {
