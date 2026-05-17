@@ -25,6 +25,9 @@ public class EncounterTrigger : MonoBehaviour
 
         if (FieldPauseState.IsPaused)
             return;
+
+        if (FieldBattleContext.IsEncounterCooldownActive)
+            return;
        
         if (other.CompareTag("Player"))
         {

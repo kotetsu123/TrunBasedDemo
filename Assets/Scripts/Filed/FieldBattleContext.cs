@@ -4,6 +4,8 @@ using UnityEngine;
 
 public static class FieldBattleContext 
 {
+    private const float DefaultEncounterCooldownSeconds = 1.5f;
+
     public static string LastFieldSceneName { get; private set; }
     public static Vector3 PlayerPositionBeforeBattle { get; private set; }
     public static Quaternion PlayerRotationBeforeBattle { get; private set; }
@@ -14,9 +16,12 @@ public static class FieldBattleContext
 
     public static string CurrentEncounterId { get; private set;}
 
+    public static float EncounterCooldownUntilTime { get; private set; }
+
     private static readonly HashSet<string> clearedSpawnIds= new HashSet<string>();
 
     public static IReadOnlyCollection<string> ClearedSpawnIds => clearedSpawnIds;
+    public static bool IsEncounterCooldownActive => Time.time < EncounterCooldownUntilTime;
     //保存进入战斗前的FieldScene名称，玩家位置朝向
     public static void SaveFieldReturnData(string fieldSceneName,Vector3 playerPos,Quaternion playerRot,string triggeredSpawnId,string encounterId)
     {
@@ -28,6 +33,12 @@ public static class FieldBattleContext
         CurrentEncounterId = encounterId;
 
         Debug.Log($"[FieldBattleContext] Saved return data: Scene={fieldSceneName}, spawnID={triggeredSpawnId},encounterID={encounterId}");
+    }
+    public static void StartEncounterCooldown(float seconds = DefaultEncounterCooldownSeconds)
+    {
+        EncounterCooldownUntilTime = Time.time + Mathf.Max(0f, seconds);
+
+        Debug.Log($"[FieldBattleContext] Encounter cooldown started: {seconds}s");
     }
 
     //把刚才打败的怪物ID 记录到已击败名单里
@@ -61,5 +72,6 @@ public static class FieldBattleContext
     {
         ClearReturnData();
         clearedSpawnIds.Clear();
+        EncounterCooldownUntilTime = 0f;
     }
 }

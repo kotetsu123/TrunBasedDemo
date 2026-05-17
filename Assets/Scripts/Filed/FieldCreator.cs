@@ -33,6 +33,7 @@ public class FieldCreator : MonoBehaviour
 
         if (FieldBattleContext.HasFieldReturnData)
         {
+            FieldBattleContext.StartEncounterCooldown();
             FieldBattleContext.ClearReturnData();
         }
 
