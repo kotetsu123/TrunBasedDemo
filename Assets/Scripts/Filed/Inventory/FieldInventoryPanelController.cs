@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FieldInventoryPanelController : BasePanel
 {
@@ -14,8 +15,13 @@ public class FieldInventoryPanelController : BasePanel
     [SerializeField] private CanvasGroup descriptionPanel;
     [SerializeField] private TMP_Text selectedItemNameText;
     [SerializeField] private TMP_Text selectedItemDescriptionText;
+    [SerializeField] private Button useItemButton;
+
+    [Header("Party")]
+    [SerializeField] private FieldPartyHudController partyHudController;
 
     private readonly List<FieldInventoryItemView> spawnedItems = new();
+    private ItemData selectedItem;
 
     protected override void Awake()
     {
@@ -24,16 +30,32 @@ public class FieldInventoryPanelController : BasePanel
         //还需要一个清楚描述的东西
         ClearDescription();
         HideDescription();
+        SetUseButtonInteractable(false);
+
+        if (useItemButton != null)
+            useItemButton.onClick.AddListener(OnUseSelectedItemClicked);
+    }
+    private void OnDestroy()
+    {
+        if (useItemButton != null)
+            useItemButton.onClick.RemoveListener(OnUseSelectedItemClicked);
     }
     public override void Show()
     {
         Refresh();
         base.Show();
     }
+    public override void Hide()
+    {
+        HideDescription();
+        base.Hide();
+    }
     public void Refresh()
     {
         ClearItems();
         ClearDescription();
+        selectedItem = null;
+        SetUseButtonInteractable(false);
         if (contentRoot == null || itemViewPrefab == null)
             return;
 
@@ -80,7 +102,64 @@ public class FieldInventoryPanelController : BasePanel
             return;
         }
         
+        selectedItem = item;
+        SetUseButtonInteractable(CanUseSelectedItem());
         ShowDescription(item);
+    }
+    public void OnUseSelectedItemClicked()
+    {
+        if (!CanUseSelectedItem())
+            return;
+
+        switch (selectedItem.itemtype)
+        {
+            case ItemType.Heal:
+                UseHealItem(selectedItem);
+                break;
+        }
+    }
+    private void UseHealItem(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        if (!PartyRuntimeState.TryHealFirstInjuredAliveMember(item.power, out Character healedMember))
+        {
+            Debug.Log("[FieldInventory] No injured alive party member found.");
+            return;
+        }
+
+        if (!InventoryRuntimeState.ConsumeItem(item))
+            return;
+
+        Debug.Log($"[FieldInventory] Used {item.itemName} on {healedMember.Name}");
+
+        partyHudController?.Refresh();
+        Refresh();
+
+        if (InventoryRuntimeState.HasItem(item))
+        {
+            selectedItem = item;
+            ShowDescription(item);
+            SetUseButtonInteractable(CanUseSelectedItem());
+        }
+        else
+        {
+            HideDescription();
+        }
+    }
+    private bool CanUseSelectedItem()
+    {
+        if (selectedItem == null)
+            return false;
+
+        return selectedItem.itemtype == ItemType.Heal &&
+            InventoryRuntimeState.CanUseItem(selectedItem);
+    }
+    private void SetUseButtonInteractable(bool interactable)
+    {
+        if (useItemButton != null)
+            useItemButton.interactable = interactable;
     }
     private void ShowDescription(ItemData item)
     {
@@ -102,6 +181,8 @@ public class FieldInventoryPanelController : BasePanel
             descriptionPanel.interactable = false;
             descriptionPanel.blocksRaycasts = false;
         }
+        selectedItem = null;
+        SetUseButtonInteractable(false);
         ClearDescription();
     }
     public void ClearDescription()

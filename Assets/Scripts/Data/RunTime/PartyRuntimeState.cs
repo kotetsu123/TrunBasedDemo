@@ -58,6 +58,34 @@ public class PartyRuntimeState
         Debug.Log($"[PartyRuntimeState] Updated party count={partyMembers.Count}");
     }
 
+
+    public static bool TryHealFirstInjuredAliveMember(int amount, out Character healedMember)
+    {
+        healedMember = null;
+
+        if (amount <= 0)
+            return false;
+
+        foreach (var member in partyMembers)
+        {
+            if (member == null)
+                continue;
+            if (member.isDead || member.Hp <= 0)
+                continue;
+            if (member.Hp >= member.MaxHp)
+                continue;
+
+            int prevHp = member.Hp;
+            member.Hp = Mathf.Min(member.Hp + amount, member.MaxHp);
+            member.NotifyHpChange(prevHp, member.Hp);
+            healedMember = member;
+
+            Debug.Log($"[PartyRuntimeState] Healed {member.Name}: {prevHp}->{member.Hp}");
+            return true;
+        }
+
+        return false;
+    }
     public static void Clear()
     {
         partyMembers.Clear();
