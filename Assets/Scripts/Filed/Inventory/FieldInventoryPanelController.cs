@@ -19,9 +19,11 @@ public class FieldInventoryPanelController : BasePanel
 
     [Header("Party")]
     [SerializeField] private FieldPartyHudController partyHudController;
+    [SerializeField] private FieldInventoryPartyTargetPanelController partyTargetPanel;
 
     private readonly List<FieldInventoryItemView> spawnedItems = new();
     private ItemData selectedItem;
+    private bool isSelectingTarget;
 
     protected override void Awake()
     {
@@ -34,11 +36,17 @@ public class FieldInventoryPanelController : BasePanel
 
         if (useItemButton != null)
             useItemButton.onClick.AddListener(OnUseSelectedItemClicked);
+
+        if (partyTargetPanel != null)
+            partyTargetPanel.OnPartyMemberSelected += HandlePartyMemberSelected;
     }
     private void OnDestroy()
     {
         if (useItemButton != null)
             useItemButton.onClick.RemoveListener(OnUseSelectedItemClicked);
+
+        if (partyTargetPanel != null)
+            partyTargetPanel.OnPartyMemberSelected -= HandlePartyMemberSelected;
     }
     public override void Show()
     {
@@ -48,6 +56,7 @@ public class FieldInventoryPanelController : BasePanel
     public override void Hide()
     {
         HideDescription();
+        partyTargetPanel?.Hide();
         base.Hide();
     }
     public void Refresh()
@@ -55,6 +64,8 @@ public class FieldInventoryPanelController : BasePanel
         ClearItems();
         ClearDescription();
         selectedItem = null;
+        isSelectingTarget = false;
+        partyTargetPanel?.Hide();
         SetUseButtonInteractable(false);
         if (contentRoot == null || itemViewPrefab == null)
             return;
@@ -102,6 +113,8 @@ public class FieldInventoryPanelController : BasePanel
             return;
         }
         
+        isSelectingTarget = false;
+        partyTargetPanel?.Hide();
         selectedItem = item;
         SetUseButtonInteractable(CanUseSelectedItem());
         ShowDescription(item);
@@ -114,26 +127,44 @@ public class FieldInventoryPanelController : BasePanel
         switch (selectedItem.itemtype)
         {
             case ItemType.Heal:
-                UseHealItem(selectedItem);
+                StartTargetSelection();
                 break;
         }
     }
-    private void UseHealItem(ItemData item)
+    private void StartTargetSelection()
     {
-        if (item == null)
+        isSelectingTarget = true;
+        SetUseButtonInteractable(false);
+        partyTargetPanel?.Show();
+        Debug.Log("[FieldInventory] Select a party member to use item.");
+    }
+    private void HandlePartyMemberSelected(Character target)
+    {
+        if (!isSelectingTarget)
+            return;
+        if (selectedItem == null || !InventoryRuntimeState.CanUseItem(selectedItem))
             return;
 
-        if (!PartyRuntimeState.TryHealFirstInjuredAliveMember(item.power, out Character healedMember))
+        UseHealItemOnTarget(selectedItem, target);
+    }
+    private void UseHealItemOnTarget(ItemData item, Character target)
+    {
+        if (item == null || target == null)
+            return;
+
+        if (!PartyRuntimeState.TryHealMember(target, item.power))
         {
-            Debug.Log("[FieldInventory] No injured alive party member found.");
+            Debug.Log("[FieldInventory] Selected party member cannot use this item.");
             return;
         }
 
         if (!InventoryRuntimeState.ConsumeItem(item))
             return;
 
-        Debug.Log($"[FieldInventory] Used {item.itemName} on {healedMember.Name}");
+        Debug.Log($"[FieldInventory] Used {item.itemName} on {target.Name}");
 
+        isSelectingTarget = false;
+        partyTargetPanel?.Hide();
         partyHudController?.Refresh();
         Refresh();
 
@@ -153,7 +184,8 @@ public class FieldInventoryPanelController : BasePanel
         if (selectedItem == null)
             return false;
 
-        return selectedItem.itemtype == ItemType.Heal &&
+        return !isSelectingTarget &&
+            selectedItem.itemtype == ItemType.Heal &&
             InventoryRuntimeState.CanUseItem(selectedItem);
     }
     private void SetUseButtonInteractable(bool interactable)
@@ -182,6 +214,8 @@ public class FieldInventoryPanelController : BasePanel
             descriptionPanel.blocksRaycasts = false;
         }
         selectedItem = null;
+        isSelectingTarget = false;
+        partyTargetPanel?.Hide();
         SetUseButtonInteractable(false);
         ClearDescription();
     }

@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class FiledPartyHudItem : MonoBehaviour
+public class FiledPartyHudItem : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Image hpfill;
     [SerializeField] private Color _hpFillDefaultColor;
@@ -11,9 +13,14 @@ public class FiledPartyHudItem : MonoBehaviour
     // [SerializeField]
 
     private Character _boundData;
+    private Action<Character> _onClicked;
+    private Graphic[] _raycastGraphics;
 
     private void Awake()
     {
+        _raycastGraphics = GetComponentsInChildren<Graphic>(true);
+        SetRaycastTarget(false);
+
         if (hpfill != null)
         {
             _hpFillDefaultColor = hpfill.color;
@@ -26,11 +33,13 @@ public class FiledPartyHudItem : MonoBehaviour
     }
 
 
-    public void Bind(Character data)
+    public void Bind(Character data, Action<Character> onClicked = null)
     {
         Unbind();
 
         _boundData = data;
+        _onClicked = onClicked;
+        SetRaycastTarget(_onClicked != null);
 
         if (_boundData == null)
         {
@@ -44,6 +53,24 @@ public class FiledPartyHudItem : MonoBehaviour
         Refresh();
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (_boundData == null)
+            return;
+
+        _onClicked?.Invoke(_boundData);
+    }
+    private void SetRaycastTarget(bool enabled)
+    {
+        if (_raycastGraphics == null)
+            return;
+
+        foreach (var graphic in _raycastGraphics)
+        {
+            if (graphic != null)
+                graphic.raycastTarget = enabled;
+        }
+    }
     private void Refresh()
     {
         
@@ -79,6 +106,8 @@ public class FiledPartyHudItem : MonoBehaviour
 
         _boundData.OnHpChanged -= HandleHpChanged;
         _boundData = null;
+        _onClicked = null;
+        SetRaycastTarget(false);
     }
     private void OnDestroy()
     {
