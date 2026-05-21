@@ -6,6 +6,7 @@ public class FieldInventoryInputController : MonoBehaviour
 {
     [SerializeField] private FieldInventoryPanelController inventorypanel;
     [SerializeField] private KeyCode toggleKey = KeyCode.B;
+    [SerializeField] private KeyCode closeKey = KeyCode.Escape;
 
     private bool isOpen;
 
@@ -14,6 +15,10 @@ public class FieldInventoryInputController : MonoBehaviour
         if (Input.GetKeyDown(toggleKey))
         {
             ToggleInventory();
+        }
+        if (isOpen && inventorypanel != null && !inventorypanel.IsSelectingTarget && Input.GetKeyDown(closeKey))
+        {
+            CloseInventory();
         }
     }
     private void ToggleInventory()
@@ -31,9 +36,17 @@ public class FieldInventoryInputController : MonoBehaviour
            
         else
         {
-            inventorypanel.Hide();
-            FieldPauseState.SetPaused(false);
+            CloseInventory();
         }
            
+    }
+    private void CloseInventory()
+    {
+        if (inventorypanel == null)
+            return;
+
+        isOpen = false;
+        inventorypanel.Hide();
+        FieldPauseState.SetPaused(false);
     }
 }

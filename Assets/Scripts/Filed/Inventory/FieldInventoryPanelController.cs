@@ -25,6 +25,8 @@ public class FieldInventoryPanelController : BasePanel
     private ItemData selectedItem;
     private bool isSelectingTarget;
 
+    public bool IsSelectingTarget => isSelectingTarget;
+
     protected override void Awake()
     {
         base.Awake();
@@ -58,6 +60,16 @@ public class FieldInventoryPanelController : BasePanel
         HideDescription();
         partyTargetPanel?.Hide();
         base.Hide();
+    }
+    private void Update()
+    {
+        if (!isSelectingTarget)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+        {
+            CancelTargetSelection();
+        }
     }
     public void Refresh()
     {
@@ -137,6 +149,14 @@ public class FieldInventoryPanelController : BasePanel
         SetUseButtonInteractable(false);
         partyTargetPanel?.Show();
         Debug.Log("[FieldInventory] Select a party member to use item.");
+    }
+    private void CancelTargetSelection()
+    {
+        isSelectingTarget = false;
+        partyTargetPanel?.Hide();
+        SetUseButtonInteractable(CanUseSelectedItem());
+
+        Debug.Log("[FieldInventory] Item target selection canceled.");
     }
     private void HandlePartyMemberSelected(Character target)
     {
