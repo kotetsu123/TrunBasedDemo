@@ -82,29 +82,18 @@ public class FieldInventoryPanelController : BasePanel
         if (contentRoot == null || itemViewPrefab == null)
             return;
 
-        List<KeyValuePair<ItemData, int>> itemStacks = new List<KeyValuePair<ItemData, int>>();
-
-        foreach (var pair in InventoryRuntimeState.Items)
-        {
-            ItemData item = pair.Key;
-            int count = pair.Value;
-
-            if (item == null || count <= 0)
-                continue;
-
-            itemStacks.Add(pair);
-        }
-
-        int requiredSlotCount = Mathf.Max(slotCount, itemStacks.Count);
+        // Field 背包按运行时 slot 顺序生成 UI。这样 UI 第 N 格就对应数据里的第 N 格。
+        IReadOnlyList<InventorySlotState> slots = InventoryRuntimeState.Slots;
+        int requiredSlotCount = Mathf.Max(slotCount, slots.Count);
 
         for (int i = 0; i < requiredSlotCount; i++)
         {
             FieldInventoryItemView view = Instantiate(itemViewPrefab, contentRoot);
 
-            if (i < itemStacks.Count)
+            if (i < slots.Count && slots[i] != null && !slots[i].IsEmpty)
             {
-                var stack = itemStacks[i];
-                view.Bind(stack.Key, stack.Value, HandleSelected);
+                InventorySlotState slot = slots[i];
+                view.Bind(slot.item, slot.count, HandleSelected);
             }
             else
             {
