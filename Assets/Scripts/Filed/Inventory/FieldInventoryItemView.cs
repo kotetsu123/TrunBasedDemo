@@ -15,8 +15,16 @@ public class FieldInventoryItemView : MonoBehaviour
     private ItemData _item;
     private Action<ItemData> _onSelected;
 
-    public void BindEmpty(Action<ItemData> onSelected)
+    // 记录这个 UI 格子对应 InventoryRuntimeState.Slots 里的第几个 slot。
+    // 之后拖拽时会用这个 index 去交换两个 slot 的运行时数据。
+    private int _slotIndex = -1;
+
+
+    public int SlotIndex => _slotIndex; 
+
+    public void BindEmpty(int slotIndex,Action<ItemData> onSelected)
     {
+        _slotIndex = slotIndex;
         _item = null;
         _onSelected = onSelected;
 
@@ -36,9 +44,10 @@ public class FieldInventoryItemView : MonoBehaviour
         }
     }
 
-    public void Bind(ItemData item,int count,Action<ItemData> onSelected)
+    public void Bind(ItemData item,int count,int slotIndex,Action<ItemData> onSelected)
     {
         _item = item;
+        _slotIndex = slotIndex;
         _onSelected = onSelected;
        
         if (itemCountText != null)

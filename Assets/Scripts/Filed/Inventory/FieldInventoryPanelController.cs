@@ -93,11 +93,11 @@ public class FieldInventoryPanelController : BasePanel
             if (i < slots.Count && slots[i] != null && !slots[i].IsEmpty)
             {
                 InventorySlotState slot = slots[i];
-                view.Bind(slot.item, slot.count, HandleSelected);
+                view.Bind(slot.item, slot.count,i, HandleSelected);
             }
             else
             {
-                view.BindEmpty(HandleSelected);
+                view.BindEmpty(i,HandleSelected);
             }
 
             spawnedItems.Add(view);
