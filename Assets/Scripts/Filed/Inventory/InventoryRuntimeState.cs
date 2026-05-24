@@ -15,7 +15,7 @@ public class InventorySlotState
     public ItemData item;
     public int count;
 
-    // 一个背包格子的运行时状态。item 为 null 或 count <= 0 时，这个格子就当作空格。
+    // A slot is empty when it has no item or its count is zero.
     public bool IsEmpty => item == null || count <= 0;
 
     public void Set(ItemData newItem, int newCount)
@@ -35,8 +35,8 @@ public static class InventoryRuntimeState
 {
     public const int DefaultCapacity = 20;
 
-    // 背包真正保存的是一排 slot，而不是 Dictionary。
-    // 这样 UI、拖拽、保存/读取都可以依赖固定的格子顺序。
+    // Runtime inventory is stored as ordered slots, not a Dictionary.
+    // This lets UI, drag-and-drop, and save/load preserve exact slot positions.
     private static readonly List<InventorySlotState> slots = new();
 
     public static IReadOnlyList<InventorySlotState> Slots => slots;
@@ -51,11 +51,10 @@ public static class InventoryRuntimeState
 
         Clear();
 
-        // 先生成固定数量的空格子，再把初始道具放进去。
-        // 这样就算只有 1 个道具，背包也仍然会显示 20 个 slot。
+        // Create fixed empty slots first, then place initial items into them.
         EnsureCapacity(capacity);
 
-        if(initialItems!=null)
+        if (initialItems != null)
         {
             foreach (var stack in initialItems)
             {
@@ -65,6 +64,7 @@ public static class InventoryRuntimeState
                 AddItem(stack.item, stack.count);
             }
         }
+
         IsInitialized = true;
     }
 
@@ -73,7 +73,7 @@ public static class InventoryRuntimeState
         if (item == null || count <= 0)
             return;
 
-        // 第一版规则：同一种道具会优先堆叠到已有格子里。
+        // First version rule: same ItemData stacks into the existing slot.
         InventorySlotState stackSlot = FindSlot(item);
         if (stackSlot != null)
         {
@@ -81,12 +81,11 @@ public static class InventoryRuntimeState
             return;
         }
 
-        // 如果背包里还没有这种道具，就放到第一个空格子。
+        // If this item does not exist yet, put it into the first empty slot.
         InventorySlotState emptySlot = FindEmptySlot();
         if (emptySlot == null)
         {
-            // 现在还没有“背包已满”的正式流程，所以先扩容并给 warning。
-            // 之后做掉落/商店时，可以把这里改成 AddItem 失败并提示玩家。
+            // There is no formal inventory-full flow yet, so expand for now and warn.
             emptySlot = new InventorySlotState();
             slots.Add(emptySlot);
             Debug.LogWarning("[InventoryRuntimeState] Inventory capacity was full, expanded by one slot.");
@@ -114,7 +113,7 @@ public static class InventoryRuntimeState
 
         slot.count -= count;
 
-        // 数量用完后不移除 slot，只清空内容。slot index 要保留下来给 UI/拖拽使用。
+        // Keep the slot index stable; only clear its content when the item is used up.
         if (slot.count <= 0)
             slot.Clear();
 
@@ -125,7 +124,7 @@ public static class InventoryRuntimeState
     {
         List<ItemData> result = new List<ItemData>();
 
-        foreach(var slot in slots)
+        foreach (var slot in slots)
         {
             if (slot == null || slot.IsEmpty)
                 continue;
@@ -134,6 +133,7 @@ public static class InventoryRuntimeState
 
             result.Add(slot.item);
         }
+
         return result;
     }
 
@@ -166,9 +166,74 @@ public static class InventoryRuntimeState
         if (!IsValidSlotIndex(fromIndex) || !IsValidSlotIndex(toIndex))
             return false;
 
-        // 之后拖拽道具时，只需要交换两个 slot 的运行时数据，再刷新 UI。
+        // Drag-and-drop only needs to swap runtime slot data, then refresh UI.
         (slots[fromIndex], slots[toIndex]) = (slots[toIndex], slots[fromIndex]);
         return true;
+    }
+
+    public static InventorySaveData ToSaveData()
+    {
+        InventorySaveData saveData = new InventorySaveData();
+
+        // Save every runtime slot, including empty slots, to preserve inventory layout.
+        foreach (var slot in slots)
+        {
+            InventorySlotSaveData slotSaveData = new InventorySlotSaveData();
+
+            if (slot != null && !slot.IsEmpty)
+            {
+                slotSaveData.itemId = slot.item.itemId;
+                slotSaveData.count = slot.count;
+            }
+
+            saveData.slots.Add(slotSaveData);
+        }
+
+        return saveData;
+    }
+
+    public static void LoadFromSaveData(InventorySaveData saveData, ItemDataBase itemDatabase)
+    {
+        Clear();
+
+        if (saveData == null || saveData.slots == null)
+        {
+            // No save data means an empty default inventory.
+            EnsureCapacity(DefaultCapacity);
+            IsInitialized = true;
+            return;
+        }
+
+        // Rebuild the runtime slots in the exact same order as the saved slots.
+        for (int i = 0; i < saveData.slots.Count; i++)
+        {
+            InventorySlotSaveData slotSaveData = saveData.slots[i];
+            InventorySlotState slot = new InventorySlotState();
+
+            if (slotSaveData != null && slotSaveData.count > 0)
+            {
+                ItemData item = itemDatabase != null
+                    ? itemDatabase.FindById(slotSaveData.itemId)
+                    : null;
+
+                if (item != null)
+                {
+                    // Fill this runtime slot with restored ItemData/count.
+                    slot.Set(item, slotSaveData.count);
+                }
+                else
+                {
+                    Debug.LogWarning($"[InventoryRuntimeState] Failed to load item. itemId={slotSaveData.itemId}");
+                }
+            }
+
+            // Always add the slot, even when empty, so the saved layout is preserved.
+            slots.Add(slot);
+        }
+
+        // If an old save has fewer slots than the current default capacity, fill the rest.
+        EnsureCapacity(DefaultCapacity);
+        IsInitialized = true;
     }
 
     public static void Clear()
@@ -181,15 +246,13 @@ public static class InventoryRuntimeState
     {
         int targetCapacity = Mathf.Max(0, capacity);
 
-        // 确保 slots 至少有 targetCapacity 个格子。
-        // 这里不会缩小背包，只负责补足缺少的空 slot。
+        // Only adds missing slots; it never shrinks the inventory.
         while (slots.Count < targetCapacity)
             slots.Add(new InventorySlotState());
     }
 
     private static InventorySlotState FindSlot(ItemData item)
     {
-        // 找到已经持有同一种 ItemData 的格子，用于堆叠或消耗。
         for (int i = 0; i < slots.Count; i++)
         {
             InventorySlotState slot = slots[i];
@@ -204,7 +267,6 @@ public static class InventoryRuntimeState
 
     private static InventorySlotState FindEmptySlot()
     {
-        // 找第一个空格子。空格子的 slot 本身要保留，只清空 item/count。
         for (int i = 0; i < slots.Count; i++)
         {
             InventorySlotState slot = slots[i];
