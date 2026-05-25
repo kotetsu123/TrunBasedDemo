@@ -11,6 +11,8 @@ using UnityEngine.UI;
 public class Character
 
 {
+    public string characterId;//角色id，唯一标识符
+
     public Team Team;
     public event Action<int, int> OnHpChanged;//prev ,cur
     public event Action<int, int> OnMpChanged;
@@ -105,6 +107,8 @@ public class Character
     {
         return new Character
         {
+            characterId = this.characterId,
+
             Team = this.Team,
 
             Name = this.Name,

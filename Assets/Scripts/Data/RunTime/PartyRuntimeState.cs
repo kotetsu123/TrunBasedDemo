@@ -46,7 +46,9 @@ public class PartyRuntimeState
             //如果战斗后的数据没有头像
             //而旧数据里有头像
             //那就把旧头像复制给新数据
-            Character oldData = oldMembers.Find(x => x != null && x.Name == updateData.Name);
+            //先用 characterId 找
+            //如果旧数据没有 id，才 fallback 用 Name
+            Character oldData = oldMembers.Find(x => x != null && !string.IsNullOrWhiteSpace(x.characterId)&&x.characterId==updateData.characterId);
 
             if (updateData.Portrait == null && oldData != null && oldData.Portrait != null)
             {
@@ -106,5 +108,32 @@ public class PartyRuntimeState
     }    public static void Clear()
     {
         partyMembers.Clear();
+    }
+
+    // 按 PartyMembers 当前顺序导出队伍快照。
+    // List index 会作为之后读取时的队伍顺序。
+    public static PartySaveData ToSaveData()
+    {
+        PartySaveData saveData = new PartySaveData();
+
+        foreach(var member in partyMembers)
+        {
+            
+            PartyMemberSaveData memberSave = new PartyMemberSaveData();
+            if (member != null)
+            {
+                memberSave.characterId = member.characterId;
+                memberSave.hp = member.Hp;
+                memberSave.maxHp = member.MaxHp;
+                memberSave.mp = member.Mp;
+                memberSave.maxMp = member.MaxMp;
+                memberSave.level = member.Level;
+                memberSave.exp = member.Exp;
+                memberSave.isDead = member.isDead;
+                
+            }
+            saveData.members.Add(memberSave);
+        }
+        return saveData;
     }
 }
