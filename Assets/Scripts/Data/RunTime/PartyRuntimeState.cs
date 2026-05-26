@@ -4,25 +4,29 @@ using UnityEngine;
 
 public class PartyRuntimeState
 {
-    private static readonly List<Character> partyMembers=new List<Character>();
+    private static readonly List<Character> partyMembers = new List<Character>();
 
     public static IReadOnlyList<Character> PartyMembers => partyMembers;
-    public static bool HasPartyData=>partyMembers.Count > 0;
+    public static bool HasPartyData => partyMembers.Count > 0;
+
     public static void InitializeIfEmpty(IEnumerable<Character> initialMembers)
     {
         if (HasPartyData)
             return;
+
         partyMembers.Clear();
 
         if (initialMembers == null)
             return;
-        foreach(var member in initialMembers)
+
+        foreach (var member in initialMembers)
         {
             if (member == null)
                 continue;
 
             partyMembers.Add(member);
         }
+
         Debug.Log($"[PartyRunTimeState] Initialized party count={partyMembers.Count}");
     }
 
@@ -34,7 +38,8 @@ public class PartyRuntimeState
 
         if (controllers == null)
             return;
-        foreach(var ctrl in controllers)
+
+        foreach (var ctrl in controllers)
         {
             if (ctrl == null || ctrl.data == null)
                 continue;
@@ -43,23 +48,24 @@ public class PartyRuntimeState
 
             Character updateData = ctrl.data;
 
-            //如果战斗后的数据没有头像
-            //而旧数据里有头像
-            //那就把旧头像复制给新数据
-            //先用 characterId 找
-            //如果旧数据没有 id，才 fallback 用 Name
-            Character oldData = oldMembers.Find(x => x != null && !string.IsNullOrWhiteSpace(x.characterId)&&x.characterId==updateData.characterId);
+            // Prefer stable characterId when matching previous field data, then fall back to Name for old data.
+            Character oldData = oldMembers.Find(x =>
+                x != null &&
+                !string.IsNullOrWhiteSpace(x.characterId) &&
+                x.characterId == updateData.characterId);
 
+            if (oldData == null)
+                oldData = oldMembers.Find(x => x != null && x.Name == updateData.Name);
+
+            // Battle data may lose portrait references, so restore it from the previous field copy when needed.
             if (updateData.Portrait == null && oldData != null && oldData.Portrait != null)
-            {
                 updateData.Portrait = oldData.Portrait;
-            }
 
             partyMembers.Add(ctrl.data);
         }
+
         Debug.Log($"[PartyRuntimeState] Updated party count={partyMembers.Count}");
     }
-
 
     public static bool TryHealFirstInjuredAliveMember(int amount, out Character healedMember)
     {
@@ -88,6 +94,7 @@ public class PartyRuntimeState
 
         return false;
     }
+
     public static bool TryHealMember(Character member, int amount)
     {
         if (member == null || amount <= 0)
@@ -105,20 +112,20 @@ public class PartyRuntimeState
 
         Debug.Log($"[PartyRuntimeState] Healed {member.Name}: {prevHp}->{member.Hp}");
         return true;
-    }    public static void Clear()
+    }
+
+    public static void Clear()
     {
         partyMembers.Clear();
     }
 
-    // 按 PartyMembers 当前顺序导出队伍快照。
-    // List index 会作为之后读取时的队伍顺序。
     public static PartySaveData ToSaveData()
     {
         PartySaveData saveData = new PartySaveData();
 
-        foreach(var member in partyMembers)
+        // Export members in current party order. The list index becomes the saved party order.
+        foreach (var member in partyMembers)
         {
-            
             PartyMemberSaveData memberSave = new PartyMemberSaveData();
             if (member != null)
             {
@@ -130,10 +137,54 @@ public class PartyRuntimeState
                 memberSave.level = member.Level;
                 memberSave.exp = member.Exp;
                 memberSave.isDead = member.isDead;
-                
             }
+
             saveData.members.Add(memberSave);
         }
+
         return saveData;
+    }
+
+    public static void LoadFromSaveData(PartySaveData saveData, CharacterDataBase characterDataBase)
+    {
+        partyMembers.Clear();
+
+        if (saveData == null || saveData.members == null)
+        {
+            Debug.LogWarning("[PartyRuntimeState] Load skipped because save data is null.");
+            return;
+        }
+
+        for (int i = 0; i < saveData.members.Count; i++)
+        {
+            PartyMemberSaveData memberSave = saveData.members[i];
+            if (memberSave == null || string.IsNullOrWhiteSpace(memberSave.characterId))
+                continue;
+
+            Character baseCharacter = characterDataBase != null
+                ? characterDataBase.FindById(memberSave.characterId)
+                : null;
+
+            if (baseCharacter == null)
+            {
+                Debug.LogWarning($"[PartyRuntimeState] Failed to load party member. characterId={memberSave.characterId}");
+                continue;
+            }
+
+            // Copy the database character before applying save data so runtime changes do not modify source data.
+            Character runtimeMember = baseCharacter.Copy();
+
+            runtimeMember.MaxHp = memberSave.maxHp;
+            runtimeMember.Hp = Mathf.Clamp(memberSave.hp, 0, runtimeMember.MaxHp);
+            runtimeMember.MaxMp = memberSave.maxMp;
+            runtimeMember.Mp = Mathf.Clamp(memberSave.mp, 0, runtimeMember.MaxMp);
+            runtimeMember.Level = Mathf.Max(1, memberSave.level);
+            runtimeMember.Exp = Mathf.Max(0, memberSave.exp);
+            runtimeMember.isDead = memberSave.isDead || runtimeMember.Hp <= 0;
+
+            partyMembers.Add(runtimeMember);
+        }
+
+        Debug.Log($"[PartyRuntimeState] Loaded party count={partyMembers.Count}");
     }
 }
