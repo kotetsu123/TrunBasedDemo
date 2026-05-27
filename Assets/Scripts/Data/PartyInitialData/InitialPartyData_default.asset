@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: InitialPartyData_default
   m_EditorClassIdentifier: 
   members:
-  - Team: 0
-    Name: Player0
+  - characterId: Paul_001
+    Team: 0
+    Name: Paul
     MaxHp: 200
     Hp: 200
     MaxMp: 100
@@ -32,8 +33,9 @@ MonoBehaviour:
     isPlayer: 1
     battleEnded: 0
     intent: 0
-  - Team: 0
-    Name: Player1
+  - characterId: Argo_002
+    Team: 0
+    Name: Argo
     MaxHp: 200
     Hp: 200
     MaxMp: 100

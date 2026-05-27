@@ -3827,6 +3827,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1807939825}
   - component: {fileID: 1807939826}
+  - component: {fileID: 1807939827}
   m_Layer: 0
   m_Name: inventorysaveloadTester
   m_TagString: Untagged
@@ -3862,6 +3863,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemDatabase: {fileID: 11400000, guid: 770a9bf72ed848340b4dd338d72ca5e1, type: 2}
+--- !u!114 &1807939827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807939824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db5c1b2aa5c437479b3d3a426860e5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1818626004
 GameObject:
   m_ObjectHideFlags: 0
