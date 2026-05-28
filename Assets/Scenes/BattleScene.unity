@@ -2302,6 +2302,7 @@ MonoBehaviour:
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
+      characterId: 
       Team: 1
       Name: e0
       MaxHp: 120
@@ -2314,6 +2315,7 @@ MonoBehaviour:
       Speed: 80
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2323,6 +2325,7 @@ MonoBehaviour:
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
+      characterId: 
       Team: 1
       Name: e1
       MaxHp: 120
@@ -2335,6 +2338,7 @@ MonoBehaviour:
       Speed: 80
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2344,6 +2348,7 @@ MonoBehaviour:
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
+      characterId: 
       Team: 1
       Name: e2
       MaxHp: 120
@@ -2356,6 +2361,7 @@ MonoBehaviour:
       Speed: 80
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2365,6 +2371,7 @@ MonoBehaviour:
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
+      characterId: 
       Team: 1
       Name: e3
       MaxHp: 120
@@ -2377,6 +2384,7 @@ MonoBehaviour:
       Speed: 80
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2386,6 +2394,7 @@ MonoBehaviour:
   - team: 1
     prefabs: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
     characterData:
+      characterId: 
       Team: 1
       Name: e4
       MaxHp: 120
@@ -2398,6 +2407,7 @@ MonoBehaviour:
       Speed: 80
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2408,6 +2418,7 @@ MonoBehaviour:
   - team: 0
     prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
     characterData:
+      characterId: 
       Team: 0
       Name: player0
       MaxHp: 200
@@ -2420,6 +2431,7 @@ MonoBehaviour:
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -2429,6 +2441,7 @@ MonoBehaviour:
   - team: 0
     prefabs: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
     characterData:
+      characterId: 
       Team: 0
       Name: player1
       MaxHp: 200
@@ -2441,6 +2454,7 @@ MonoBehaviour:
       Speed: 100
       ActionValue: 0
       MaxActionValue: 200
+      Portrait: {fileID: 0}
       isOnField: 0
       isActing: 0
       isDead: 0
@@ -7615,6 +7629,8 @@ MonoBehaviour:
   levelUpPopup: {fileID: 1427258972}
   returnFieldDelay: 2
   fieldSceneName: FieldScene
+  itemDataBase: {fileID: 11400000, guid: 770a9bf72ed848340b4dd338d72ca5e1, type: 2}
+  characterDataBase: {fileID: 11400000, guid: ba7c5627880e59a4dabcdf461e9deb20, type: 2}
 --- !u!1 &2018218463
 GameObject:
   m_ObjectHideFlags: 0

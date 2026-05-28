@@ -33,6 +33,7 @@ public class PartyRuntimeState
     public static void UpdateFromBattleController(IEnumerable<BaseController> controllers)
     {
         List<Character> oldMembers = new List<Character>(partyMembers);
+        List<Character> updatedMembers = new List<Character>();
 
         partyMembers.Clear();
 
@@ -61,10 +62,49 @@ public class PartyRuntimeState
             if (updateData.Portrait == null && oldData != null && oldData.Portrait != null)
                 updateData.Portrait = oldData.Portrait;
 
-            partyMembers.Add(ctrl.data);
+            updatedMembers.Add(ctrl.data);
+        }
+
+        // Keep the original party order stable even if battle controllers were removed/re-added by death and revive.
+        foreach (var oldMember in oldMembers)
+        {
+            Character updatedMember = FindMatchingMember(updatedMembers, oldMember);
+            if (updatedMember == null)
+                continue;
+
+            partyMembers.Add(updatedMember);
+            updatedMembers.Remove(updatedMember);
+        }
+
+        // Append brand-new members after the original party. This keeps future join flows from being dropped.
+        foreach (var updatedMember in updatedMembers)
+        {
+            if (updatedMember == null)
+                continue;
+
+            partyMembers.Add(updatedMember);
         }
 
         Debug.Log($"[PartyRuntimeState] Updated party count={partyMembers.Count}");
+    }
+
+    private static Character FindMatchingMember(List<Character> members, Character target)
+    {
+        if (members == null || target == null)
+            return null;
+
+        if (!string.IsNullOrWhiteSpace(target.characterId))
+        {
+            Character byId = members.Find(member =>
+                member != null &&
+                !string.IsNullOrWhiteSpace(member.characterId) &&
+                member.characterId == target.characterId);
+
+            if (byId != null)
+                return byId;
+        }
+
+        return members.Find(member => member != null && member.Name == target.Name);
     }
 
     public static bool TryHealFirstInjuredAliveMember(int amount, out Character healedMember)

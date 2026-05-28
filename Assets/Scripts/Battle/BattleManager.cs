@@ -880,10 +880,9 @@ public class BattleManager : MonoBehaviour
             if (c.data == null) { Debug.Log($"[Snapshots] {c.name} data=NULL"); continue; }
             Debug.Log($"[Snapshots] {c.name} team={c.data.Team} name={c.data.Name}");
         }*/
-        foreach (var c in controllers)
+        foreach (var c in GetPlayerControllersInPartyOrder())
         {
             if (c == null || c.data == null) continue;
-            if (c.data.Team!=Team.Player) continue;
 
             list.Add(new CharacterResultSnapshot
             {
@@ -902,6 +901,59 @@ public class BattleManager : MonoBehaviour
 
         return list;
     }
+    /*1. 从 controllers 里拿出所有玩家 controller
+      2. 遍历 PartyRuntimeState.PartyMembers
+      3. 每个队伍成员都去 battle controllers 里找对应 controller
+      4. 找到了就按 PartyRuntimeState 的顺序加入 ordered
+      5. 没匹配上的 controller 追加到最后*/
+    private List<BaseController> GetPlayerControllersInPartyOrder()
+    {
+        var playerControllers = controllers
+            .Where(c => c != null && c.data != null && c.data.Team == Team.Player)
+            .ToList();
+
+        var ordered = new List<BaseController>();
+
+        // PartyRuntimeState is the stable source of party order; controllers can move when a dead player is revived.
+        foreach (var partyMember in PartyRuntimeState.PartyMembers)
+        {
+            BaseController matched = FindMatchingController(playerControllers, partyMember);
+            if (matched == null)
+                continue;
+
+            ordered.Add(matched);
+            playerControllers.Remove(matched);
+        }
+
+        // Keep any unexpected/new player controllers instead of silently dropping them.
+        ordered.AddRange(playerControllers);
+
+        return ordered;
+    }
+
+    private BaseController FindMatchingController(List<BaseController> playerControllers, Character partyMember)
+    {
+        if (playerControllers == null || partyMember == null)
+            return null;
+
+        if (!string.IsNullOrWhiteSpace(partyMember.characterId))
+        {
+            BaseController byId = playerControllers.FirstOrDefault(c =>
+                c != null &&
+                c.data != null &&
+                !string.IsNullOrWhiteSpace(c.data.characterId) &&
+                c.data.characterId == partyMember.characterId);
+
+            if (byId != null)
+                return byId;
+        }
+
+        return playerControllers.FirstOrDefault(c =>
+            c != null &&
+            c.data != null &&
+            c.data.Name == partyMember.Name);
+    }
+
     void UpdateTimeLineUI(List<BaseController> ordered)
     {
         if (ordered == null || ordered.Count == 0) return;
