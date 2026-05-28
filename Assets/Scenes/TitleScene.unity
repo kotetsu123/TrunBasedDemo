@@ -2106,6 +2106,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fildSceneName: FildScene
   settingPanel: {fileID: 1408072236}
+  loadGameButton: {fileID: 1837214801}
+  itemDataBase: {fileID: 11400000, guid: 770a9bf72ed848340b4dd338d72ca5e1, type: 2}
+  characterDataBase: {fileID: 11400000, guid: ba7c5627880e59a4dabcdf461e9deb20, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
