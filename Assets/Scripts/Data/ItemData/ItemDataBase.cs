@@ -1,30 +1,29 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
-[CreateAssetMenu(menuName ="Battle/Item Database")]
-public class ItemDataBase :ScriptableObject
+[CreateAssetMenu(menuName = "Battle/Item Database")]
+public class ItemDataBase : ScriptableObject
 {
-    [SerializeField] private List<ItemData> items = new();
+    [SerializeField] private List<ItemData> items = new List<ItemData>();
 
-    // 存档里只有 itemId，所以读取背包时需要通过数据库把 itemId 找回 ItemData
+    // Save data only stores itemId, so loading needs this lookup to restore ItemData.
     public ItemData FindById(string itemId)
     {
         if (string.IsNullOrWhiteSpace(itemId))
             return null;
 
-        for(int i = 0; i < items.Count; i++)
+        for (int i = 0; i < items.Count; i++)
         {
-            ItemData item= items[i];
-
+            ItemData item = items[i];
             if (item == null)
                 continue;
 
-            if (item.itemId == itemId)
+            // item.name / itemName fallback keeps old ItemData assets loadable even before itemId is serialized.
+            if (item.itemId == itemId || item.name == itemId || item.itemName == itemId)
                 return item;
         }
-        Debug.LogWarning($"[ItemDataBase] Item not found. {itemId} 的 ItemData");
+
+        Debug.LogWarning($"[ItemDataBase] Item not found. itemId={itemId}");
         return null;
     }
 }

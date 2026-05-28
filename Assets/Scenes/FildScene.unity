@@ -3875,6 +3875,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8db5c1b2aa5c437479b3d3a426860e5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemDataBase: {fileID: 11400000, guid: 770a9bf72ed848340b4dd338d72ca5e1, type: 2}
+  characterDataBase: {fileID: 11400000, guid: ba7c5627880e59a4dabcdf461e9deb20, type: 2}
+  inventoryPanel: {fileID: 755044484}
+  partyHudController: {fileID: 1294726527}
 --- !u!1 &1818626004
 GameObject:
   m_ObjectHideFlags: 0
