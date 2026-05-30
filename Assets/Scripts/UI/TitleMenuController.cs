@@ -45,8 +45,8 @@ public class TitleMenuController : MonoBehaviour
         if (!SaveSystem.Load(itemDataBase, characterDataBase))
             return;
 
-        // Current save only restores party/inventory, so battle return data must not leak into the loaded run.
-        FieldBattleContext.ClearAll();
+        // Load already restores cleared spawn IDs, so only transient battle-return data should be reset.
+        FieldBattleContext.ClearReturnData();
 
         SceneManager.LoadScene(fildSceneName);
     }

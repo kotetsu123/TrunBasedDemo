@@ -7,4 +7,5 @@ public class GameSaveData
     // Runtime snapshots that can be serialized together by SaveSystem.
     public InventorySaveData inventory;
     public PartySaveData party;
+    public FieldSaveData field;
 }

@@ -67,6 +67,45 @@ public static class FieldBattleContext
         HasFieldReturnData = false;
         CurrentEncounterId = null;
     }
+    public static FieldSaveData ToSaveData()
+    {
+        FieldSaveData saveData = new FieldSaveData();
+
+
+        //HaseSet is good for runtime lookup, but save data uses List so JsonUtility can serialize it
+        foreach(string spawnId in clearedSpawnIds)
+        {
+            if (string.IsNullOrWhiteSpace(spawnId))
+                continue;
+
+            saveData.clearedSpawnIds.Add(spawnId);
+        }
+        
+        return saveData; 
+    }
+
+    public static void LoadFromSaveData(FieldSaveData saveData)
+    {
+        clearedSpawnIds.Clear();
+
+        if (saveData == null || saveData.clearedSpawnIds == null)
+            return;
+
+        //Rebuild the runtime HashSet from the spawn IDs.
+
+        foreach (string spawnId in saveData.clearedSpawnIds)
+        {
+            if (string.IsNullOrWhiteSpace(spawnId))
+                continue;
+
+            clearedSpawnIds.Add(spawnId);
+        }
+        ClearReturnData();
+        EncounterCooldownUntilTime = 0f;
+       
+
+    }
+
     //用于重新开始流程或返回标题时完全情路
     public static void ClearAll()
     {
@@ -74,4 +113,5 @@ public static class FieldBattleContext
         clearedSpawnIds.Clear();
         EncounterCooldownUntilTime = 0f;
     }
+
 }

@@ -14,6 +14,7 @@ public static class SaveSystem
         {
             inventory = InventoryRuntimeState.ToSaveData(),
             party = PartyRuntimeState.ToSaveData(),
+            field= FieldBattleContext.ToSaveData(),
         };
     }
 
@@ -60,6 +61,9 @@ public static class SaveSystem
 
         // Party needs CharacterDataBase to convert saved characterId values back into Character data.
         PartyRuntimeState.LoadFromSaveData(saveData.party, characterDataBase);
+
+        //Field state restores cleared spawn IDs so defeated enemies do not respawn after Load.
+        FieldBattleContext.LoadFromSaveData(saveData.field);
 
         Debug.Log($"[SaveSystem] Loaded game from: {SavePath}");
         return true;

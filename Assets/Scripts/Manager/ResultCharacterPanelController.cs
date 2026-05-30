@@ -156,8 +156,8 @@ public class ResultCharacterPanelController : BasePanel
         if (!SaveSystem.Load(itemDataBase, characterDataBase))
             return;
 
-        // Loading from battle should leave the failed battle and ignore stale encounter return data.
-        FieldBattleContext.ClearAll();
+        // Load already restores cleared spawn IDs, so only transient battle-return data should be reset.
+        FieldBattleContext.ClearReturnData();
 
         SceneManager.LoadScene(fieldSceneName);
     }
