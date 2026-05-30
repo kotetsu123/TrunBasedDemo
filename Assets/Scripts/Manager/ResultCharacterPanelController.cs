@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ResultCharacterPanelController : BasePanel
 {
@@ -16,7 +17,12 @@ public class ResultCharacterPanelController : BasePanel
     [SerializeField] private LevelUpPopController levelUpPopup;
 
     [SerializeField] private float returnFieldDelay = 2.0f;
-    [SerializeField] private string fieldSceneName = "FieldScene";
+    [SerializeField] private string fieldSceneName = "FildScene";
+
+    [Header("Save / Load")]
+    [SerializeField] private Button loadGameButton;
+    [SerializeField] private ItemDataBase itemDataBase;
+    [SerializeField] private CharacterDataBase characterDataBase;
 
     protected override void Awake()
     {
@@ -27,6 +33,8 @@ public class ResultCharacterPanelController : BasePanel
     {
         if (endPanel != null)
             endPanel.OnClosed += HandleEndPanelClosed;
+
+        RefreshLoadButtonState();
     }
     private void OnDisable()
     {
@@ -50,7 +58,7 @@ public class ResultCharacterPanelController : BasePanel
         }
         if (isVictory||isEscape)
         {          
-            //胜利：正常显示角色结算
+            // Win/Escape: show the normal character result items.
             for (int i = 0; i < items.Length; i++)
             {
                 if (i < partySnapShots.Count)
@@ -66,7 +74,7 @@ public class ResultCharacterPanelController : BasePanel
         }
         else
         {        
-            //失败，显示buttonRoot 当中的两个按钮，隐藏角色结算
+            // Lose: show retry/title buttons and hide character result items.
             for(int i = 0; i < items.Length; i++)
             {
                 items[i].gameObject.SetActive(false);
@@ -136,6 +144,31 @@ public class ResultCharacterPanelController : BasePanel
     {
         SceneManager.LoadScene(titleMenuName);
     }
+
+    public void OnClickLoadGame()
+    {
+        if (!SaveSystem.HasSaveFile())
+        {
+            RefreshLoadButtonState();
+            return;
+        }
+
+        if (!SaveSystem.Load(itemDataBase, characterDataBase))
+            return;
+
+        // Loading from battle should leave the failed battle and ignore stale encounter return data.
+        FieldBattleContext.ClearAll();
+
+        SceneManager.LoadScene(fieldSceneName);
+    }
+
+    private void RefreshLoadButtonState()
+    {
+        // Keep the battle result Load button disabled until a real save file exists.
+        if (loadGameButton != null)
+            loadGameButton.interactable = SaveSystem.HasSaveFile();
+    }
+
     private IEnumerator AutoReturnFieldAfterDelay()
     {
         yield return new WaitForSeconds(returnFieldDelay);
