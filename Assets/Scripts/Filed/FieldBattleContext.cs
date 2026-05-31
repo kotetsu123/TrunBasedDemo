@@ -20,6 +20,11 @@ public static class FieldBattleContext
 
     private static readonly HashSet<string> clearedSpawnIds= new HashSet<string>();
 
+    //存档的数据相关。
+    public static bool HasSavedPlayerTransform { get; private set; }
+    public static Vector3 SavedPlayerPos { get; private set; }
+    public static Quaternion SavedPlayerRot { get; private set; }
+
     public static IReadOnlyCollection<string> ClearedSpawnIds => clearedSpawnIds;
     public static bool IsEncounterCooldownActive => Time.time < EncounterCooldownUntilTime;
     //保存进入战斗前的FieldScene名称，玩家位置朝向
@@ -87,29 +92,48 @@ public static class FieldBattleContext
     public static void LoadFromSaveData(FieldSaveData saveData)
     {
         clearedSpawnIds.Clear();
-
-        if (saveData == null || saveData.clearedSpawnIds == null)
-            return;
-
-        //Rebuild the runtime HashSet from the spawn IDs.
-
-        foreach (string spawnId in saveData.clearedSpawnIds)
-        {
-            if (string.IsNullOrWhiteSpace(spawnId))
-                continue;
-
-            clearedSpawnIds.Add(spawnId);
-        }
         ClearReturnData();
         EncounterCooldownUntilTime = 0f;
-       
 
+        HasSavedPlayerTransform = false;
+        SavedPlayerPos = Vector3.zero;
+        SavedPlayerRot = Quaternion.identity;
+
+        if (saveData == null)
+            return;
+
+        if (saveData.clearedSpawnIds != null)
+        {
+            //Rebuild the runtime HashSet from the spawn IDs.
+
+            foreach (string spawnId in saveData.clearedSpawnIds)
+            {
+                if (string.IsNullOrWhiteSpace(spawnId))
+                    continue;
+
+                clearedSpawnIds.Add(spawnId);
+            }
+        }
+        //恢复玩家位置
+        if (saveData.hasPlayerTransform)
+        {
+            HasSavedPlayerTransform = true;
+            SavedPlayerPos = saveData.playerPos;
+            SavedPlayerRot = Quaternion.Euler(saveData.playerRotEuler);
+        }
+    }
+    public static void ClearSavedPlayerTransform()
+    {
+        HasSavedPlayerTransform = false;
+        SavedPlayerPos = Vector3.zero;
+        SavedPlayerRot = Quaternion.identity;
     }
 
     //用于重新开始流程或返回标题时完全情路
     public static void ClearAll()
     {
         ClearReturnData();
+        ClearSavedPlayerTransform();
         clearedSpawnIds.Clear();
         EncounterCooldownUntilTime = 0f;
     }

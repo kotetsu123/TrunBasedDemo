@@ -41,20 +41,35 @@ public class FieldCreator : MonoBehaviour
     }
     private void SetupPlayer()
     {
-        if (player == null || playerStartPoint == null)
+        if (player == null)
             return;
+        // Battle return has the highest priority because it is an immediate scene round trip.
         if (FieldBattleContext.HasFieldReturnData)
         {
-            player.position = FieldBattleContext.PlayerPositionBeforeBattle;
-            player.rotation = FieldBattleContext.PlayerRotationBeforeBattle;
+            FieldPlayerTransformUtility.Teleport(
+                player,
+                FieldBattleContext.PlayerPositionBeforeBattle,
+                FieldBattleContext.PlayerRotationBeforeBattle);
             return;
         }
+        // Saved player transform is used when entering Field from Load.
+        if (FieldBattleContext.HasSavedPlayerTransform)
+        {
+            FieldPlayerTransformUtility.Teleport(
+                player,
+                FieldBattleContext.SavedPlayerPos,
+                FieldBattleContext.SavedPlayerRot);
+            FieldBattleContext.ClearSavedPlayerTransform();
+            return;
+        }
+        // New Game or no saved transform: use the scene start point.
         if (playerStartPoint != null)
         {
-            player.position = playerStartPoint.position;
-            player.rotation = playerStartPoint.rotation;
+            FieldPlayerTransformUtility.Teleport(
+                player,
+                playerStartPoint.position,
+                playerStartPoint.rotation);
         }
-       
     }
 
     private void SpwanEnemies()

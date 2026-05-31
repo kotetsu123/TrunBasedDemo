@@ -7,14 +7,21 @@ public static class SaveSystem
 
     // Unity provides persistentDataPath as a platform-safe folder for save files.
     private static string SavePath => Path.Combine(Application.persistentDataPath, SaveFileName);
-
+    
     public static GameSaveData BuildSaveData()
     {
+        
+        FieldSaveData fieldSaveData = FieldBattleContext.ToSaveData();
+
+        // FieldSaveContext only exists in Field scenes.
+        // Title/Battle saves can still keep runtime field state, but cannot read a player Transform.
+        FieldSaveContext.Current?.TryFillFieldSaveData(fieldSaveData);
+
         return new GameSaveData
         {
             inventory = InventoryRuntimeState.ToSaveData(),
             party = PartyRuntimeState.ToSaveData(),
-            field= FieldBattleContext.ToSaveData(),
+            field=fieldSaveData,
         };
     }
 
@@ -64,6 +71,10 @@ public static class SaveSystem
 
         //Field state restores cleared spawn IDs so defeated enemies do not respawn after Load.
         FieldBattleContext.LoadFromSaveData(saveData.field);
+
+        // If Load is called while already in a Field scene, apply the saved player transform immediately.
+        // Title Load has no FieldSaveContext, so FieldCreator will apply it after the Field scene loads.
+        FieldSaveContext.Current?.TryApplySavedPlayerTransform();
 
         Debug.Log($"[SaveSystem] Loaded game from: {SavePath}");
         return true;

@@ -13,6 +13,8 @@ public class EnemySpawnManager : MonoBehaviour
         {
             if (point == null)
                 continue;
+            if (!point.gameObject.activeInHierarchy)
+                continue;
 
             if (FieldBattleContext.IsSpawnCleard(point.SpawnId))
             {

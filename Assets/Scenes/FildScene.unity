@@ -878,6 +878,7 @@ GameObject:
   m_Component:
   - component: {fileID: 749454895}
   - component: {fileID: 749454896}
+  - component: {fileID: 749454897}
   m_Layer: 0
   m_Name: SceneTransitionController
   m_TagString: Untagged
@@ -915,6 +916,19 @@ MonoBehaviour:
   fadeCanvasGroup: {fileID: 1344029254}
   fadeDuration: 0.5
   waitBeforLoad: 0.2
+--- !u!114 &749454897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749454894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a271e50e70ea54e8e0a8440ad6a1c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1753244267}
 --- !u!1 &755044478
 GameObject:
   m_ObjectHideFlags: 0
