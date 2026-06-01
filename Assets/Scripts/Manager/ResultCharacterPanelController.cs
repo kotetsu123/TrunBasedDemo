@@ -159,7 +159,7 @@ public class ResultCharacterPanelController : BasePanel
         // Load already restores cleared spawn IDs, so only transient battle-return data should be reset.
         FieldBattleContext.ClearReturnData();
 
-        SceneManager.LoadScene(fieldSceneName);
+        SceneManager.LoadScene(SaveSystem.GetLoadedFieldSceneNameOrDefault(fieldSceneName));
     }
 
     private void RefreshLoadButtonState()

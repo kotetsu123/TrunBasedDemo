@@ -48,7 +48,7 @@ public class TitleMenuController : MonoBehaviour
         // Load already restores cleared spawn IDs, so only transient battle-return data should be reset.
         FieldBattleContext.ClearReturnData();
 
-        SceneManager.LoadScene(fildSceneName);
+        SceneManager.LoadScene(SaveSystem.GetLoadedFieldSceneNameOrDefault(fildSceneName));
     }
 
     public void OnSettingClicked()

@@ -7,6 +7,8 @@ public static class SaveSystem
 
     // Unity provides persistentDataPath as a platform-safe folder for save files.
     private static string SavePath => Path.Combine(Application.persistentDataPath, SaveFileName);
+
+    public static string LastLoadedFieldSceneName { get; private set; }
     
     public static GameSaveData BuildSaveData()
     {
@@ -42,6 +44,8 @@ public static class SaveSystem
 
     public static bool Load(ItemDataBase itemDataBase, CharacterDataBase characterDataBase)
     {
+        LastLoadedFieldSceneName = null;
+
         if (!HasSaveFile())
         {
             Debug.LogWarning($"[SaveSystem] Save file not found: {SavePath}");
@@ -63,6 +67,8 @@ public static class SaveSystem
             return false;
         }
 
+        LastLoadedFieldSceneName = saveData.field?.sceneName;
+
         // Inventory needs ItemDataBase to convert saved itemId values back into ItemData.
         InventoryRuntimeState.LoadFromSaveData(saveData.inventory, itemDataBase);
 
@@ -78,5 +84,19 @@ public static class SaveSystem
 
         Debug.Log($"[SaveSystem] Loaded game from: {SavePath}");
         return true;
+    }
+
+    public static string GetLoadedFieldSceneNameOrDefault(string fallbackSceneName)
+    {
+        if (string.IsNullOrWhiteSpace(LastLoadedFieldSceneName))
+            return fallbackSceneName;
+
+        if (!Application.CanStreamedLevelBeLoaded(LastLoadedFieldSceneName))
+        {
+            Debug.LogWarning($"[SaveSystem] Saved field scene cannot be loaded: {LastLoadedFieldSceneName}. Fallback={fallbackSceneName}");
+            return fallbackSceneName;
+        }
+
+        return LastLoadedFieldSceneName;
     }
 }
