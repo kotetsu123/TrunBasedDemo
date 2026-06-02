@@ -10,6 +10,8 @@ public class FieldInventoryInputController : MonoBehaviour
 
     private bool isOpen;
 
+    public bool IsOpen => isOpen;
+
     private void Update()
     {
         if (Input.GetKeyDown(toggleKey))
@@ -40,7 +42,7 @@ public class FieldInventoryInputController : MonoBehaviour
         }
            
     }
-    private void CloseInventory()
+    public void CloseInventory()
     {
         if (inventorypanel == null)
             return;

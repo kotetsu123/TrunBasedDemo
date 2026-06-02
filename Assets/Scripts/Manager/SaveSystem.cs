@@ -27,14 +27,23 @@ public static class SaveSystem
         };
     }
 
-    public static void Save()
+    public static bool Save()
     {
-        GameSaveData saveData = BuildSaveData();
-        string json = JsonUtility.ToJson(saveData, true);
+        try
+        {
+            GameSaveData saveData = BuildSaveData();
+            string json = JsonUtility.ToJson(saveData, true);
 
-        File.WriteAllText(SavePath, json);
+            File.WriteAllText(SavePath, json);
 
-        Debug.Log($"[SaveSystem] Saved game to: {SavePath}");
+            Debug.Log($"[SaveSystem] Saved game to: {SavePath}");
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[SaveSystem] Failed to save game: {ex.Message}");
+            return false;
+        }
     }
 
     public static bool HasSaveFile()
