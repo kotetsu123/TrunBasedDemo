@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   encounterId: encounter_Test_001
   enemyChatacters:
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: test_001_A
     MaxHp: 120
     Hp: 120
@@ -33,7 +34,8 @@ MonoBehaviour:
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: test_001_B
     MaxHp: 120
     Hp: 120
@@ -52,7 +54,8 @@ MonoBehaviour:
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: test_001_C
     MaxHp: 120
     Hp: 120
@@ -71,7 +74,8 @@ MonoBehaviour:
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: test_001_D
     MaxHp: 120
     Hp: 120
@@ -90,3 +94,9 @@ MonoBehaviour:
     isPlayer: 0
     battleEnded: 0
     intent: 0
+  rewardExp: 240
+  itemDrops:
+  - item: {fileID: 11400000, guid: 1dd1fab1a86b02e469020980ac42b0aa, type: 2}
+    minCount: 1
+    maxCount: 4
+    dropChance: 0.8

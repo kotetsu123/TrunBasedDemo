@@ -1,4 +1,4 @@
-ï»¿using DG.Tweening;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,17 +14,17 @@ using static UnityEngine.GraphicsBuffer;
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager Instance{ get; private set; }
-    //c#event å¹¿æ’­ï¼Œå½“è¡ŒåŠ¨è€…æ”¹å˜æ—¶è§¦å‘
+    //c#event ¹ã²¥£¬µ±ĞĞ¶¯Õß¸Ä±äÊ±´¥·¢
     public event Action<BaseController, BaseController> OnActionChanged;
     public event Action<List<BaseController>> OnTimeLineOrdered;
-    //ç›®æ ‡é”å®šTargetCircle ç”¨event
+    //Ä¿±êËø¶¨TargetCircle ÓÃevent
     public event Action<BaseController> OnTargetChanged;
     public event Action<bool> OnInputStateChanged;
-    //å½“å‰actor //é«˜å…‰//é•œå¤´
+    //µ±Ç°actor //¸ß¹â//¾µÍ·
     public event Action<BaseController>OnCurrentActorChanged;
-    //å‘å¤–å¹¿æ’­æˆ˜æ–—æ˜¯å¦ç»“æŸ
+    //ÏòÍâ¹ã²¥Õ½¶·ÊÇ·ñ½áÊø
     public event Action<BattleResultPayload> OnBattleEnded;
-    //é“å…·æ•°é‡æ”¹å˜
+    //µÀ¾ßÊıÁ¿¸Ä±ä
     public Action<ItemData, int> OnItemCountChanged;
 
     // public List<Character> characters = new List<BaseController>();
@@ -37,7 +37,7 @@ public class BattleManager : MonoBehaviour
 
     public PlayerController player;
     public EnemyController enemy;
-    //æ—¶é—´è½´ç›¸å…³
+    //Ê±¼äÖáÏà¹Ø
     public GameObject timeLineIconPrefab;
     public RectTransform actionBarPanel;
 
@@ -49,25 +49,25 @@ public class BattleManager : MonoBehaviour
     
     public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
 
-    private int tick = 0;//æ—¶é—´åˆ»åº¦
+    private int tick = 0;//Ê±¼ä¿Ì¶È
 
     private bool _reorderRequested;
     private readonly List<BaseController> _lastPublishedOrdered = new();
-    //å½“å‰è¡ŒåŠ¨è€…
+    //µ±Ç°ĞĞ¶¯Õß
     private BaseController _currentActor;
-    //å½“å‰ç›®æ ‡
+    //µ±Ç°Ä¿±ê
     private  BaseController  _currentTarget;
-    //å½“å‰æµè§ˆç›®æ ‡
+    //µ±Ç°ä¯ÀÀÄ¿±ê
     private BaseController _previewTarget;
-    //å½“å‰ç›®æ ‡ç±»å‹
+    //µ±Ç°Ä¿±êÀàĞÍ
     private SkillTargetType _currentTargetType;
 
     
     private bool actionChosen = false;
-    //æ—¶é—´è½´ç›¸å…³
-    [SerializeField] private RectTransform actionbarPanel;// åŸæ¥çš„layout root
-    [SerializeField] private RectTransform iconVisualRoot;//æ–°å¢ï¼šiconæ˜¾ç¤ºå±‚
-    [SerializeField] private GameObject slotPrefab;//æ–°å¢ï¼šsloté¢„åˆ¶ä½“
+    //Ê±¼äÖáÏà¹Ø
+    [SerializeField] private RectTransform actionbarPanel;// Ô­À´µÄlayout root
+    [SerializeField] private RectTransform iconVisualRoot;//ĞÂÔö£ºiconÏÔÊ¾²ã
+    [SerializeField] private GameObject slotPrefab;//ĞÂÔö£ºslotÔ¤ÖÆÌå
    
 
     [SerializeField] private VerticalLayoutGroup actionBarLayout;
@@ -76,31 +76,31 @@ public class BattleManager : MonoBehaviour
     private readonly List<RectTransform>_slots=new List<RectTransform>();
 
     [SerializeField] private BattleFormation formation;
-    //ç‚¹å‡»æ£€æµ‹ç›¸å…³   
+    //µã»÷¼ì²âÏà¹Ø   
     [SerializeField] private BattleTargetSelector targetSelector;
-    //ç”Ÿæˆç›¸å…³
+    //Éú³ÉÏà¹Ø
     [SerializeField] private BattleSpawner spawner;
-    //é€‰ä¸­æ¨¡å—ç›¸å…³
+    //Ñ¡ÖĞÄ£¿éÏà¹Ø
     [SerializeField] private TargetCircle targetCirclePrefab;
     [SerializeField] private Canvas worldSpaceCanvs;
-    //æˆ˜æ–—æŒ‡ä»¤æ¨¡å—ç›¸å…³
+    //Õ½¶·Ö¸ÁîÄ£¿éÏà¹Ø
     [SerializeField] private BattleCommandPanel commandPanel;
     [SerializeField] private SkillPanelController skillPanel;
-    //å¼¹å‡ºæŠ€èƒ½åå­—ç›¸å…³
+    //µ¯³ö¼¼ÄÜÃû×ÖÏà¹Ø
     [SerializeField] private SkillNamePopController skillNamePopUp;
-    //é“å…·ç›¸å…³
+    //µÀ¾ßÏà¹Ø
     [SerializeField] private ItemPanelController itemPanel;
     [SerializeField] private List<ItemData> startingItems=new List<ItemData>();
     [SerializeField] private List<int> startItemCounts = new List<int>();
 
 
-    //ç»éªŒç›¸å…³
+    //¾­ÑéÏà¹Ø
     [SerializeField] private LevelUpPopController levelUpPopup;
     private List<LevelUpResult> _lastLevelUpResults= new List<LevelUpResult>();
 
     public IReadOnlyList<LevelUpResult>LastLevelUpResults=> _lastLevelUpResults;
 
-    //æˆ˜æ–—é•œå¤´ç›¸å…³
+    //Õ½¶·¾µÍ·Ïà¹Ø
     [SerializeField] private BattleCameraDirector cameraDirector;
     [Header("Battle Presentation Timing")]
     [SerializeField] private float attackCameraLeadTime = 0.25f;
@@ -115,12 +115,12 @@ public class BattleManager : MonoBehaviour
 
     private TargetCircle _targetCircle;
 
-    private bool _timelineDirty = false;//éœ€è¦åˆ·æ–°æ—¶é—´è½´UI
+    private bool _timelineDirty = false;//ĞèÒªË¢ĞÂÊ±¼äÖáUI
 
     private bool _battleStartSequencePlayed=false;
 
     private bool _timelineInitialized = false;
-    private Tween _moveTween;//é˜²æ­¢é‡å…¥
+    private Tween _moveTween;//·ÀÖ¹ÖØÈë
 
     
 
@@ -168,12 +168,12 @@ public class BattleManager : MonoBehaviour
 
     void Update()
     {
-        if (battleEnded) return;//å¦‚æœæˆ˜æ–—ç»“æŸï¼Œè·³è¿‡æœ¬æ¬¡æ›´æ–°
-        if (isActing) return;//æ­£åœ¨è¡ŒåŠ¨ä¸­ï¼Œè·³è¿‡æœ¬æ¬¡æ›´æ–°
-        if (!isBattleReady) return;//æˆ˜æ–—æœªå‡†å¤‡å¥½ï¼Œè·³è¿‡æœ¬æ¬¡æ›´æ–°
+        if (battleEnded) return;//Èç¹ûÕ½¶·½áÊø£¬Ìø¹ı±¾´Î¸üĞÂ
+        if (isActing) return;//ÕıÔÚĞĞ¶¯ÖĞ£¬Ìø¹ı±¾´Î¸üĞÂ
+        if (!isBattleReady) return;//Õ½¶·Î´×¼±¸ºÃ£¬Ìø¹ı±¾´Î¸üĞÂ
 
         tick++;
-        //æ¯éš”10ä¸ªæ—¶é—´åˆ»åº¦ï¼Œæ‰€æœ‰è§’è‰²å¢åŠ è¡ŒåŠ¨å€¼
+        //Ã¿¸ô10¸öÊ±¼ä¿Ì¶È£¬ËùÓĞ½ÇÉ«Ôö¼ÓĞĞ¶¯Öµ
         if (tick % 10 == 0)
         {
             updateActionValues();
@@ -185,13 +185,13 @@ public class BattleManager : MonoBehaviour
         if (!_reorderRequested) return;
         _reorderRequested = false;
 
-        //ç»Ÿä¸€è®¡ç®—æœ¬å¸§æœ€ç»ˆé¡ºåº
+        //Í³Ò»¼ÆËã±¾Ö¡×îÖÕË³Ğò
         var ordered = controllers
             .Where(c => c != null && !c.isDead && c.data != null && !c.data.isDead)
             .OrderBy(c => c.data.ActionValue)
             .ToList();
 
-        //é¡ºåºå®Œå…¨æ²¡å˜ï¼šä¸å‘å¸ƒï¼Œä¸åšé‡æ’/åŠ¨ç”»ï¼ˆè§£å†³æ¯ä¸ªå›åˆå¡ä¸€ä¸‹ï¼‰
+        //Ë³ĞòÍêÈ«Ã»±ä£º²»·¢²¼£¬²»×öÖØÅÅ/¶¯»­£¨½â¾öÃ¿¸ö»ØºÏ¿¨Ò»ÏÂ£©
         if (isSameOrder(ordered, _lastPublishedOrdered))
             return;
 
@@ -203,7 +203,7 @@ public class BattleManager : MonoBehaviour
     private void EnsureSlotCount(int requiredCount)
     {
         if (actionbarPanel == null || slotPrefab == null) return;
-        //ä¸å¤Ÿå°±è¡¥slotï¼Œå¤Ÿäº†å°±æ˜¾ç¤º/éšè—
+        //²»¹»¾Í²¹slot£¬¹»ÁË¾ÍÏÔÊ¾/Òş²Ø
         while (_slots.Count < requiredCount)
         {
             var go = Instantiate(slotPrefab, actionbarPanel);
@@ -217,16 +217,16 @@ public class BattleManager : MonoBehaviour
             if (_slots[i] != null && _slots[i].gameObject.activeSelf!=shouldShow)
                 _slots[i].gameObject.SetActive(shouldShow);
         }
-        //å¼ºåˆ¶åˆ·æ–°å¸ƒå±€
+        //Ç¿ÖÆË¢ĞÂ²¼¾Ö
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(actionbarPanel);
     }
     public void RegisterCharacter(BaseController character)
     {
 
-        //æ²¡ä¸Šåœºçš„ä¸æ³¨å†Œ
+        //Ã»ÉÏ³¡µÄ²»×¢²á
         if (character == null || character.data == null) return;
-        //é‡å¤è°ƒç”¨guard å»é‡guard
+        //ÖØ¸´µ÷ÓÃguard È¥ÖØguard
         if (controllers.Contains(character))
         {          
             return;
@@ -259,12 +259,12 @@ public class BattleManager : MonoBehaviour
 
         timeLineIcons.Add(character, icon);
 
-        //character.data.ActionValue = character.data.MaxActionValue; //åˆå§‹è¡ŒåŠ¨å€¼è®¾ä¸ºæœ€å¤§å€¼
+        //character.data.ActionValue = character.data.MaxActionValue; //³õÊ¼ĞĞ¶¯ÖµÉèÎª×î´óÖµ
         FindObjectOfType<TimeLineUI>()?.BuildCache();
 
         character.OnRevied += HandleCharacterRevived;
-        _timelineDirty= true;//æ³¨å†Œè§’è‰²åéœ€è¦åˆ·æ–°æ—¶é—´è½´
-        //RequestReorder();//æœ€åä¸€å¸§æä¸€ä¸‹
+        _timelineDirty= true;//×¢²á½ÇÉ«ºóĞèÒªË¢ĞÂÊ±¼äÖá
+        //RequestReorder();//×îºóÒ»Ö¡¸ãÒ»ÏÂ
     }
 
     void InitializeBattle()
@@ -272,13 +272,13 @@ public class BattleManager : MonoBehaviour
         if (isBattleReady) return;
         foreach (var character in controllers)
         {
-            character.data.ActionValue = character.data.MaxActionValue; //åˆå§‹è¡ŒåŠ¨å€¼è®¾ä¸ºæœ€å¤§å€¼
+            character.data.ActionValue = character.data.MaxActionValue; //³õÊ¼ĞĞ¶¯ÖµÉèÎª×î´óÖµ
         }
 
         PlaceAllExistingControllersIntoFormation();
 
         isBattleReady = true;
-        //å¼€å±€å°±åˆ·æ–°ä¸€æ¬¡ UI æ’åˆ—
+        //¿ª¾Ö¾ÍË¢ĞÂÒ»´Î UI ÅÅÁĞ
         RequestReorder();
        // InitItemInventory();
         _lastLevelUpResults.Clear();
@@ -293,7 +293,7 @@ public class BattleManager : MonoBehaviour
     private IEnumerator BattleStartSequenceRountine()
     {
        
-        //ç­‰ä¸€å¸§ï¼Œç­‰æ‰€æœ‰éƒ½å‡†å¤‡å¥½
+        //µÈÒ»Ö¡£¬µÈËùÓĞ¶¼×¼±¸ºÃ
         yield return null;
         BaseController firstPlayer= controllers.FirstOrDefault(c => c != null && c.data != null && c.data.Team == Team.Player);
 
@@ -305,7 +305,7 @@ public class BattleManager : MonoBehaviour
         }
         _battleStartSequencePlayed = true;
     }
-    //æ¯æ¬¡ç®—å‡ºorderedï¼Œéƒ½ç»Ÿä¸€èµ°ä¸€ä¸ªå‡½æ•°
+    //Ã¿´ÎËã³öordered£¬¶¼Í³Ò»×ßÒ»¸öº¯Êı
     private void PublishOrdered(List<BaseController> ordered)
     {
         UpdateTimeLineUI(ordered);
@@ -313,41 +313,41 @@ public class BattleManager : MonoBehaviour
     }
     void updateActionValues()
     {
-        controllers.RemoveAll(c => c == null); //ç§»é™¤å·²é”€æ¯çš„è§’è‰²//æ¸…æ‰Destroyåç•™ä¸‹çš„ç©ºä½ï¼Œé˜²æ­¢ç©ºå¼•ç”¨
+        controllers.RemoveAll(c => c == null); //ÒÆ³ıÒÑÏú»ÙµÄ½ÇÉ«//ÇåµôDestroyºóÁôÏÂµÄ¿ÕÎ»£¬·ÀÖ¹¿ÕÒıÓÃ
         if (isActing) return;
-        //å‡å°‘è¡ŒåŠ¨å€¼ï¼Œå½“è¡ŒåŠ¨å€¼åˆ°è¾¾0æˆ–è¿™è€…ä½äº0æ—¶ï¼Œè§¦å‘è¡ŒåŠ¨
+        //¼õÉÙĞĞ¶¯Öµ£¬µ±ĞĞ¶¯Öµµ½´ï0»òÕâÕßµÍÓÚ0Ê±£¬´¥·¢ĞĞ¶¯
         foreach (var c in controllers)
         {
             if (c == null || c.data == null) continue;
-            if (c.isDead) continue; //æ­»äº¡è§’è‰²ä¸è¡ŒåŠ¨
+            if (c.isDead) continue; //ËÀÍö½ÇÉ«²»ĞĞ¶¯
             if (!c.data.isOnField) continue;
-            //é€Ÿåº¦è¶Šå¿«ï¼Œè¡ŒåŠ¨å€¼å‡å°‘è¶Šå¿«
+            //ËÙ¶ÈÔ½¿ì£¬ĞĞ¶¯Öµ¼õÉÙÔ½¿ì
             c.data.ActionValue -= c.data.Speed / 0.75f;           
         }
 
-        //æ‰¾å‡ºè¡ŒåŠ¨å€¼æœ€å°çš„è§’è‰²(è°æœ€æ¥è¿‘0)
+        //ÕÒ³öĞĞ¶¯Öµ×îĞ¡µÄ½ÇÉ«(Ë­×î½Ó½ü0)
         var ordered = controllers
             .Where(c => !c.isDead&&c.data!=null&&c!=null&&c.data.isOnField)
             .OrderBy(c => c.data.ActionValue)
             .ToList();
        // Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
        
-        //æ›´æ–°ui
+        //¸üĞÂui
         var nextActor= ordered.FirstOrDefault();
         if(nextActor != null && nextActor.data.ActionValue <= 0 && !isActing)
         {
-            //å…ˆç¡®å®šå½“å‰è¡ŒåŠ¨è€…ï¼ˆè®©uiæœ‰äº‹å®æºï¼‰
+            //ÏÈÈ·¶¨µ±Ç°ĞĞ¶¯Õß£¨ÈÃuiÓĞÊÂÊµÔ´£©
             SetCurrentActor(nextActor);
 
-            //ç”¨å½“å‰ordered æ¨ä¸€æ¬¡nextActor ä¹‹åçš„é¡ºåºï¼Œé€šçŸ¥uiåˆ·æ–°
-            //ç»Ÿä¸€å‘å¸ƒä¸€æ¬¡ï¼ˆä½ç½®å’Œnextéƒ½æ›´æ–°ï¼‰
-              RequestReorder();//åªè¯·æ±‚åˆ·æ–°ä¸€æ¬¡
+            //ÓÃµ±Ç°ordered ÍÆÒ»´ÎnextActor Ö®ºóµÄË³Ğò£¬Í¨ÖªuiË¢ĞÂ
+            //Í³Ò»·¢²¼Ò»´Î£¨Î»ÖÃºÍnext¶¼¸üĞÂ£©
+              RequestReorder();//Ö»ÇëÇóË¢ĞÂÒ»´Î
 
             StartCoroutine(PerformTrun(nextActor));
         }
         else
         {
-            //æ›´æ–°ui//æ™®é€š æ’åºæ›´æ–°//å¹³æ—¶ä¹Ÿç»Ÿä¸€å‘å¸ƒ
+            //¸üĞÂui//ÆÕÍ¨ ÅÅĞò¸üĞÂ//Æ½Ê±Ò²Í³Ò»·¢²¼
            RequestReorder();
         }
     }
@@ -355,16 +355,16 @@ public class BattleManager : MonoBehaviour
     {
         //SetCurrentActor(actor);
 
-        //æˆ˜æ–—ç»“æŸç»ˆæ­¢è¡ŒåŠ¨
+        //Õ½¶·½áÊøÖÕÖ¹ĞĞ¶¯
         if (battleEnded)
             yield break;
 
         isActing = true;
         actor.data.isActing = true;
-        Debug.Log($"{actor.data.Name}å¼€å§‹è¡ŒåŠ¨ï¼");
+        Debug.Log($"{actor.data.Name}¿ªÊ¼ĞĞ¶¯£¡");
         
-        //æ¨¡æ‹Ÿæ‰§è¡ŒåŠ¨ä½œ
-        yield return new WaitForSeconds(1.5f); //ç­‰å¾…1ç§’ï¼Œæ¨¡æ‹Ÿè¡ŒåŠ¨æ—¶é—´
+        //Ä£ÄâÖ´ĞĞ¶¯×÷
+        yield return new WaitForSeconds(1.5f); //µÈ´ı1Ãë£¬Ä£ÄâĞĞ¶¯Ê±¼ä
         if (actor == null || actor.data == null || actor.data.isDead)
         {
             isActing = false;
@@ -375,8 +375,8 @@ public class BattleManager : MonoBehaviour
         //
         if (actor.data.Team==Team.Player)
         {
-            //ç­‰å¾…ç©å®¶è¾“å…¥
-            Debug.Log("ç­‰å¾…ç©å®¶è¾“å…¥æŒ‡ä»¤...");
+            //µÈ´ıÍæ¼ÒÊäÈë
+            Debug.Log("µÈ´ıÍæ¼ÒÊäÈëÖ¸Áî...");
             yield return StartCoroutine(WaitForPlayerAction(actor));
             if (actor == null || actor.data == null || actor.data.isDead)
             {
@@ -388,7 +388,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            //æ•Œäººè‡ªåŠ¨è¡ŒåŠ¨            
+            //µĞÈË×Ô¶¯ĞĞ¶¯            
             yield return StartCoroutine(WaitForEnemyAction(actor));
             if (actor == null || actor.data == null || actor.data.isDead)
             {
@@ -397,7 +397,7 @@ public class BattleManager : MonoBehaviour
                     actor.data.isActing = false;
             }
         }
-        //è¡ŒåŠ¨å®Œæˆåæ¢å¤è¡ŒåŠ¨å€¼      
+        //ĞĞ¶¯Íê³Éºó»Ö¸´ĞĞ¶¯Öµ      
         if (!battleEnded)
         {
             actor.data.ActionValue = actor.data.MaxActionValue;
@@ -412,7 +412,7 @@ public class BattleManager : MonoBehaviour
         actor.data.isActing = false;
         isActing = false;
         
-        Debug.Log($"{actor.data.Name}ç»“æŸè¡ŒåŠ¨ï¼");
+        Debug.Log($"{actor.data.Name}½áÊøĞĞ¶¯£¡");
     }
     IEnumerator WaitForPlayerAction(BaseController actor)
     {
@@ -420,8 +420,8 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log("press the space key attack the enemy");
         _currentCommand = CommandType.None;
-        //å›åˆå¼€å§‹å…ˆè‡ªåŠ¨é€‰ä¸€ä¸ªç›®æ ‡ï¼ˆå¦‚æœå½“å‰ç›®æ ‡æ— æ•ˆçš„è¯ï¼‰
-        //è¿›å…¥ç©å®¶å†³ç­–çŠ¶æ€æ—¶ï¼Œåˆ·æ–°åˆ°é»˜è®¤å¯¹å³™é•œå¤´
+        //»ØºÏ¿ªÊ¼ÏÈ×Ô¶¯Ñ¡Ò»¸öÄ¿±ê£¨Èç¹ûµ±Ç°Ä¿±êÎŞĞ§µÄ»°£©
+        //½øÈëÍæ¼Ò¾ö²ß×´Ì¬Ê±£¬Ë¢ĞÂµ½Ä¬ÈÏ¶ÔÖÅ¾µÍ·
         targetSelector.AutoPickTargetIfNeeded(actor);
         if(_currentTarget!=null&&_battleStartSequencePlayed==true)
             cameraDirector?.FocusBattlePreviewShot(actor, _currentTarget);
@@ -433,7 +433,7 @@ public class BattleManager : MonoBehaviour
         while (!actionChosen)
         {
 
-            //debug ç»éªŒç³»ç»Ÿç”¨
+            //debug ¾­ÑéÏµÍ³ÓÃ
             if (Input.GetKeyDown(KeyCode.T))
             {
                 actor.data.GainExp(120);
@@ -444,25 +444,25 @@ public class BattleManager : MonoBehaviour
                 yield break;
             }
                 
-            //skillPanel è¿”å›commandPanel
+            //skillPanel ·µ»ØcommandPanel
             HandleSkillCancel();
-            //itemPanel è¿”å›commandPanel
+            //itemPanel ·µ»ØcommandPanel
             HandleItemCancel();
-            //é€‰ä¸­è¿”å›
+            //Ñ¡ÖĞ·µ»Ø
             HandleCancelInput();
 
-            //è¿˜æ²¡é€‰æŒ‡ä»¤æ—¶ï¼Œåªç­‰èœå•æŒ‰é’®
+            //»¹Ã»Ñ¡Ö¸ÁîÊ±£¬Ö»µÈ²Ëµ¥°´Å¥
             if (_currentCommand == CommandType.None)
             {
                 yield return null;
                 continue;
             }
-            //é€‰äº†attack ä¹‹åï¼Œæ‰å…è®¸ç›®æ ‡åˆ‡æ¢å’Œç¡®è®¤
+            //Ñ¡ÁËattack Ö®ºó£¬²ÅÔÊĞíÄ¿±êÇĞ»»ºÍÈ·ÈÏ
             if (_currentCommand == CommandType.Attack)
             {
                 
                 targetSelector.HandleTargetSelectionInput(actor,_currentTargetType);
-                // æŒ‰ç©ºæ ¼æ”»å‡»
+                // °´¿Õ¸ñ¹¥»÷
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     var target = _currentTarget;
@@ -531,7 +531,7 @@ public class BattleManager : MonoBehaviour
     }
     IEnumerator WaitForEnemyAction(BaseController actor)
     {
-        yield return new WaitForSeconds(0.5f);//åœé¡¿ä¸€ä¸‹
+        yield return new WaitForSeconds(0.5f);//Í£¶ÙÒ»ÏÂ
 
         var skill=ChooseEnemySkill(actor);
         /*if (skill == null)
@@ -554,17 +554,17 @@ public class BattleManager : MonoBehaviour
         if (actor == null || target == null)
             yield break;
 
-        //æ‘„åƒå¤´é”å®š
+        //ÉãÏñÍ·Ëø¶¨
         cameraDirector?.LockCamera();
 
         yield return new WaitForSeconds(attackCameraLeadTime);
 
         ShowSkillName("Attack");
-        //é€ æˆä¼¤å®³
+        //Ôì³ÉÉËº¦
         target.TakeDamage(actor.data.Attack);
 
         CheckBattleEnd(actor, target);
-        //ç»™é•œå¤´ä¸€ç‚¹æ—¶é—´çœ‹ä¼¤å®³ç»“æœ
+        //¸ø¾µÍ·Ò»µãÊ±¼ä¿´ÉËº¦½á¹û
         yield return new WaitForSeconds(attackImpactHoldTime);
 
         cameraDirector?.UnlockCamera();
@@ -574,20 +574,20 @@ public class BattleManager : MonoBehaviour
     {
         if(actor==null||target==null||_selectedSkill==null)
             yield break;
-        //æ‘„åƒå¤´é”å®š
+        //ÉãÏñÍ·Ëø¶¨
         cameraDirector?.LockCamera();
 
-        //æ ¹æ®ç¡®è®¤æ—¶çš„targettype å†³å®šé•œå¤´
+        //¸ù¾İÈ·ÈÏÊ±µÄtargettype ¾ö¶¨¾µÍ·
         /*  if(_selectedSkill.targetType == SkillTargetType.Self||target==actor)
               cameraDirector?.FocusActorTurnShot(actor);
           else
               cameraDirector?.FocusTargetHitShot(target);*/
         PlaySkillCamera(actor, target, skill, targetType);
 
-        //ç»™é•œå¤´ä¸€ç‚¹æ—¶é—´
+        //¸ø¾µÍ·Ò»µãÊ±¼ä
         yield return new WaitForSeconds(skillCameraLeadTime);
 
-        //yield return new WaitForSeconds(0.5f); //å‡è£…åŠ¨ç”»æ—¶é—´æ˜¯0.5ç§’
+        //yield return new WaitForSeconds(0.5f); //¼Ù×°¶¯»­Ê±¼äÊÇ0.5Ãë
 
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
@@ -610,7 +610,7 @@ public class BattleManager : MonoBehaviour
         {
             cameraDirector?.FocusEnemyGroup();
         }
-        //è‡ªèº«æŠ€èƒ½çœ‹è‡ªå·±
+        //×ÔÉí¼¼ÄÜ¿´×Ô¼º
         else if (isSelfSkill)
         {
             cameraDirector?.FocusActorTurnShot(actor);
@@ -620,7 +620,7 @@ public class BattleManager : MonoBehaviour
             cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
         }
 
-        //ç»™é•œå¤´ä¸€ç‚¹æ—¶é—´
+        //¸ø¾µÍ·Ò»µãÊ±¼ä
         yield return new WaitForSeconds(skillCameraLeadTime);
 
         yield return new WaitForSeconds(0.5f);
@@ -628,7 +628,7 @@ public class BattleManager : MonoBehaviour
         actor.UseSkill(skill, target);
         CheckBattleEnd(actor, target);
 
-        //ç»™é•œå¤´ä¸€ç‚¹æ—¶é—´çœ‹ç»“æœ
+        //¸ø¾µÍ·Ò»µãÊ±¼ä¿´½á¹û
         yield return new WaitForSeconds(skilllimpactHoldTime);
         cameraDirector?.UnlockCamera();
     }
@@ -644,7 +644,7 @@ public class BattleManager : MonoBehaviour
                 break;
 
             case SkillTargetType.EnemySingle:
-                //å•ä½“æ•Œæ–¹æŠ€èƒ½ï¼Œæ²¿ç”¨æµè§ˆ/äº¤æˆ˜é•œå¤´è§„åˆ™
+                //µ¥ÌåµĞ·½¼¼ÄÜ£¬ÑØÓÃä¯ÀÀ/½»Õ½¾µÍ·¹æÔò
                 if (target != null)
                     cameraDirector?.FocusPlayerSideTargetPreviewShot(actor, target);
                 break;
@@ -684,7 +684,7 @@ public class BattleManager : MonoBehaviour
         int index = UnityEngine.Random.Range(0, damageSkills.Count);      
         return damageSkills[index];
     }
-    //å•ä¸ª
+    //µ¥¸ö
     private SkillData FindSkillByType(IReadOnlyList<SkillData> skills,SkillType type)
     {
         if (skills == null) return null;
@@ -720,7 +720,7 @@ public class BattleManager : MonoBehaviour
         switch (skill.targetType)
         {
             case SkillTargetType.EnemySingle:
-                //æ•Œäººçš„æ•Œäºº=ç©å®¶ è¿™é‡Œä½¿ç”¨çš„å‡½æ•°å…¶å®æ˜¯é€šç”¨å‡½æ•°
+                //µĞÈËµÄµĞÈË=Íæ¼Ò ÕâÀïÊ¹ÓÃµÄº¯ÊıÆäÊµÊÇÍ¨ÓÃº¯Êı
                 return GetRandomEnemyTarget(actor);
             case SkillTargetType.AllySingle:
                 if (skill.skillType == SkillType.Heal)
@@ -739,7 +739,7 @@ public class BattleManager : MonoBehaviour
             return null;
 
         BaseController best = null;
-        float lowestHpRatio=float.MaxValue;//å…ˆè®¾ç½®ä¸€ä¸ªæå¤§çš„æ•°ï¼Œå½“ä½œå½“å‰æœ€ä½è¡€é‡æ¯”ä¾‹
+        float lowestHpRatio=float.MaxValue;//ÏÈÉèÖÃÒ»¸ö¼«´óµÄÊı£¬µ±×÷µ±Ç°×îµÍÑªÁ¿±ÈÀı
 
         foreach(var unit in controllers)
         {
@@ -749,12 +749,12 @@ public class BattleManager : MonoBehaviour
             if (!unit.data.isOnField) continue;
             if (unit.data.Hp >= unit.data.MaxHp) continue;
 
-            //å½“å‰è¿™ä¸ªå•ä½çš„è¡€é‡ç™¾åˆ†æ¯”
+            //µ±Ç°Õâ¸öµ¥Î»µÄÑªÁ¿°Ù·Ö±È
             float hpRatio=(float)unit.data.Hp/unit.data.MaxHp;
 
             if (hpRatio < lowestHpRatio)
             {
-                //å¯¹æ¯”
+                //¶Ô±È
                 lowestHpRatio = hpRatio;
                 best = unit;
             }
@@ -768,15 +768,15 @@ public class BattleManager : MonoBehaviour
             return result;
         foreach (var unit in )
     }*/
-    //æ£€æµ‹æˆ˜æ–—æ˜¯å¦ç»“æŸï¼ˆä»»ä½•ä¸€æ–¹å…¨ç­ï¼‰
+    //¼ì²âÕ½¶·ÊÇ·ñ½áÊø£¨ÈÎºÎÒ»·½È«Ãğ£©
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
         if (battleEnded) return;
         if (target == null || target.data == null) return;
         if (target.data.Hp > 0) return;
         _lastLevelUpResults.Clear();
-        //ä¸è¦ç«‹åˆ»battle Ended=true
-        //åˆ¤æ–­æ˜¯å¦è¿˜æœ‰ä»»ä½•å­˜åœ¨çš„å•ä½
+        //²»ÒªÁ¢¿Ìbattle Ended=true
+        //ÅĞ¶ÏÊÇ·ñ»¹ÓĞÈÎºÎ´æÔÚµÄµ¥Î»
         bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Enemy);
         bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Player);
 
@@ -786,63 +786,44 @@ public class BattleManager : MonoBehaviour
            HandleBattleEnd(result);          
         }
     }
-    //æˆ˜æ–—ç»“æŸåçš„å¤„ç†
+    //Õ½¶·½áÊøºóµÄ´¦Àí
     private void HandleBattleEnd(BattleResult result)
     {
         if (battleEnded) return;
 
          battleEnded = true;
-        //å¼ºåˆ¶å…³é—­è¾“å…¥
+        //Ç¿ÖÆ¹Ø±ÕÊäÈë
         OnInputStateChanged?.Invoke(false);
-        //æ¸…ç©ºä¸Šä¸€æ¬¡å‡çº§ç»“æœ
+        //Çå¿ÕÉÏÒ»´ÎÉı¼¶½á¹û
         _lastLevelUpResults.Clear();
-        //èƒœåˆ©æ—¶å‘ç»éªŒ
+        // Win rewards are handled by EncounterRewardService now.
+        // BattleManager still stores level-up results so the existing result UI can keep reading LastLevelUpResults.
         if (result == BattleResult.Win)
         {
             FieldBattleContext.MarkTriggerdEnemyCleared();
+            const int fallbackRewardExp = 120;
+            EncounterRewardResult rewardResult = EncounterRewardService.GrantRewards(
+                spawner != null ? spawner.CurrentEncounterData : null,
+                controllers,
+                fallbackRewardExp);
+            _lastLevelUpResults.AddRange(rewardResult.levelUpResults);
 
-            const int rewardExp = 120;
-            _lastLevelUpResults.AddRange(AwardPartyExp(rewardExp));
-
-            //èƒœåˆ©å: ç»éªŒï¼Œç­‰çº§ï¼Œhp/mpå›å†™çŠ¶æ€
+            //Ê¤Àûºó: ¾­Ñé£¬µÈ¼¶£¬hp/mp»ØĞ´×´Ì¬
             PartyRuntimeState.UpdateFromBattleController(controllers);
         }
        
-        //Lose ä¸å›å†™
-        //retry æ˜¯ç»§ç»­ä½¿ç”¨è¿›å…¥æˆ˜æ–—å‰çš„partyruntimestate
+        //Lose ²»»ØĞ´
+        //retry ÊÇ¼ÌĞøÊ¹ÓÃ½øÈëÕ½¶·Ç°µÄpartyruntimestate
 
-        //ç»“ç®—å¿«ç…§
+        //½áËã¿ìÕÕ
         var snapshots = BuildPartySnapShots();
         var payload = new BattleResultPayload(result, snapshots);
         Debug.Log($"[BattleManager] snapshots count={snapshots?.Count ?? -1}");
         if (snapshots != null && snapshots.Count > 0)
             Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");
-        //å¹¿æ’­æˆ˜æ–—ç»“æŸ
+        //¹ã²¥Õ½¶·½áÊø
         OnBattleEnded?.Invoke(payload);
     }
-    //ç»éªŒå€¼æ·»åŠ æ–¹æ³•
-    private List<LevelUpResult> AwardPartyExp(int amount)
-    {
-        var result=new List<LevelUpResult>();
-
-        foreach(var c in controllers)
-        {
-            if (c == null || c.data == null)
-                continue;
-            if (c.data.Team != Team.Player)
-                continue;
-            int beforeLevel = c.data.Level;
-
-            c.data.GainExp(amount);
-
-            int afterLevel = c.data.Level;
-
-            result.Add(new LevelUpResult(c.data.Name, beforeLevel, afterLevel));
-        }
-
-        return result;
-    }
-   
     private void UseItem(BaseController actor,ItemData item,BaseController target)
     {
         if(actor==null||item==null||target==null) return;
@@ -886,8 +867,8 @@ public class BattleManager : MonoBehaviour
 
             list.Add(new CharacterResultSnapshot
             {
-                //portrait=c.portrait,//åªæœ‰è¿™ä¸ªæ˜¯èµ°basecontroller æ‹¿æ•°æ®ã€‚ä¸‹é¢çš„éƒ½æ˜¯ä»characteræ‹¿çš„æ•°æ®
-                portrait= c.data.Portrait,//å› ä¸ºç°åœ¨è§’è‰²æ•°æ®é‡Œä¹Ÿæœ‰å¤´åƒäº†ï¼Œæ‰€ä»¥ç›´æ¥ä»æ•°æ®é‡Œæ‹¿
+                //portrait=c.portrait,//Ö»ÓĞÕâ¸öÊÇ×ßbasecontroller ÄÃÊı¾İ¡£ÏÂÃæµÄ¶¼ÊÇ´ÓcharacterÄÃµÄÊı¾İ
+                portrait= c.data.Portrait,//ÒòÎªÏÖÔÚ½ÇÉ«Êı¾İÀïÒ²ÓĞÍ·ÏñÁË£¬ËùÒÔÖ±½Ó´ÓÊı¾İÀïÄÃ
                 Name = c.data.Name,
                 hp = c.data.Hp,
                 maxhp = c.data.MaxHp,
@@ -901,11 +882,11 @@ public class BattleManager : MonoBehaviour
 
         return list;
     }
-    /*1. ä» controllers é‡Œæ‹¿å‡ºæ‰€æœ‰ç©å®¶ controller
-      2. éå† PartyRuntimeState.PartyMembers
-      3. æ¯ä¸ªé˜Ÿä¼æˆå‘˜éƒ½å» battle controllers é‡Œæ‰¾å¯¹åº” controller
-      4. æ‰¾åˆ°äº†å°±æŒ‰ PartyRuntimeState çš„é¡ºåºåŠ å…¥ ordered
-      5. æ²¡åŒ¹é…ä¸Šçš„ controller è¿½åŠ åˆ°æœ€å*/
+    /*1. ´Ó controllers ÀïÄÃ³öËùÓĞÍæ¼Ò controller
+      2. ±éÀú PartyRuntimeState.PartyMembers
+      3. Ã¿¸ö¶ÓÎé³ÉÔ±¶¼È¥ battle controllers ÀïÕÒ¶ÔÓ¦ controller
+      4. ÕÒµ½ÁË¾Í°´ PartyRuntimeState µÄË³Ğò¼ÓÈë ordered
+      5. Ã»Æ¥ÅäÉÏµÄ controller ×·¼Óµ½×îºó*/
     private List<BaseController> GetPlayerControllersInPartyOrder()
     {
         var playerControllers = controllers
@@ -969,7 +950,7 @@ public class BattleManager : MonoBehaviour
                 var c = ordered[i];
                 if (!timeLineIcons.TryGetValue(c, out var icon) || icon == null) continue;
                if(i>=_slots.Count||_slots[i]==null) continue;
-                //ç›´æ¥æŠŠicon å˜æˆslot çš„å­ç‰©ä½“ï¼Œè®©layoutGroup å¸®å¿™æ’å¥½ä½ç½®
+                //Ö±½Ó°Ñicon ±ä³Éslot µÄ×ÓÎïÌå£¬ÈÃlayoutGroup °ïÃ¦ÅÅºÃÎ»ÖÃ
 
                var rt=icon.GetComponent<RectTransform>();
                 if (rt == null) continue;
@@ -983,11 +964,11 @@ public class BattleManager : MonoBehaviour
             _timelineInitialized = true;
             return;
         }
-        //å¦‚æœä¸Šä¸€æ¬¡è¿˜åœ¨ç§»åŠ¨ï¼Œå…ˆæ€æ‰ï¼ˆé¿å…é‡å…¥ï¼‰
+        //Èç¹ûÉÏÒ»´Î»¹ÔÚÒÆ¶¯£¬ÏÈÉ±µô£¨±ÜÃâÖØÈë£©
         _moveTween?.Kill();
         _moveTween = null;
 
-    //åˆ›å»ºæ–°çš„åŠ¨ç”»åºåˆ—
+    //´´½¨ĞÂµÄ¶¯»­ĞòÁĞ
         var seq=DOTween.Sequence();
 
         for(int i = 0; i < ordered.Count; i++)
@@ -1015,7 +996,7 @@ public class BattleManager : MonoBehaviour
         Debug.Log($"[UpdateTimeLineUI] updateTimeLineUI called");
 
 
-        //0)ç¬¬ä¸€ä¸ªï¼Œåªè®©layout æŠŠä½ç½®æ‘†æ­£ï¼Œé˜²æ­¢åˆæ¬¡ä¹±é£
+        //0)µÚÒ»¸ö£¬Ö»ÈÃlayout °ÑÎ»ÖÃ°ÚÕı£¬·ÀÖ¹³õ´ÎÂÒ·É
         if(!_timelineInitialized)
         {
             for (int i = 0; i < ordered.Count; i++)
@@ -1030,11 +1011,11 @@ public class BattleManager : MonoBehaviour
             _timelineInitialized = true;
             return;
         }
-        //å¦‚æœä¸Šä¸€æ¬¡è¿˜åœ¨ç§»åŠ¨ï¼Œå…ˆæ€æ‰ï¼ˆé¿å…é‡å…¥ï¼‰
+        //Èç¹ûÉÏÒ»´Î»¹ÔÚÒÆ¶¯£¬ÏÈÉ±µô£¨±ÜÃâÖØÈë£©
         _moveTween?.Kill();
         _moveTween = null;
 
-        //1ï¼‰è®°å½•æ—§ä½ç½®(æ’åºå‰)
+        //1£©¼ÇÂ¼¾ÉÎ»ÖÃ(ÅÅĞòÇ°)
         var oldPositions = new Dictionary<RectTransform, Vector2>(timeLineIcons.Count);
 
         foreach (var kv in timeLineIcons)
@@ -1045,23 +1026,23 @@ public class BattleManager : MonoBehaviour
             if (rt != null)
                 oldPositions[rt] = rt.anchoredPosition;
         }
-        //2)é‡æ–°æ’åºï¼ˆlayout é‡æ–°è®¡ç®—ä½ç½®ï¼‰
+        //2)ÖØĞÂÅÅĞò£¨layout ÖØĞÂ¼ÆËãÎ»ÖÃ£©
         for (int i = 0; i < ordered.Count; i++)
         {
             var c = ordered[i];
             if (!timeLineIcons.TryGetValue(c, out var icon)||icon==null) continue;
 
-            //ç›´æ¥æŠŠprefab å˜æˆactionbarpanel çš„å­ç‰©ä½“
+            //Ö±½Ó°Ñprefab ±ä³Éactionbarpanel µÄ×ÓÎïÌå
             icon.transform.SetParent(actionBarPanel, false);
 
-            //æ”¹å…„å¼Ÿé¡ºåºã€‚è®©layoutGroup è‡ªåŠ¨é‡æ’
+            //¸ÄĞÖµÜË³Ğò¡£ÈÃlayoutGroup ×Ô¶¯ÖØÅÅ
             icon.transform.SetSiblingIndex(i);  
         }
-        //3)å¼ºåˆ¶åˆ·æ–°å¸ƒå±€-æ­¤æ—¶æ¯ä¸ªiconçš„anchoredPosition å·²ç»å˜æˆâ€œç›®æ ‡â€ä½ç½®äº†
+        //3)Ç¿ÖÆË¢ĞÂ²¼¾Ö-´ËÊ±Ã¿¸öiconµÄanchoredPosition ÒÑ¾­±ä³É¡°Ä¿±ê¡±Î»ÖÃÁË
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
 
-        //4ï¼‰ç¼“å­˜ç›®æ ‡ä½ç½®ï¼Œï¼ˆæ’åºåï¼Œè¢«æ‹‰å›å°±ä½ç½®ä»¥å‰ï¼‰
+        //4£©»º´æÄ¿±êÎ»ÖÃ£¬£¨ÅÅĞòºó£¬±»À­»Ø¾ÍÎ»ÖÃÒÔÇ°£©
         var targetPos = new Dictionary<RectTransform, Vector2>(oldPositions.Count);
         foreach(var kv in oldPositions)
         {
@@ -1070,17 +1051,17 @@ public class BattleManager : MonoBehaviour
             targetPos[rt] = rt.anchoredPosition;
         }
 
-        //5)Added! å…³æ‰layoutGroupï¼Œé¿å…tweenåŠ¨ç”»æ—¶ layoutGroupå¹²æ‰°ä½ç½®
+        //5)Added! ¹ØµôlayoutGroup£¬±ÜÃâtween¶¯»­Ê± layoutGroup¸ÉÈÅÎ»ÖÃ
         if(actionBarLayout !=null)actionBarLayout.enabled = false;
 
-        //6)æŠŠiconä½ç½®æ‹‰å›æ—§ä½ç½®ï¼ˆæ’åºåï¼Œå…ˆéƒ½æ‹‰å›åŸæ¥ä½ç½®ï¼‰
+        //6)°ÑiconÎ»ÖÃÀ­»Ø¾ÉÎ»ÖÃ£¨ÅÅĞòºó£¬ÏÈ¶¼À­»ØÔ­À´Î»ÖÃ£©
         foreach (var kv in oldPositions)
         { 
             if(kv.Key!=null)
                 kv.Key.anchoredPosition = kv.Value;
         }
 
-        //7)tween åˆ°æ–°ä½ç½®(ç”¨ä¸€ä¸ªsequenceç®¡ç†)
+        //7)tween µ½ĞÂÎ»ÖÃ(ÓÃÒ»¸ösequence¹ÜÀí)
         var seq=DOTween.Sequence();
         foreach (var kv in targetPos)
         {
@@ -1088,16 +1069,16 @@ public class BattleManager : MonoBehaviour
             var pos = kv.Value;
             if (rt == null) continue;
 
-            //é¿å…åŒä¸€ä¸ªrté‡å¤æŒ‚å¤šä¸ªç§»åŠ¨tween
-            rt.DOKill(false);//åªæ€æ‰rtçš„ä½ç§»tween
+            //±ÜÃâÍ¬Ò»¸örtÖØ¸´¹Ò¶à¸öÒÆ¶¯tween
+            rt.DOKill(false);//Ö»É±µôrtµÄÎ»ÒÆtween
 
             seq.Join(rt.DOAnchorPos(pos, timelineMoveTime).SetEase(Ease.OutCubic));
         }
-        //8ï¼‰ åŠ¨ç”»ç»“æŸåï¼Œé‡æ–°æ‰“å¼€layoutGroupï¼ˆå¦‚æœæœ‰çš„è¯ï¼‰ï¼Œè®©å¸ƒå±€æ¢å¤æ­£å¸¸
+        //8£© ¶¯»­½áÊøºó£¬ÖØĞÂ´ò¿ªlayoutGroup£¨Èç¹ûÓĞµÄ»°£©£¬ÈÃ²¼¾Ö»Ö¸´Õı³£
         seq.OnComplete(() =>
         {
             if (actionBarLayout != null) actionBarLayout.enabled = true;
-           //é‡æ–°è®©layoutå¯¹å…¶ä¸€æ¬¡
+           //ÖØĞÂÈÃlayout¶ÔÆäÒ»´Î
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(actionBarPanel);
         });
@@ -1117,20 +1098,20 @@ public class BattleManager : MonoBehaviour
         if (_currentTarget == dead)
             SetCurrentTarget(null);
 
-        //å…ˆæ ‡è®°ä¸ºæ­»äº¡&ç¦ç”¨ï¼Œé¿å…å‚ä¸å…¶ä»–é€»è¾‘
+        //ÏÈ±ê¼ÇÎªËÀÍö&½ûÓÃ£¬±ÜÃâ²ÎÓëÆäËûÂß¼­
         dead.data.isDead = true;
         dead.data.Hp = 0;
         dead.enabled = false;
 
-        //å¦‚æœå½“å‰è¡ŒåŠ¨è€…æ˜¯æ­»äº¡è§’è‰²ï¼Œæ¸…é™¤å½“å‰è¡ŒåŠ¨è€…
+        //Èç¹ûµ±Ç°ĞĞ¶¯ÕßÊÇËÀÍö½ÇÉ«£¬Çå³ıµ±Ç°ĞĞ¶¯Õß
         if (CurrentActor == dead)
             SetCurrentActor(null);
   
-        //ä»æ‰€æœ‰é€»è¾‘å…¥å£ä¸­ç§»é™¤ï¼ˆæœ€å…³é”®ï¼‰//æ—¶é—´è½´
+        //´ÓËùÓĞÂß¼­Èë¿ÚÖĞÒÆ³ı£¨×î¹Ø¼ü£©//Ê±¼äÖá
         controllers.Remove(dead);
 
-        //uiå’Œåˆ—è¡¨ç§»é™¤ï¼Œé¿å…åç»­tick/è¡ŒåŠ¨ä¸­è¢«è®¿é—®åˆ°
-        //uiå±‚.ç§»é™¤æ—¶é—´è½´å›¾æ ‡
+        //uiºÍÁĞ±íÒÆ³ı£¬±ÜÃâºóĞøtick/ĞĞ¶¯ÖĞ±»·ÃÎÊµ½
+        //ui²ã.ÒÆ³ıÊ±¼äÖáÍ¼±ê
         if (timeLineIcons.TryGetValue(dead, out var icon) && icon != null)
         {
             timeLineIcons.Remove(dead);
@@ -1140,27 +1121,27 @@ public class BattleManager : MonoBehaviour
         {
             timeLineIcons.Remove(dead);
         }
-        //ç«™ä½å±‚ï¼Œåªæœ‰æ•Œäººéœ€è¦é‡Šæ”¾ç«™ä½
+        //Õ¾Î»²ã£¬Ö»ÓĞµĞÈËĞèÒªÊÍ·ÅÕ¾Î»
         if (dead.data.Team == Team.Enemy)
         {
-            //ä»ç«™ä½ä¸­é‡Šæ”¾//åªæœ‰enmeyæ‰ä¼š
+            //´ÓÕ¾Î»ÖĞÊÍ·Å//Ö»ÓĞenmey²Å»á
             formation.Release(dead, out _);
             dead.data.isOnField = false;
         }
-            //åˆ·æ–°æ—¶é—´è½´(é¿å…ui è¿˜æ˜¾ç¤ºæ—§é¡ºåº)
-            // _timelineDirty = true;//éœ€è¦æ—¶é—´è½´æ›´æ–°
+            //Ë¢ĞÂÊ±¼äÖá(±ÜÃâui »¹ÏÔÊ¾¾ÉË³Ğò)
+            // _timelineDirty = true;//ĞèÒªÊ±¼äÖá¸üĞÂ
             RequestReorder();
 
 
-        //è¡¨ç°å±‚ï¼Œéšè—å¹¶æ‘§æ¯è§’è‰²æœ¬ä½“//æ•Œäººçš„æƒ…å†µä¸‹
+        //±íÏÖ²ã£¬Òş²Ø²¢´İ»Ù½ÇÉ«±¾Ìå//µĞÈËµÄÇé¿öÏÂ
         if (dead.data.Team == Team.Enemy)
         {
             if (dead.gameObject != null)
                 dead.gameObject.SetActive(false);
 
-            //ç­‰å¾…ä¸€å¸§çœŸæ­£é”€æ¯ï¼ˆé˜²åç¨‹ç¾å‰§ä¸­é€”çˆ†ç‚¸ï¼‰
+            //µÈ´ıÒ»Ö¡ÕæÕıÏú»Ù£¨·ÀĞ­³ÌÃÀ¾çÖĞÍ¾±¬Õ¨£©
             yield return null;
-            //æ•ŒäººçœŸæ­£é”€æ¯ï¼Œå¹¶ä¸”è¡¥ä½
+            //µĞÈËÕæÕıÏú»Ù£¬²¢ÇÒ²¹Î»
             if (dead.gameObject != null)
                 Destroy(dead.gameObject);
 
@@ -1168,13 +1149,13 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            //Player ä¸é”€æ¯
-            //TODO:è¿›å…¥å€’åœ°çŠ¶æ€ï¼Œï¼ˆæ¿’æ­»ï¼‰çŠ¶æ€æœº
+            //Player ²»Ïú»Ù
+            //TODO:½øÈëµ¹µØ×´Ì¬£¬£¨±ôËÀ£©×´Ì¬»ú
             Debug.Log($"[Player Down Message] {dead.data.Name} is Down!");
             yield break;
         }   
     }
-    //è®¾ç½®å½“å‰è¡ŒåŠ¨è€…ï¼Œå¹¶è§¦å‘äº‹ä»¶ ä¹Ÿæ˜¯å”¯ä¸€æ”¹å˜_currentActorçš„åœ°æ–¹
+    //ÉèÖÃµ±Ç°ĞĞ¶¯Õß£¬²¢´¥·¢ÊÂ¼ş Ò²ÊÇÎ¨Ò»¸Ä±ä_currentActorµÄµØ·½
     private void SetCurrentActor(BaseController next)
     {
         if (_currentActor == next) return;
@@ -1196,7 +1177,7 @@ public class BattleManager : MonoBehaviour
         OnInputStateChanged?.Invoke(playerTurn);
        // UpdataTargetIndicatorVisibility();
     }
-    //è®¾ç½®å½“å‰ç›®æ ‡ï¼Œå¹¶è§¦å‘äº‹ä»¶ ä¹Ÿæ˜¯å”¯ä¸€æ”¹å˜_currentTargetçš„åœ°æ–¹
+    //ÉèÖÃµ±Ç°Ä¿±ê£¬²¢´¥·¢ÊÂ¼ş Ò²ÊÇÎ¨Ò»¸Ä±ä_currentTargetµÄµØ·½
     public void SetCurrentTarget(BaseController target)
     {
         if (_currentTarget != null && _currentTarget != target)
@@ -1208,14 +1189,14 @@ public class BattleManager : MonoBehaviour
             _currentTarget.SetTargeted(true);
 
       /*  if (_currentTarget == target) return;
-        //TODO: è¿™é‡Œé‡æ–°é€‰å½“å‰çš„æ•Œäººä¼šå–æ¶ˆé€‰ä¸­ã€‚ç„¶åå¦‚æœè¿›è¡Œæ”»å‡»çš„è¯ã€‚ä¼¤å®³ä¸ä¼šåˆ¤å®šã€‚è¦ä¹ˆè¿›è¡Œé˜²å‘†å¤„ç†ï¼šå¿…é¡»é€‰ä¸­æ•Œäººæ‰èƒ½æ”»å‡»è¦ä¹ˆè¿›è¡Œåˆ«çš„å¤„ç†
+        //TODO: ÕâÀïÖØĞÂÑ¡µ±Ç°µÄµĞÈË»áÈ¡ÏûÑ¡ÖĞ¡£È»ºóÈç¹û½øĞĞ¹¥»÷µÄ»°¡£ÉËº¦²»»áÅĞ¶¨¡£ÒªÃ´½øĞĞ·À´ô´¦Àí£º±ØĞëÑ¡ÖĞµĞÈË²ÅÄÜ¹¥»÷ÒªÃ´½øĞĞ±ğµÄ´¦Àí
         if (_currentTarget != null) _currentTarget.SetTargeted(false);
         _currentTarget = target;
         if (_currentTarget != null) _currentTarget.SetTargeted(true);
         Debug.Log($"[SetCurrentTarget] now = {_currentTarget?.data.Name}");*/
         OnTargetChanged?.Invoke(_currentTarget);
 
-        //åˆ¤æ–­åœˆåœˆæ˜¯å¦åœ¨playerå›åˆ å¹¶ä¸”å‘é€å¹¿æ’­
+        //ÅĞ¶ÏÈ¦È¦ÊÇ·ñÔÚplayer»ØºÏ ²¢ÇÒ·¢ËÍ¹ã²¥
        // bool playerTurn = (_currentActor != null && _currentActor.data != null && _currentActor.data.Team == Team.Player && _currentCommand == CommandType.Attack || _currentCommand == CommandType.Skill);
         //OnInputStateChanged?.Invoke(playerTurn);
 
@@ -1283,13 +1264,13 @@ public class BattleManager : MonoBehaviour
     {
         if (ctrl == null) return;
 
-        if (controllers.Contains(ctrl)) return;//é˜²æ­¢é‡å¤æ³¨å†Œ
+        if (controllers.Contains(ctrl)) return;//·ÀÖ¹ÖØ¸´×¢²á
         //if (ctrl == null || ctrl.data == null) return;
-        //å·²ä¸Šåœº=å·²å ä½ ä¸è¦è°ƒæ•´formation
+        //ÒÑÉÏ³¡=ÒÑÕ¼Î» ²»Òªµ÷Õûformation
         if (!ctrl.data.isOnField)
         {
-            TryPlaceIntoFormation(ctrl);//ä»…ç”¨äºâ€œåœºæ™¯æ‰‹åŠ¨æ‘†æ”¾ä½†æœªå ä½çš„â€æ—§æµç¨‹
-            if (!ctrl.data.isOnField) return;//ä¸ä¸Šåœºå°±ä¸æ³¨å†Œ
+            TryPlaceIntoFormation(ctrl);//½öÓÃÓÚ¡°³¡¾°ÊÖ¶¯°Ú·Åµ«Î´Õ¼Î»µÄ¡±¾ÉÁ÷³Ì
+            if (!ctrl.data.isOnField) return;//²»ÉÏ³¡¾Í²»×¢²á
         }
         
         Debug.Log($"[Register]{ctrl.data.Name} OnFiled={ctrl.data.isOnField} stack={Environment.StackTrace}");
@@ -1318,18 +1299,18 @@ public class BattleManager : MonoBehaviour
 
         timeLineIcons.Remove(ctrl);
         
-        _timelineDirty = true;//æ³¨é”€è§’è‰²åéœ€è¦åˆ·æ–°æ—¶é—´è½´
+        _timelineDirty = true;//×¢Ïú½ÇÉ«ºóĞèÒªË¢ĞÂÊ±¼äÖá
 
       //  RequestReorder();
     }
-    //æœ€å°å æ§½å¹¶ä¸”å¯¹é½
+    //×îĞ¡Õ¼²Û²¢ÇÒ¶ÔÆë
     public bool TryPlaceIntoFormation(BaseController ctrl)
     {
         if (ctrl == null || ctrl.data == null || formation == null) return false;
 
-        if (ctrl.data.isOnField) return true;//å·²ä¸Šåœºå°±ä¸é‡å¤è°ƒæ•´formation
+        if (ctrl.data.isOnField) return true;//ÒÑÉÏ³¡¾Í²»ÖØ¸´µ÷Õûformation
 
-        var team = ctrl.data.Team;//æ ¹æ®é˜Ÿä¼æ‰¾å¯¹åº”æ§½ä½
+        var team = ctrl.data.Team;//¸ù¾İ¶ÓÎéÕÒ¶ÔÓ¦²ÛÎ»
         int slotIndex = formation.FindFirstEmpty(team);
         if (slotIndex < 0) return false;
 
@@ -1338,7 +1319,7 @@ public class BattleManager : MonoBehaviour
         ctrl.data.isOnField = true;
 
         var anchor = formation.GetAnchor(team, slotIndex);
-        ctrl.transform.position = anchor.position; //ç›´æ¥æ”¾åˆ°ç›®æ ‡ä½ç½®ï¼Œåç»­å¯ä»¥åŠ ä¸ªåŠ¨ç”»
+        ctrl.transform.position = anchor.position; //Ö±½Ó·Åµ½Ä¿±êÎ»ÖÃ£¬ºóĞø¿ÉÒÔ¼Ó¸ö¶¯»­
         return true;
     }
     public void PlaceAllExistingControllersIntoFormation()
@@ -1351,7 +1332,7 @@ public class BattleManager : MonoBehaviour
             if (c.data.isDead || c.isDead) continue;
 
             //if (c.data.isOnField) continue;
-            //ç›´æ¥å°è¯•å æ§½ï¼ˆä¸æˆåŠŸå°±ç®—äº†ï¼Œå…ˆå äº†å†è¯´ï¼Œåç»­å¯ä»¥åŠ ä¸ªæç¤ºæˆ–è€…è‡ªåŠ¨åˆ†é…ï¼‰åˆæˆ–è€…æ˜¯containsåˆ¤æ–­
+            //Ö±½Ó³¢ÊÔÕ¼²Û£¨²»³É¹¦¾ÍËãÁË£¬ÏÈÕ¼ÁËÔÙËµ£¬ºóĞø¿ÉÒÔ¼Ó¸öÌáÊ¾»òÕß×Ô¶¯·ÖÅä£©ÓÖ»òÕßÊÇcontainsÅĞ¶Ï
             TryPlaceIntoFormation(c);
         }
     } 
@@ -1387,7 +1368,7 @@ public class BattleManager : MonoBehaviour
         c.data.Team == team);
     }
   
-   //æˆ˜æ–—æŒ‡ä»¤èœå•ç›¸å…³
+   //Õ½¶·Ö¸Áî²Ëµ¥Ïà¹Ø
     private void HandleCommandSelected(CommandType cmd)
     {
         _currentCommand = cmd;
@@ -1409,8 +1390,8 @@ public class BattleManager : MonoBehaviour
                 commandPanel.Hide();
                 skillPanel.Show(_currentActor);
                 Debug.Log($"[SkillCommand]{_currentActor.name}");
-                //TODOï¼šæ”¹æˆæ‰“å¼€skillé¢æ¿
-                return;//ç­‰å¾…ç©å®¶é€‰æ‹©æŠ€èƒ½
+                //TODO£º¸Ä³É´ò¿ªskillÃæ°å
+                return;//µÈ´ıÍæ¼ÒÑ¡Ôñ¼¼ÄÜ
 
             case CommandType.Item:
                 Debug.Log("[Command] Item selected");
@@ -1488,9 +1469,9 @@ public class BattleManager : MonoBehaviour
 
        
 
-        //åªåœ¨skillpanel æ‰“å¼€çš„æ—¶å€™å¤„ç†
+        //Ö»ÔÚskillpanel ´ò¿ªµÄÊ±ºò´¦Àí
         if (!skillPanel.IsOpen) return;
-        //å³é”®æˆ–è€…escé”®
+        //ÓÒ¼ü»òÕßesc¼ü
         if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
             return;
 
@@ -1499,9 +1480,9 @@ public class BattleManager : MonoBehaviour
     private void HandleItemCancel()
     {
         if (itemPanel == null || commandPanel == null) return;
-        //åªåœ¨itempanel æ‰“å¼€çš„æ—¶å€™å¤„ç†
+        //Ö»ÔÚitempanel ´ò¿ªµÄÊ±ºò´¦Àí
         if (!itemPanel.IsOpen) return;
-        //å³é”®æˆ–escé”®
+        //ÓÒ¼ü»òesc¼ü
         if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
             return;
         CancelItemSelection();
@@ -1527,10 +1508,10 @@ public class BattleManager : MonoBehaviour
     {
         if (!Input.GetMouseButtonDown(1) && !Input.GetKeyDown(KeyCode.Escape))
             return;
-        //skill ç›®æ ‡é€‰æ‹©ä¸­->å›åˆ°skillpanel
+        //skill Ä¿±êÑ¡ÔñÖĞ->»Øµ½skillpanel
         if (_currentCommand == CommandType.Skill && _selectedSkill != null)
         {
-            //æµè§ˆé•œå¤´è¿”å›
+            //ä¯ÀÀ¾µÍ··µ»Ø
             _previewTarget = null;
             if (_currentActor != null)
                 ReturnToBattlePreviewCamera();
@@ -1542,10 +1523,10 @@ public class BattleManager : MonoBehaviour
             skillPanel.Show(_currentActor);
             return;
         }
-        //attack  ç›®æ ‡é€‰æ‹©ä¸­->è¿”å›commanPanel
+        //attack  Ä¿±êÑ¡ÔñÖĞ->·µ»ØcommanPanel
         if (_currentCommand == CommandType.Attack)
         {
-            //æµè§ˆé•œå¤´è¿”å›
+            //ä¯ÀÀ¾µÍ··µ»Ø
             _previewTarget = null;
             if (_currentActor != null)
                 ReturnToBattlePreviewCamera();
@@ -1558,7 +1539,7 @@ public class BattleManager : MonoBehaviour
         }
         if (_currentCommand == CommandType.Item)
         {
-            //æµè§ˆé•œå¤´è¿”å›
+            //ä¯ÀÀ¾µÍ··µ»Ø
             _previewTarget = null;
             if (_currentActor != null)
                 ReturnToBattlePreviewCamera();
@@ -1576,7 +1557,7 @@ public class BattleManager : MonoBehaviour
             return;
         BaseController previewTarget = _currentTarget;
 
-        //å¦‚æœå½“å‰ç›®æ ‡ä¸ºç©ºï¼Œæˆ–å½“å‰ç›®æ ‡æ˜¯æˆ‘æ–¹ï¼Œæ”¹æˆä¸€ä¸ªæ•Œäººå½“ä½œå¯¹å³™ç›®æ ‡
+        //Èç¹ûµ±Ç°Ä¿±êÎª¿Õ£¬»òµ±Ç°Ä¿±êÊÇÎÒ·½£¬¸Ä³ÉÒ»¸öµĞÈËµ±×÷¶ÔÖÅÄ¿±ê
         if (previewTarget == null ||
             previewTarget.data == null ||
             previewTarget.data.Team == _currentActor.data.Team)
@@ -1594,9 +1575,9 @@ public class BattleManager : MonoBehaviour
 
 
        if(!controllers.Contains(ctrl))
-        //é‡æ–°åŠ å…¥æ—¶é—´è½´
+        //ÖØĞÂ¼ÓÈëÊ±¼äÖá
         RegisterController(ctrl);
-       _timelineDirty = true;//è§’è‰²å¤æ´»åéœ€è¦åˆ·æ–°æ—¶é—´è½´
+       _timelineDirty = true;//½ÇÉ«¸´»îºóĞèÒªË¢ĞÂÊ±¼äÖá
        // RequestReorder();
 
     }
@@ -1607,7 +1588,7 @@ public class BattleManager : MonoBehaviour
     }
     public void CancelSkillSelection()
     {
-        //æµè§ˆé•œå¤´è¿”å›
+        //ä¯ÀÀ¾µÍ··µ»Ø
         _previewTarget = null;
         if (_currentActor != null)
             ReturnToBattlePreviewCamera();
@@ -1620,7 +1601,7 @@ public class BattleManager : MonoBehaviour
     }
     public void CancelItemSelection()
     {
-        //æµè§ˆé•œå¤´è¿”å›
+        //ä¯ÀÀ¾µÍ··µ»Ø
         _previewTarget = null;
         if (_currentActor != null)
             ReturnToBattlePreviewCamera();
@@ -1649,8 +1630,8 @@ public class BattleManager : MonoBehaviour
 
         NotifyInputState();
 
-        //Escape ä¸å‘ç»éªŒï¼Œä¸æ ‡è®°æ•Œäººå·²å‡»è´¥
-        //ä½†æ˜¯å›å†™å½“å‰ç©å®¶çŠ¶æ€ï¼Œä¾‹å¦‚Hp/Mp
+        //Escape ²»·¢¾­Ñé£¬²»±ê¼ÇµĞÈËÒÑ»÷°Ü
+        //µ«ÊÇ»ØĞ´µ±Ç°Íæ¼Ò×´Ì¬£¬ÀıÈçHp/Mp
         PartyRuntimeState.UpdateFromBattleController(controllers);
 
 
@@ -1661,7 +1642,7 @@ public class BattleManager : MonoBehaviour
 
         OnBattleEnded?.Invoke(payload);
     }
-    //é“å…·ä½¿ç”¨ç›¸å…³
+    //µÀ¾ßÊ¹ÓÃÏà¹Ø
     public List<ItemData> GetAvailableItems()
     {
         List<ItemData> result = new List<ItemData>();
@@ -1693,20 +1674,20 @@ public class BattleManager : MonoBehaviour
         }*/
        
     }
-    //è¯»å–é“å…·æ•°é‡
+    //¶ÁÈ¡µÀ¾ßÊıÁ¿
     public int GetItemCount(ItemData item)
     {
        /* if (item == null) return 0;
         return _itemCounts.TryGetValue(item, out int count) ? count : 0;*/
        return InventoryRuntimeState.GetItemCount(item);
     }
-    //æ˜¯å¦å¯ä»¥ä½¿ç”¨
+    //ÊÇ·ñ¿ÉÒÔÊ¹ÓÃ
     public bool CanUseItem(ItemData item)
     {
         /*return GetItemCount(item) > 0;*/
         return InventoryRuntimeState.CanUseItem(item);
     }
-    //ä½¿ç”¨æ¶ˆè€—é“å…·
+    //Ê¹ÓÃÏûºÄµÀ¾ß
     private bool ConsumeItem(ItemData item)
     {
  

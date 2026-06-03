@@ -29,6 +29,8 @@ public class BattleSpawner : MonoBehaviour
 
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
 
+    public EncounterData CurrentEncounterData { get; private set; }
+
     private void Awake()
     {
         Debug.Log($"[BattleSpawner] Awake instanceID={GetInstanceID()} active={gameObject.activeInHierarchy}");
@@ -131,6 +133,7 @@ public class BattleSpawner : MonoBehaviour
         _spawnInitialDone = true;
 
         _enemyReserve.Clear();
+        CurrentEncounterData = null;
 
         Debug.Log($"[SpawnInitial] called frame={Time.frameCount} queue={_enemyReserve.Count}");
         //Player: ∞¥À≥–Ú»˚£®0-3£©//‘≠œ»µƒ≤‚ ‘≈‰÷√
@@ -231,6 +234,8 @@ public class BattleSpawner : MonoBehaviour
             Debug.LogWarning("[BattleSpawner] enemyPrefab is null. Use initialEnemies fallback.");
             return false;
         }
+        CurrentEncounterData = encounterData;
+
         foreach(var enemyCharacter in encounterData.EnemyChatacters)
         {
             if (enemyCharacter == null)
