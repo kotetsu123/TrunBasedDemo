@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,6 +27,9 @@ public class ResultCharacterPanelController : BasePanel
     [SerializeField] private ItemDataBase itemDataBase;
     [SerializeField] private CharacterDataBase characterDataBase;
 
+    [Header("Reward")]
+    [SerializeField] private TMP_Text rewardText;
+
     protected override void Awake()
     {
         base.Awake();
@@ -41,14 +47,18 @@ public class ResultCharacterPanelController : BasePanel
         if (endPanel != null)
             endPanel.OnClosed -= HandleEndPanelClosed;
     }
-    public  void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots,BattleResult result)
+    public void Show(IReadOnlyList<CharacterResultSnapshot> partySnapShots,
+        BattleResult result,
+        EncounterRewardResult rewardResult)
     {
         bool isVictory = result == BattleResult.Win;
         bool isEscape= result== BattleResult.Escape;
         bool isLose=result== BattleResult.Lose;
 
-        if(buttonRoot!=null)
-       buttonRoot.SetActive(isLose);
+        UpdateRewardText(isVictory ? rewardResult : null);
+
+        if (buttonRoot != null)
+            buttonRoot.SetActive(isLose);
 
         Debug.Log($"[SettlePanel] Show snapshots={(partySnapShots == null ? "NULL" : partySnapShots.Count.ToString())}");
         if (partySnapShots != null)
@@ -61,7 +71,7 @@ public class ResultCharacterPanelController : BasePanel
             // Win/Escape: show the normal character result items.
             for (int i = 0; i < items.Length; i++)
             {
-                if (i < partySnapShots.Count)
+                if (partySnapShots != null && i < partySnapShots.Count)
                 {
                     items[i].gameObject.SetActive(true);
                     items[i].Bind(partySnapShots[i]);
@@ -87,6 +97,32 @@ public class ResultCharacterPanelController : BasePanel
         canvasGroup.interactable = true;
        
     }
+
+    private void UpdateRewardText(EncounterRewardResult rewardResult)
+    {
+        if (rewardText == null)
+            return;
+        if (rewardResult == null)
+        {
+            rewardText.text = "";
+            rewardText.gameObject.SetActive(false);
+            return;
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.AppendLine($"EXP +{rewardResult.exp}");
+        if (rewardResult.itemRewards != null)
+        {
+            foreach (InitialItemStack itemReward in rewardResult.itemRewards)
+            {
+                if (itemReward == null || itemReward.item == null)
+                    continue;
+                builder.AppendLine($"{itemReward.item.itemName} x{itemReward.count}");
+            }
+        }
+        rewardText.text = builder.ToString().TrimEnd();
+        rewardText.gameObject.SetActive(!string.IsNullOrWhiteSpace(rewardText.text));
+    }
+
     private IEnumerator PlayLevelUpPopUps(List<LevelUpResult> results)
     {
 
@@ -125,7 +161,7 @@ public class ResultCharacterPanelController : BasePanel
     {
         if (payload == null) return;    
 
-        Show(payload.PartySnapshots,payload.Result);
+        Show(payload.PartySnapshots, payload.Result, payload.RewardResult);
         if (payload.Result == BattleResult.Win)
         {
             StartCoroutine(PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList()));

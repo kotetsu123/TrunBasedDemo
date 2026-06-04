@@ -798,11 +798,13 @@ public class BattleManager : MonoBehaviour
         _lastLevelUpResults.Clear();
         // Win rewards are handled by EncounterRewardService now.
         // BattleManager still stores level-up results so the existing result UI can keep reading LastLevelUpResults.
+       EncounterRewardResult rewardResult= null;
+
         if (result == BattleResult.Win)
         {
             FieldBattleContext.MarkTriggerdEnemyCleared();
             const int fallbackRewardExp = 120;
-            EncounterRewardResult rewardResult = EncounterRewardService.GrantRewards(
+             rewardResult = EncounterRewardService.GrantRewards(
                 spawner != null ? spawner.CurrentEncounterData : null,
                 controllers,
                 fallbackRewardExp);
@@ -817,7 +819,7 @@ public class BattleManager : MonoBehaviour
 
         //½áËã¿ìÕÕ
         var snapshots = BuildPartySnapShots();
-        var payload = new BattleResultPayload(result, snapshots);
+        var payload = new BattleResultPayload(result, snapshots,rewardResult);
         Debug.Log($"[BattleManager] snapshots count={snapshots?.Count ?? -1}");
         if (snapshots != null && snapshots.Count > 0)
             Debug.Log($"[BattleManager] first={snapshots[0].Name} hp={snapshots[0].hp}/{snapshots[0].maxhp}");

@@ -23,9 +23,12 @@ public class BattleResultPayload
     public BattleResult Result { get; }
     public IReadOnlyList<CharacterResultSnapshot> PartySnapshots { get; }
 
-    public BattleResultPayload(BattleResult result,List<CharacterResultSnapshot> partySnapshots)
+    public EncounterRewardResult RewardResult { get;  }
+
+    public BattleResultPayload(BattleResult result,List<CharacterResultSnapshot> partySnapshots, EncounterRewardResult rewardResult=null)
     {
         this.Result = result;
         this.PartySnapshots = partySnapshots;
+        RewardResult = rewardResult;
     }
 }
