@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -28,7 +26,7 @@ public class ResultCharacterPanelController : BasePanel
     [SerializeField] private CharacterDataBase characterDataBase;
 
     [Header("Reward")]
-    [SerializeField] private TMP_Text rewardText;
+    [SerializeField] private RewardPopController rewardPopup;
 
     protected override void Awake()
     {
@@ -54,8 +52,6 @@ public class ResultCharacterPanelController : BasePanel
         bool isVictory = result == BattleResult.Win;
         bool isEscape= result== BattleResult.Escape;
         bool isLose=result== BattleResult.Lose;
-
-        UpdateRewardText(isVictory ? rewardResult : null);
 
         if (buttonRoot != null)
             buttonRoot.SetActive(isLose);
@@ -98,37 +94,11 @@ public class ResultCharacterPanelController : BasePanel
        
     }
 
-    private void UpdateRewardText(EncounterRewardResult rewardResult)
-    {
-        if (rewardText == null)
-            return;
-        if (rewardResult == null)
-        {
-            rewardText.text = "";
-            rewardText.gameObject.SetActive(false);
-            return;
-        }
-        StringBuilder builder = new StringBuilder();
-        builder.AppendLine($"EXP +{rewardResult.exp}");
-        if (rewardResult.itemRewards != null)
-        {
-            foreach (InitialItemStack itemReward in rewardResult.itemRewards)
-            {
-                if (itemReward == null || itemReward.item == null)
-                    continue;
-                builder.AppendLine($"{itemReward.item.itemName} x{itemReward.count}");
-            }
-        }
-        rewardText.text = builder.ToString().TrimEnd();
-        rewardText.gameObject.SetActive(!string.IsNullOrWhiteSpace(rewardText.text));
-    }
-
     private IEnumerator PlayLevelUpPopUps(List<LevelUpResult> results)
     {
-
-
         if (results == null || results.Count == 0)
             yield break;
+
         foreach (var result in results)
         {
             if (!result.DidLevelUp)
@@ -141,6 +111,18 @@ public class ResultCharacterPanelController : BasePanel
                 yield return new WaitForSeconds(levelUpPopup.GetTotalDuration());
             }
         }
+    }
+
+    private IEnumerator PlayWinResultSequence(EncounterRewardResult rewardResult)
+    {
+        if (rewardPopup != null && rewardPopup.HasReward(rewardResult))
+        {
+            rewardPopup.Play(rewardResult);
+            yield return new WaitForSeconds(rewardPopup.GetTotalDuration());
+        }
+
+        yield return PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList());
+
         yield return new WaitForSeconds(returnFieldDelay);
 
         ReturnToField();
@@ -164,7 +146,7 @@ public class ResultCharacterPanelController : BasePanel
         Show(payload.PartySnapshots, payload.Result, payload.RewardResult);
         if (payload.Result == BattleResult.Win)
         {
-            StartCoroutine(PlayLevelUpPopUps(BattleManager.Instance.LastLevelUpResults.ToList()));
+            StartCoroutine(PlayWinResultSequence(payload.RewardResult));
             return;
         }
         if (payload.Result == BattleResult.Escape)
