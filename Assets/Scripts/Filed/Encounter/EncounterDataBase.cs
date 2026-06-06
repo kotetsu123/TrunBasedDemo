@@ -8,6 +8,12 @@ public class EncounterDataBase : ScriptableObject {
 
     public EncounterData FindeById(string encounterId)
     {
+        if (string.IsNullOrWhiteSpace(encounterId))
+        {
+            Debug.LogWarning("[EncounterDataBase] EncounterId is empty.");
+            return null;
+        }
+
         foreach(var encounter in encounters)
         {
             if (encounter == null)

@@ -9,6 +9,12 @@ public class EnemyDataBase : ScriptableObject
 
     public EnemyFieldData FindById(string enemyId)
     {
+        if (string.IsNullOrWhiteSpace(enemyId))
+        {
+            Debug.LogWarning("[EnemyDataBase] EnemyId is empty.");
+            return null;
+        }
+
         foreach(var enemy in enemies)
         {
             if (enemy == null) continue;

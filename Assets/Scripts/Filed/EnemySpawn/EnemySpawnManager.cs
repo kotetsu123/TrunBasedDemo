@@ -21,14 +21,44 @@ public class EnemySpawnManager : MonoBehaviour
                 Debug.Log($"Skipping spawn for {point.SpawnId} due to field return context.");
                 continue;
             }
-            EnemyFieldData enemyData = enemyDataBase.FindById(point.EnemyId);
 
-            if (enemyData == null || enemyData.FieldPrefab == null)         
+            string encounterId = point.EncounterId;
+            GameObject fieldPrefab = point.FieldPrefab;
+            float wanderRadius = point.WanderRadius;
+
+            // Compatibility fallback: old SpawnPoints can still use enemyId to read Field prefab and encounterId.
+            if ((fieldPrefab == null || string.IsNullOrWhiteSpace(encounterId)) &&
+                !string.IsNullOrWhiteSpace(point.EnemyId))
+            {
+                EnemyFieldData enemyData = enemyDataBase != null ? enemyDataBase.FindById(point.EnemyId) : null;
+
+                if (enemyData != null)
+                {
+                    if (fieldPrefab == null)
+                        fieldPrefab = enemyData.FieldPrefab;
+
+                    if (string.IsNullOrWhiteSpace(encounterId))
+                        encounterId = enemyData.EncounterId;
+
+                    wanderRadius = enemyData.WanderRadius;
+                }
+            }
+
+            if (fieldPrefab == null)
+            {
+                Debug.LogWarning($"[EnemySpawnManager] Field prefab is missing. spawnId={point.SpawnId}, encounterId={encounterId}, enemyId={point.EnemyId}");
                 continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(encounterId))
+            {
+                Debug.LogWarning($"[EnemySpawnManager] EncounterId is missing. spawnId={point.SpawnId}, enemyId={point.EnemyId}");
+                continue;
+            }
 
             
             GameObject enemy = Instantiate(
-                enemyData.FieldPrefab,
+                fieldPrefab,
                 point.transform.position,
                 point.transform.rotation);
 
@@ -38,9 +68,9 @@ public class EnemySpawnManager : MonoBehaviour
             {
                 fieldEnemy.Init(
                     point.SpawnId,
-                    enemyData.EncounterId,
+                    encounterId,
                     point.transform.position,
-                    enemyData.WanderRadius);
+                    wanderRadius);
             }
         }
     }

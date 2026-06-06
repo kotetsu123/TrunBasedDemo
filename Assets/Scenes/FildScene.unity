@@ -2473,6 +2473,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnId: Filed001_spawn_04
+  encounterId: 
+  fieldPrefab: {fileID: 0}
+  wanderRadius: 3
   enemyId: 001
 --- !u!1 &913506890
 GameObject:
@@ -2519,6 +2522,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnId: Filed001_spawn_02
+  encounterId: 
+  fieldPrefab: {fileID: 0}
+  wanderRadius: 3
   enemyId: slime
 --- !u!1 &951993407
 GameObject:
@@ -3342,7 +3348,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnId: Filed001_spawn_01
-  enemyId: test_001
+  encounterId: encounter_Test_001
+  fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+  wanderRadius: 3
+  enemyId: 
 --- !u!1 &1294726522
 GameObject:
   m_ObjectHideFlags: 0
@@ -4498,6 +4507,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnId: Filed001_spawn_03
+  encounterId: 
+  fieldPrefab: {fileID: 0}
+  wanderRadius: 3
   enemyId: 001
 --- !u!1 &1584028255
 GameObject:
