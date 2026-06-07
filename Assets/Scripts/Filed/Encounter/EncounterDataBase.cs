@@ -14,13 +14,30 @@ public class EncounterDataBase : ScriptableObject {
             return null;
         }
 
+        EncounterData found = null;
+
         foreach(var encounter in encounters)
         {
             if (encounter == null)
                 continue;
-            if (encounter.EncounterId == encounterId)
-                return encounter;
+
+            encounter.ValidateConfig();
+
+            if (encounter.EncounterId != encounterId)
+                continue;
+
+            if (found != null)
+            {
+                Debug.LogWarning($"[EncounterDataBase] Duplicate EncounterId found: {encounterId}. first={found.name}, duplicate={encounter.name}");
+                continue;
+            }
+
+            found = encounter;
         }
+
+        if (found != null)
+            return found;
+
         Debug.LogWarning($"[EncounterDataBase] EncounterID not found:{encounterId}");
         return null;
     }

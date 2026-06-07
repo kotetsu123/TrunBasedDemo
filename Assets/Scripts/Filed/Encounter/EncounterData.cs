@@ -13,6 +13,8 @@ public class EncounterItemDrop
     // Inspector slider from 0 to 1. 1 means 100% drop chance, 0.5 means 50%, and 0 means never drops.
     [SerializeField, Range(0f, 1f)] private float dropChance = 1f;
 
+    public bool HasItem => item != null;
+
     public bool TryRoll(out InitialItemStack reward)
     {
         reward = null;
@@ -54,6 +56,56 @@ public class EncounterData : ScriptableObject
     public List<Character> EnemyChatacters => enemyChatacters;
     public int RewardExp => rewardExp;
     public IReadOnlyList<EncounterItemDrop> ItemDrops => itemDrops;
+
+    public bool ValidateConfig()
+    {
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(encounterId))
+        {
+            Debug.LogWarning($"[EncounterData] EncounterId is empty. asset={name}");
+            isValid = false;
+        }
+
+        if (enemyChatacters == null || enemyChatacters.Count == 0)
+        {
+            Debug.LogWarning($"[EncounterData] Enemy list is empty. encounterId={encounterId}, asset={name}");
+            isValid = false;
+        }
+        else
+        {
+            for (int i = 0; i < enemyChatacters.Count; i++)
+            {
+                if (enemyChatacters[i] != null)
+                    continue;
+
+                Debug.LogWarning($"[EncounterData] Enemy entry is null. encounterId={encounterId}, index={i}, asset={name}");
+                isValid = false;
+            }
+        }
+
+        if (itemDrops != null)
+        {
+            for (int i = 0; i < itemDrops.Count; i++)
+            {
+                EncounterItemDrop drop = itemDrops[i];
+                if (drop == null)
+                {
+                    Debug.LogWarning($"[EncounterData] Item drop entry is null. encounterId={encounterId}, index={i}, asset={name}");
+                    isValid = false;
+                    continue;
+                }
+
+                if (!drop.HasItem)
+                {
+                    Debug.LogWarning($"[EncounterData] Item drop has no item. encounterId={encounterId}, index={i}, asset={name}");
+                    isValid = false;
+                }
+            }
+        }
+
+        return isValid;
+    }
 }
 
 // Reward service returns this result package to BattleManager after reward calculation.
