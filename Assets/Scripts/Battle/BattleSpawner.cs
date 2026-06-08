@@ -229,6 +229,13 @@ public class BattleSpawner : MonoBehaviour
             Debug.LogWarning($"[BattleSpawner] EncounterData not found: {encounterId}. Use initialEnemies fallback.");
             return false;
         }
+
+        if (!encounterData.ValidateConfig())
+        {
+            Debug.LogWarning($"[BattleSpawner] EncounterData is invalid: {encounterId}. Use initialEnemies fallback.");
+            return false;
+        }
+
         if (enemyPrefab == null)
         {
             Debug.LogWarning("[BattleSpawner] enemyPrefab is null. Use initialEnemies fallback.");
@@ -236,6 +243,7 @@ public class BattleSpawner : MonoBehaviour
         }
         CurrentEncounterData = encounterData;
 
+        int spawnedEnemyCount = 0;
         foreach(var enemyCharacter in encounterData.EnemyChatacters)
         {
             if (enemyCharacter == null)
@@ -249,8 +257,17 @@ public class BattleSpawner : MonoBehaviour
             };
             
             EnqueueOrSpawn(req);
+            spawnedEnemyCount++;
         }
-        Debug.Log($"[BattleSpawner] Spawned encounter enemies: {encounterId}");
+
+        if (spawnedEnemyCount <= 0)
+        {
+            CurrentEncounterData = null;
+            Debug.LogWarning($"[BattleSpawner] EncounterData has no spawnable enemies: {encounterId}. Use initialEnemies fallback.");
+            return false;
+        }
+
+        Debug.Log($"[BattleSpawner] Spawned encounter enemies: {encounterId}, count={spawnedEnemyCount}");
 
         return true;
     }
