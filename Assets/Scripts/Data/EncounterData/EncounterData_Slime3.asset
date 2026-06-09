@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   encounterId: encounter_slime_3
   enemyChatacters:
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: slime
     MaxHp: 100
     Hp: 0
@@ -26,13 +27,15 @@ MonoBehaviour:
     Speed: 55
     ActionValue: 0
     MaxActionValue: 200
+    Portrait: {fileID: 0}
     isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: slime
     MaxHp: 100
     Hp: 0
@@ -44,13 +47,15 @@ MonoBehaviour:
     Speed: 55
     ActionValue: 0
     MaxActionValue: 200
+    Portrait: {fileID: 0}
     isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 0
     battleEnded: 0
     intent: 0
-  - Team: 1
+  - characterId: 
+    Team: 1
     Name: slime
     MaxHp: 100
     Hp: 0
@@ -62,9 +67,16 @@ MonoBehaviour:
     Speed: 55
     ActionValue: 0
     MaxActionValue: 200
+    Portrait: {fileID: 0}
     isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 0
     battleEnded: 0
     intent: 0
+  rewardExp: 120
+  itemDrops:
+  - item: {fileID: 11400000, guid: 1dd1fab1a86b02e469020980ac42b0aa, type: 2}
+    minCount: 0
+    maxCount: 3
+    dropChance: 0.88

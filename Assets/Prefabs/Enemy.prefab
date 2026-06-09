@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data:
+    characterId: 
     Team: 1
     Name: goblet
     MaxHp: 0
@@ -166,6 +167,7 @@ MonoBehaviour:
     Speed: 90
     ActionValue: 0
     MaxActionValue: 200
+    Portrait: {fileID: 0}
     isOnField: 1
     isActing: 0
     isDead: 0
@@ -178,7 +180,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 357a4c0dd6c99c64e8b86b286d59b25a, type: 2}
   - {fileID: 11400000, guid: 98a4d05ce4017f949a04c792d3ed9d19, type: 2}
   - {fileID: 11400000, guid: 613a7b9efc48f3d45a1a6aad6a1ec6eb, type: 2}
-  floatingTextPrefab: {fileID: 0}
+  floatingTextPrefab: {fileID: 3498894492765518994, guid: b8c628566a340cc48bc2bc7cdb98cef8, type: 3}
   floatringTexAnchor: {fileID: 2358419330789022985}
   hpbarPrefab: {fileID: 1878811498021360621, guid: 5344cba1fd68c984e964e7b99ec66101, type: 3}
   worldUICanvas: {fileID: 0}
