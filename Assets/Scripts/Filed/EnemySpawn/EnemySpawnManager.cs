@@ -16,7 +16,7 @@ public class EnemySpawnManager : MonoBehaviour
             if (!point.gameObject.activeInHierarchy)
                 continue;
 
-            if (FieldBattleContext.IsSpawnCleard(point.SpawnId))
+            if (FieldBattleContext.ShouldSkipSpawn(point.SpawnId, point.CanRespawn, point.RespawnSeconds))
             {
                 Debug.Log($"Skipping spawn for {point.SpawnId} due to field return context.");
                 continue;

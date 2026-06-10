@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
+public class FieldClearedSpawnSaveData
+{
+    public string spawnId;
+    public string clearedAtUtc;
+}
+[System.Serializable]
 public class FieldSaveData 
 {
     //保存已经被击败的 SpawnPoint ID=> FiledBattleContext.ClearedSpawnIds
     //Load 后 EnemySpawnManager 会用这个Id 来判断哪些怪物不要重新生成。
     public List<string >clearedSpawnIds= new List<string>();
+
+    // Timed respawn needs to know when each spawn was cleared.
+    // JsonUtility cannot serialize Dictionary, so save it as a list of records.
+    public List<FieldClearedSpawnSaveData> clearedSpawnRecords = new List<FieldClearedSpawnSaveData>();
 
     //保存玩家所在的field场景名。
     //之后多地图时，Title Load 可以根据这个字段回到正确场景。

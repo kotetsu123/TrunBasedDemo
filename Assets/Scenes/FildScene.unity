@@ -2477,6 +2477,8 @@ MonoBehaviour:
   fieldPrefab: {fileID: 0}
   wanderRadius: 3
   enemyId: 001
+  respawnType: 0
+  respawnSeconds: 60
 --- !u!1 &913506890
 GameObject:
   m_ObjectHideFlags: 0
@@ -2526,6 +2528,8 @@ MonoBehaviour:
   fieldPrefab: {fileID: 0}
   wanderRadius: 3
   enemyId: slime
+  respawnType: 0
+  respawnSeconds: 60
 --- !u!1 &951993407
 GameObject:
   m_ObjectHideFlags: 0
@@ -3352,6 +3356,8 @@ MonoBehaviour:
   fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
   wanderRadius: 3
   enemyId: 
+  respawnType: 1
+  respawnSeconds: 30
 --- !u!1 &1294726522
 GameObject:
   m_ObjectHideFlags: 0
@@ -4511,6 +4517,8 @@ MonoBehaviour:
   fieldPrefab: {fileID: 0}
   wanderRadius: 3
   enemyId: 001
+  respawnType: 0
+  respawnSeconds: 60
 --- !u!1 &1584028255
 GameObject:
   m_ObjectHideFlags: 0
