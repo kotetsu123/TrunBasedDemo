@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FieldCreator : MonoBehaviour
 {
+    [SerializeField] private FieldData fieldData;
+    [SerializeField] private Transform generatedSpawnPointRoot;
     [SerializeField] private Transform player;
     [SerializeField] private Transform playerStartPoint;
     [SerializeField] private EnemySpawnManager enemySpawnManager;
@@ -26,6 +28,7 @@ public class FieldCreator : MonoBehaviour
         //之后返回 已经初始化过。跳过初始化。
         InventoryRuntimeState.InitializeIfEmpty(initialItems);
 
+        CreateSpawnPointsFromFieldData();
         SetupPlayer();
         SpwanEnemies();
 
@@ -75,5 +78,29 @@ public class FieldCreator : MonoBehaviour
     private void SpwanEnemies()
     {
         enemySpawnManager?.SpawnAll();
+    }
+
+    private void CreateSpawnPointsFromFieldData()
+    {
+        if (fieldData == null || enemySpawnManager == null)
+            return;
+
+        List<EnemySpawnPoint> generatedSpawnPoints = new List<EnemySpawnPoint>();
+
+        foreach (FieldSpawnPointEntry entry in fieldData.SpawnPoints)
+        {
+            if (entry == null)
+                continue;
+
+            GameObject spawnPointObject = new GameObject($"SpawnPoint_{entry.SpawnId}");
+            Transform spawnPointTransform = spawnPointObject.transform;
+            spawnPointTransform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
+
+            EnemySpawnPoint spawnPoint = spawnPointObject.AddComponent<EnemySpawnPoint>();
+            spawnPoint.Configure(entry);
+            generatedSpawnPoints.Add(spawnPoint);
+        }
+
+        enemySpawnManager.SetSpawnPoints(generatedSpawnPoints);
     }
 }

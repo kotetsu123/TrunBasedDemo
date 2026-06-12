@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f9f08fda558a8142a8038f769db4ce2, type: 3}
+  m_Name: FieldData_Test
+  m_EditorClassIdentifier: 
+  fieldId: 
+  spawnPoints:
+  - spawnId: test_field_spawn_001
+    encounterId: encounter_Test_001
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: 0, y: 0.5, z: 7}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 1
+    respawnSeconds: 30

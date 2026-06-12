@@ -13,6 +13,23 @@ public class EnemySpawnManager : MonoBehaviour
     private readonly Dictionary<string, EnemyFieldController> activeEnemiesBySpawnId = new Dictionary<string, EnemyFieldController>();
     private float nextLiveRespawnCheckTime;
 
+    public void SetSpawnPoints(IReadOnlyList<EnemySpawnPoint> newSpawnPoints)
+    {
+        activeEnemiesBySpawnId.Clear();
+
+        if (newSpawnPoints == null)
+        {
+            spawnPoints = new EnemySpawnPoint[0];
+            return;
+        }
+
+        spawnPoints = new EnemySpawnPoint[newSpawnPoints.Count];
+        for (int i = 0; i < newSpawnPoints.Count; i++)
+        {
+            spawnPoints[i] = newSpawnPoints[i];
+        }
+    }
+
     public void SpawnAll()
     {
         foreach (var point in spawnPoints)

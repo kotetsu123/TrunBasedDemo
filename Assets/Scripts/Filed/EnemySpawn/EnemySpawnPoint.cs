@@ -27,4 +27,20 @@ public class EnemySpawnPoint : MonoBehaviour
     // Boss-like spawn points stay cleared forever. Timed spawn points can come back after RespawnSeconds.
     public bool CanRespawn => respawnType == EnemySpawnRespawnType.Timed;
     public float RespawnSeconds => Mathf.Max(0f, respawnSeconds);
+
+    public void Configure(FieldSpawnPointEntry entry)
+    {
+        if (entry == null)
+            return;
+
+        spawnId = entry.SpawnId;
+        encounterId = entry.EncounterId;
+        fieldPrefab = entry.FieldPrefab;
+        wanderRadius = entry.WanderRadius;
+        enemyId = entry.EnemyId;
+        respawnType = entry.RespawnType;
+        respawnSeconds = entry.RespawnSeconds;
+
+        transform.SetPositionAndRotation(entry.Position, entry.Rotation);
+    }
 }

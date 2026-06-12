@@ -2800,6 +2800,8 @@ MonoBehaviour:
   - {fileID: 1570286944}
   - {fileID: 901198064}
   enemyDataBase: {fileID: 11400000, guid: 9de47d4d1fc491f4684bc1f278d5b89e, type: 2}
+  enableLiveRespawn: 1
+  liveRespawnCheckInterval: 1
 --- !u!4 &1164361664
 Transform:
   m_ObjectHideFlags: 0
@@ -4460,6 +4462,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f5afcc82e81bf43966bf50bc21ba07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fieldData: {fileID: 11400000, guid: 323c35cbb76fd834c9934723dacdcfe8, type: 2}
+  generatedSpawnPointRoot: {fileID: 1818626006}
   player: {fileID: 1753244267}
   playerStartPoint: {fileID: 951993408}
   enemySpawnManager: {fileID: 1164361663}
