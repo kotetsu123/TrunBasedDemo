@@ -25,12 +25,30 @@ public class FieldSpawnPointEntry
     public float RespawnSeconds => respawnSeconds;
 }
 
+[System.Serializable]
+public class FieldObjectEntry
+{
+    [SerializeField] private string objectId;
+    [SerializeField] private GameObject prefab;
+    [SerializeField] private Vector3 position;
+    [SerializeField] private Vector3 rotationEuler;
+    [SerializeField] private Vector3 scale = Vector3.one;
+
+    public string ObjectId => objectId;
+    public GameObject Prefab => prefab;
+    public Vector3 Position => position;
+    public Quaternion Rotation => Quaternion.Euler(rotationEuler);
+    public Vector3 Scale => scale;
+}
+
 [CreateAssetMenu(fileName = "FieldData_", menuName = "Game Data/Field Data")]
 public class FieldData : ScriptableObject
 {
     [SerializeField] private string fieldId;
     [SerializeField] private List<FieldSpawnPointEntry> spawnPoints = new List<FieldSpawnPointEntry>();
+    [SerializeField] private List<FieldObjectEntry> fieldObjects = new List<FieldObjectEntry>();
 
     public string FieldId => fieldId;
     public IReadOnlyList<FieldSpawnPointEntry> SpawnPoints => spawnPoints;
+    public IReadOnlyList<FieldObjectEntry> FieldObjects => fieldObjects;
 }

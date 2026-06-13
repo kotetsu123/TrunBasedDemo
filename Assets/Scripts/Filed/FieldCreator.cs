@@ -6,6 +6,7 @@ public class FieldCreator : MonoBehaviour
 {
     [SerializeField] private FieldData fieldData;
     [SerializeField] private Transform generatedSpawnPointRoot;
+    [SerializeField] private Transform generatedObjectRoot;
     [SerializeField] private Transform player;
     [SerializeField] private Transform playerStartPoint;
     [SerializeField] private EnemySpawnManager enemySpawnManager;
@@ -29,6 +30,7 @@ public class FieldCreator : MonoBehaviour
         InventoryRuntimeState.InitializeIfEmpty(initialItems);
 
         CreateSpawnPointsFromFieldData();
+        CreateObjectsFromFieldData();
         SetupPlayer();
         SpwanEnemies();
 
@@ -102,5 +104,32 @@ public class FieldCreator : MonoBehaviour
         }
 
         enemySpawnManager.SetSpawnPoints(generatedSpawnPoints);
+    }
+
+    private void CreateObjectsFromFieldData()
+    {
+        if (fieldData == null)
+            return;
+
+        foreach (FieldObjectEntry entry in fieldData.FieldObjects)
+        {
+            if (entry == null)
+                continue;
+
+            if (entry.Prefab == null)
+            {
+                Debug.LogWarning($"[FieldCreator] Field object prefab is missing. fieldId={fieldData.FieldId}, objectId={entry.ObjectId}");
+                continue;
+            }
+
+            // This is a lightweight entry point for data-driven field objects.
+            // Heavy 3D environment art can still stay scene-authored, while gameplay objects can be generated here.
+            GameObject fieldObject = Instantiate(entry.Prefab, entry.Position, entry.Rotation);
+            fieldObject.name = string.IsNullOrWhiteSpace(entry.ObjectId)
+                ? entry.Prefab.name
+                : entry.ObjectId;
+            fieldObject.transform.localScale = entry.Scale;
+            fieldObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
+        }
     }
 }
