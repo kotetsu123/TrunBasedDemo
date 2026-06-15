@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: EncounterData_Slime3
   m_EditorClassIdentifier: 
   encounterId: encounter_slime_3
+  enemyEntries:
+  - enemyId: slime
+    count: 3
   enemyChatacters:
   - characterId: 
     Team: 1

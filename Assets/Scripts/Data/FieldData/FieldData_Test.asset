@@ -23,3 +23,13 @@ MonoBehaviour:
     enemyId: 
     respawnType: 1
     respawnSeconds: 30
+  - spawnId: test_field_spawn_002
+    encounterId: encounter_slime_3
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: 0, y: 0.5, z: 2}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 1
+    respawnSeconds: 30
+  fieldObjects: []

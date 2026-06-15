@@ -23,6 +23,7 @@ public class BattleSpawner : MonoBehaviour
 
 
     [SerializeField] private EncounterDataBase encounterDatabase;
+    [SerializeField] private EnemyCharacterDataBase enemyCharacterDatabase;
     [SerializeField] private GameObject enemyPrefab;
 
     private bool _spawnInitialDone = false;
@@ -244,20 +245,17 @@ public class BattleSpawner : MonoBehaviour
         CurrentEncounterData = encounterData;
 
         int spawnedEnemyCount = 0;
-        foreach(var enemyCharacter in encounterData.EnemyChatacters)
-        {
-            if (enemyCharacter == null)
-                continue;
 
-            SpawnRequest req = new SpawnRequest()
-            {
-                team = Team.Enemy,
-                prefabs = enemyPrefab,
-                characterData = enemyCharacter.Copy()
-            };
-            
-            EnqueueOrSpawn(req);
-            spawnedEnemyCount++;
+        if (encounterData.HasEnemyEntries)
+        {
+            Debug.Log($"[BattleSpawner] Use enemyEntries table. encounterId={encounterId}, entryCount={encounterData.EnemyEntries.Count}");
+            spawnedEnemyCount = SpawnEnemyEntries(encounterData);
+        }
+
+        if (spawnedEnemyCount <= 0)
+        {
+            Debug.Log($"[BattleSpawner] Use legacy enemyChatacters fallback. encounterId={encounterId}");
+            spawnedEnemyCount = SpawnLegacyEnemyCharacters(encounterData);
         }
 
         if (spawnedEnemyCount <= 0)
@@ -270,5 +268,76 @@ public class BattleSpawner : MonoBehaviour
         Debug.Log($"[BattleSpawner] Spawned encounter enemies: {encounterId}, count={spawnedEnemyCount}");
 
         return true;
+    }
+
+    private int SpawnEnemyEntries(EncounterData encounterData)
+    {
+        if (encounterData == null || encounterData.EnemyEntries == null)
+            return 0;
+
+        if (enemyCharacterDatabase == null)
+        {
+            Debug.LogWarning($"[BattleSpawner] EnemyCharacterDataBase is null. encounterId={encounterData.EncounterId}");
+            return 0;
+        }
+
+        int spawnedEnemyCount = 0;
+
+        foreach (EncounterEnemyEntry enemyEntry in encounterData.EnemyEntries)
+        {
+            if (enemyEntry == null || !enemyEntry.IsValid)
+                continue;
+
+            Character enemyTemplate = enemyCharacterDatabase.FindById(enemyEntry.EnemyId);
+            if (enemyTemplate == null)
+                continue;
+
+            Debug.Log($"[BattleSpawner] Enemy entry resolved. encounterId={encounterData.EncounterId}, enemyId={enemyEntry.EnemyId}, enemyName={enemyTemplate.Name}, count={enemyEntry.Count}");
+
+            for (int i = 0; i < enemyEntry.Count; i++)
+            {
+                SpawnEnemyCharacter(enemyTemplate);
+                spawnedEnemyCount++;
+            }
+        }
+
+        return spawnedEnemyCount;
+    }
+
+    private int SpawnLegacyEnemyCharacters(EncounterData encounterData)
+    {
+        if (encounterData == null || encounterData.EnemyChatacters == null)
+            return 0;
+
+        int spawnedEnemyCount = 0;
+
+        foreach (var enemyCharacter in encounterData.EnemyChatacters)
+        {
+            if (enemyCharacter == null)
+                continue;
+
+            Debug.Log($"[BattleSpawner] Legacy enemy resolved. encounterId={encounterData.EncounterId}, enemyName={enemyCharacter.Name}");
+            SpawnEnemyCharacter(enemyCharacter);
+            spawnedEnemyCount++;
+        }
+
+        return spawnedEnemyCount;
+    }
+
+    private void SpawnEnemyCharacter(Character enemyCharacter)
+    {
+        Character battleEnemy = enemyCharacter.Copy();
+        battleEnemy.Team = Team.Enemy;
+        battleEnemy.isPlayer = false;
+        battleEnemy.isOnField = true;
+
+        SpawnRequest req = new SpawnRequest()
+        {
+            team = Team.Enemy,
+            prefabs = enemyPrefab,
+            characterData = battleEnemy
+        };
+
+        EnqueueOrSpawn(req);
     }
 }

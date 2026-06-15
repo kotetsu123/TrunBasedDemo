@@ -42,10 +42,22 @@ public class EncounterItemDrop
     }
 }
 
+[System.Serializable]
+public class EncounterEnemyEntry
+{
+    [SerializeField] private string enemyId;
+    [SerializeField] private int count = 1;
+
+    public string EnemyId => enemyId;
+    public int Count => Mathf.Max(1, count);
+    public bool IsValid => !string.IsNullOrWhiteSpace(enemyId) && count > 0;
+}
+
 [CreateAssetMenu(menuName ="Game/Data/Encounter Data")]
 public class EncounterData : ScriptableObject
 {
     [SerializeField] private string encounterId;
+    [SerializeField] private List<EncounterEnemyEntry> enemyEntries = new List<EncounterEnemyEntry>();
     [SerializeField] private List<Character> enemyChatacters = new List<Character>();
 
     // Reward service returns this result package to BattleManager after reward calculation.
@@ -53,9 +65,11 @@ public class EncounterData : ScriptableObject
     [SerializeField] private List<EncounterItemDrop> itemDrops = new List<EncounterItemDrop>();
 
     public string EncounterId => encounterId;
+    public IReadOnlyList<EncounterEnemyEntry> EnemyEntries => enemyEntries;
     public List<Character> EnemyChatacters => enemyChatacters;
     public int RewardExp => rewardExp;
     public IReadOnlyList<EncounterItemDrop> ItemDrops => itemDrops;
+    public bool HasEnemyEntries => enemyEntries != null && enemyEntries.Count > 0;
 
     public bool ValidateConfig()
     {
@@ -67,7 +81,19 @@ public class EncounterData : ScriptableObject
             isValid = false;
         }
 
-        if (enemyChatacters == null || enemyChatacters.Count == 0)
+        if (HasEnemyEntries)
+        {
+            for (int i = 0; i < enemyEntries.Count; i++)
+            {
+                EncounterEnemyEntry enemyEntry = enemyEntries[i];
+                if (enemyEntry != null && enemyEntry.IsValid)
+                    continue;
+
+                Debug.LogWarning($"[EncounterData] Enemy entry is invalid. encounterId={encounterId}, index={i}, asset={name}");
+                isValid = false;
+            }
+        }
+        else if (enemyChatacters == null || enemyChatacters.Count == 0)
         {
             Debug.LogWarning($"[EncounterData] Enemy list is empty. encounterId={encounterId}, asset={name}");
             isValid = false;
