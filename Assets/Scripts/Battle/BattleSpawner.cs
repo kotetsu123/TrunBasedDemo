@@ -254,7 +254,7 @@ public class BattleSpawner : MonoBehaviour
 
         if (spawnedEnemyCount <= 0)
         {
-            Debug.Log($"[BattleSpawner] Use legacy enemyChatacters fallback. encounterId={encounterId}");
+            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemyChatacters fallback. encounterId={encounterId}");
             spawnedEnemyCount = SpawnLegacyEnemyCharacters(encounterData);
         }
 
@@ -288,7 +288,7 @@ public class BattleSpawner : MonoBehaviour
             if (enemyEntry == null || !enemyEntry.IsValid)
                 continue;
 
-            Character enemyTemplate = enemyCharacterDatabase.FindById(enemyEntry.EnemyId);
+            Character enemyTemplate = enemyCharacterDatabase.FindByEnemyId(enemyEntry.EnemyId);
             if (enemyTemplate == null)
                 continue;
 

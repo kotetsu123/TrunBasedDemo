@@ -6,7 +6,7 @@ public class EnemyCharacterDataBase : ScriptableObject
 {
     [SerializeField] private List<Character> enemies = new List<Character>();
 
-    public Character FindById(string enemyId)
+    public Character FindByEnemyId(string enemyId)
     {
         if (string.IsNullOrWhiteSpace(enemyId))
         {
@@ -19,6 +19,7 @@ public class EnemyCharacterDataBase : ScriptableObject
             if (enemy == null)
                 continue;
 
+            // Enemy table ids are stored on Character.characterId because Character is shared by players and enemies.
             if (enemy.characterId == enemyId)
             {
                 Debug.Log($"[EnemyCharacterDataBase] Enemy found. enemyId={enemyId}, enemyName={enemy.Name}");

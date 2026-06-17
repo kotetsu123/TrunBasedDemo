@@ -45,6 +45,8 @@ public class EncounterItemDrop
 [System.Serializable]
 public class EncounterEnemyEntry
 {
+    // This enemyId matches Character.characterId in EnemyCharacterDataBase.
+    // EncounterData only describes the battle team, so it uses enemyId here.
     [SerializeField] private string enemyId;
     [SerializeField] private int count = 1;
 

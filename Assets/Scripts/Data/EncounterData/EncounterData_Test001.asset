@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   encounterId: encounter_Test_001
   enemyEntries:
-  - enemyId: Test_001
-    count: 4
+  - enemyId: test_001_A
+    count: 2
+  - enemyId: test_001_B
+    count: 1
+  - enemyId: test_001_C
+    count: 1
   enemyChatacters:
   - characterId: 
     Team: 1
