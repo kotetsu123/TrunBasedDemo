@@ -2868,6 +2868,7 @@ MonoBehaviour:
   encounterDatabase: {fileID: 11400000, guid: 9201cc78d47f18d45bf670e77b37561e, type: 2}
   enemyCharacterDatabase: {fileID: 11400000, guid: 7cc48549d33757a498ddb809b818f388, type: 2}
   enemyPrefab: {fileID: 3653005007927200776, guid: fb82be1e05a4304449d3f1796b379d48, type: 3}
+  allowLegacyEnemyCharactersFallback: 0
 --- !u!4 &629646182
 Transform:
   m_ObjectHideFlags: 0

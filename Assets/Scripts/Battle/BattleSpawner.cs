@@ -25,6 +25,7 @@ public class BattleSpawner : MonoBehaviour
     [SerializeField] private EncounterDataBase encounterDatabase;
     [SerializeField] private EnemyCharacterDataBase enemyCharacterDatabase;
     [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private bool allowLegacyEnemyCharactersFallback = true;
 
     private bool _spawnInitialDone = false;
 
@@ -252,10 +253,14 @@ public class BattleSpawner : MonoBehaviour
             spawnedEnemyCount = SpawnEnemyEntries(encounterData);
         }
 
-        if (spawnedEnemyCount <= 0)
+        if (spawnedEnemyCount <= 0 && allowLegacyEnemyCharactersFallback)
         {
             Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemyChatacters fallback. encounterId={encounterId}");
             spawnedEnemyCount = SpawnLegacyEnemyCharacters(encounterData);
+        }
+        else if (spawnedEnemyCount <= 0)
+        {
+            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies and legacy fallback is disabled. encounterId={encounterId}");
         }
 
         if (spawnedEnemyCount <= 0)
