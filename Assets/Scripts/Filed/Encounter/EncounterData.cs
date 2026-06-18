@@ -60,6 +60,8 @@ public class EncounterData : ScriptableObject
 {
     [SerializeField] private string encounterId;
     [SerializeField] private List<EncounterEnemyEntry> enemyEntries = new List<EncounterEnemyEntry>();
+    // Legacy fallback data from the old encounter setup.
+    // Prefer enemyEntries for new encounters.
     [SerializeField] private List<Character> enemyChatacters = new List<Character>();
 
     // Reward service returns this result package to BattleManager after reward calculation.
@@ -68,7 +70,7 @@ public class EncounterData : ScriptableObject
 
     public string EncounterId => encounterId;
     public IReadOnlyList<EncounterEnemyEntry> EnemyEntries => enemyEntries;
-    public List<Character> EnemyChatacters => enemyChatacters;
+    public List<Character> LegacyEnemyCharacters => enemyChatacters;
     public int RewardExp => rewardExp;
     public IReadOnlyList<EncounterItemDrop> ItemDrops => itemDrops;
     public bool HasEnemyEntries => enemyEntries != null && enemyEntries.Count > 0;

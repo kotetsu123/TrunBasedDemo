@@ -255,7 +255,7 @@ public class BattleSpawner : MonoBehaviour
 
         if (spawnedEnemyCount <= 0 && allowLegacyEnemyCharactersFallback)
         {
-            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemyChatacters fallback. encounterId={encounterId}");
+            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemy characters fallback. encounterId={encounterId}");
             spawnedEnemyCount = SpawnLegacyEnemyCharacters(encounterData);
         }
         else if (spawnedEnemyCount <= 0)
@@ -311,12 +311,12 @@ public class BattleSpawner : MonoBehaviour
 
     private int SpawnLegacyEnemyCharacters(EncounterData encounterData)
     {
-        if (encounterData == null || encounterData.EnemyChatacters == null)
+        if (encounterData == null || encounterData.LegacyEnemyCharacters == null)
             return 0;
 
         int spawnedEnemyCount = 0;
 
-        foreach (var enemyCharacter in encounterData.EnemyChatacters)
+        foreach (var enemyCharacter in encounterData.LegacyEnemyCharacters)
         {
             if (enemyCharacter == null)
                 continue;
