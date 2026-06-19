@@ -320,7 +320,9 @@ Assets/Scripts/Battle/BattleSpawner.cs
 ```text
 FieldBattleContext.CurrentEncounterId
  -> EncounterDataBase.FindeById()
- -> EncounterData.EnemyChatacters
+ -> EncounterData.EnemyEntries
+ -> EnemyCharacterDataBase.FindByEnemyId()
+ -> Character template
  -> enemyPrefab
  -> SpawnRequest
  -> BattleFormation slot
@@ -333,8 +335,14 @@ Fallback：
 - 如果找不到 EncounterData。
 - 如果 EncounterData 配置无效。
 - 如果 `enemyPrefab` 为空。
+- 如果 `enemyEntries` 没有生成任何敌人，且 `allowLegacyEnemyCharactersFallback` 关闭。
 
 则使用 `initialEnemies` 测试配置。
+
+Legacy fallback：
+
+- `allowLegacyEnemyCharactersFallback` 开启时，`enemyEntries` 生成 0 个敌人后会尝试旧的 `LegacyEnemyCharacters`。
+- `BattleScene` 当前关闭该 fallback，用于验证 Encounter 是否真正走 table 数据流。
 
 ### 4.2 BattleManager
 
@@ -418,7 +426,65 @@ RewardPop 使用 `EncounterRewardResult` 显示本场获得的 EXP 和掉落道�
 
 ## 5. Encounter / Reward System
 
-### 5.1 EncounterData
+### 5.1 Encounter Table Flow
+
+Encounter table 是 Field 与 Battle 之间的核心连接层。
+
+Field 侧只负责决定“触发哪一场遭遇”，Battle 侧再根据 Encounter table 决定“这场战斗生成哪些敌人”。
+
+完整数据流：
+
+```text
+FieldData / EnemySpawnPoint
+ -> spawnId
+ -> encounterId
+ -> EnemySpawnManager
+ -> EnemyFieldController
+ -> EncounterTrigger
+ -> FieldBattleContext.CurrentEncounterId
+ -> BattleSpawner
+ -> EncounterDataBase
+ -> EncounterData.enemyEntries
+ -> EnemyCharacterDataBase
+ -> Character template
+ -> enemyPrefab
+ -> BattleFormation
+```
+
+职责拆分：
+
+```text
+FieldData / EnemySpawnPoint:
+    管理 Field 场景中的敌人生成点、fieldPrefab、spawnId、encounterId、respawn 规则。
+
+EncounterData:
+    管理一场战斗的敌人队伍、经验奖励、掉落配置。
+
+EnemyCharacterDataBase:
+    管理 enemyId 对应的 Character 模板数据。
+```
+
+当前推荐配置：
+
+```text
+EncounterData.enemyEntries:
+    enemyId: slime
+    count: 3
+
+EnemyCharacterDataBase.enemies:
+    Character.characterId: slime
+    Name: slime
+    Hp / Attack / Speed ...
+```
+
+注意：
+
+- `EncounterEnemyEntry.enemyId` 对应 `EnemyCharacterDataBase` 中的 `Character.characterId`。
+- `enemyEntries` 是新流程。
+- `enemyChatacters` 是旧流程留下的序列化字段，代码中通过 `LegacyEnemyCharacters` 暴露。
+- `allowLegacyEnemyCharactersFallback` 用来控制 table 配置失败时是否允许回退旧数据。
+
+### 5.2 EncounterData
 
 文件：
 
@@ -432,17 +498,20 @@ Assets/Scripts/Filed/Encounter/EncounterData.cs
 
 ```text
 encounterId
-enemyChatacters
+enemyEntries
+enemyChatacters / LegacyEnemyCharacters
 rewardExp
 itemDrops
 ```
 
 说明：
 
-- 当前版本中 `EncounterData` 直接引用 `Character` 作为敌人模板。
-- 后续可以进一步拆成 `enemyId -> EnemyDatabase -> Character template`。
+- 当前主流程使用 `enemyEntries` 配置敌人队伍。
+- `enemyEntries` 每一项包含 `enemyId` 和 `count`。
+- `enemyId` 会通过 `EnemyCharacterDataBase` 找到对应的 `Character` 模板。
+- `enemyChatacters` 保留为 legacy fallback，不推荐新 Encounter 继续使用。
 
-### 5.2 EncounterDataBase
+### 5.3 EncounterDataBase
 
 文件：
 
@@ -458,7 +527,7 @@ Assets/Scripts/Filed/Encounter/EncounterDataBase.cs
 - 找不到 id 警告。
 - 重复 id 警告。
 
-### 5.3 EncounterRewardService
+### 5.4 EncounterRewardService
 
 文件：
 
@@ -715,6 +784,7 @@ ItemDataBase
 SkillData
 EnemyFieldData
 EnemyDataBase
+EnemyCharacterDataBase
 EncounterData
 EncounterDataBase
 FieldData
@@ -731,6 +801,9 @@ ItemDataBase:
 
 EnemyDataBase / EnemyFieldData:
     Field 旧流程兼容，用 enemyId 补充 fieldPrefab / encounterId。
+
+EnemyCharacterDataBase:
+    Battle 敌人模板表，用 enemyId 查找 Character 数据。
 
 EncounterDataBase:
     Battle 生成入口，用 encounterId 找 EncounterData。
@@ -802,7 +875,11 @@ FieldCreator.fieldData != null:
 
 ```text
 BattleSpawner 找到 EncounterData:
-    使用 encounter enemy list 生成敌人。
+    优先使用 enemyEntries + EnemyCharacterDataBase 生成敌人。
+
+enemyEntries 生成 0 个敌人:
+    allowLegacyEnemyCharactersFallback 开启时，回退 LegacyEnemyCharacters。
+    allowLegacyEnemyCharactersFallback 关闭时，输出 warning 并继续 initialEnemies fallback。
 
 BattleSpawner 找不到 EncounterData:
     fallback 到 initialEnemies。
@@ -822,7 +899,8 @@ BattleSpawner 找不到 EncounterData:
 
 ### 当前边界
 
-- `EncounterData` 目前直接引用 `Character`，还没有完全拆成 `enemyId -> EnemyDatabase -> enemy template`。
+- `EncounterData` 的敌人生成主流程已经改为 `enemyEntries -> EnemyCharacterDataBase -> Character template`。
+- 旧 `enemyChatacters` 字段仍保留为 legacy fallback，避免破坏已有 Unity asset。
 - `FieldData` 目前是 gameplay table，不是完整 3D map generator。
 - Field object entry 只是入口，宝箱/NPC/传送点等交互逻辑还未细化。
 - Inventory full flow 目前是自动扩容并 warning。
@@ -830,8 +908,8 @@ BattleSpawner 找不到 EncounterData:
 
 ### 推荐后续扩展
 
-1. `EnemyData` / `EncounterData` 第二版  
-   把 EncounterData 中的敌人从直接 Character 引用，改成 enemyId / quantity / position。
+1. Encounter data cleanup  
+   全部 Encounter 迁移稳定后，可以考虑隐藏或移除 legacy enemyChatacters 字段。
 
 2. Interactable Data  
    在 FieldData 中增加 chest / NPC / portal 等 gameplay object 类型。

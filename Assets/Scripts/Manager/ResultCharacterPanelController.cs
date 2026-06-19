@@ -31,7 +31,9 @@ public class ResultCharacterPanelController : BasePanel
     protected override void Awake()
     {
         base.Awake();
-        Hide();
+        // Result panel must start fully hidden. A tweened Hide() can leave the panel visible for a short moment
+        // when entering a fresh BattleScene after Escape/Run.
+        HideImmediate();
     }
     private void OnEnable()
     {
