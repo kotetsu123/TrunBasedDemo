@@ -24,8 +24,12 @@ public class EncounterItemDrop
             return false;
 
         // Random.value returns 0-1. If it is higher than dropChance, this item does not drop.
-        if (Random.value > dropChance)
+        float roll = Random.value;
+        if (roll > dropChance)
+        {
+            Debug.Log($"[EncounterReward] Drop miss. item={item.itemName}, chance={dropChance:0.##}, roll={roll:0.##}");
             return false;
+        }
 
         // Keep the configured count safe even if Inspector values are set incorrectly.
         // Guard against invalid Inspector values such as 0, negative counts, or max < min.
@@ -38,6 +42,8 @@ public class EncounterItemDrop
             item = item,
             count = Random.Range(safeMin, safeMax + 1)
         };
+
+        Debug.Log($"[EncounterReward] Drop success. item={item.itemName}, chance={dropChance:0.##}, roll={roll:0.##}, count={reward.count}");
         return true;
     }
 }
