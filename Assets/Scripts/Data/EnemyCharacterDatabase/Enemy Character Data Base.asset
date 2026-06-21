@@ -26,7 +26,7 @@ MonoBehaviour:
     Speed: 55
     ActionValue: 0
     MaxActionValue: 200
-    Portrait: {fileID: 0}
+    Portrait: {fileID: 21300000, guid: 5c8611d5945ace04f9177b334a6217b2, type: 3}
     isOnField: 0
     isActing: 0
     isDead: 0
@@ -87,6 +87,26 @@ MonoBehaviour:
     ActionValue: -13.333331
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+    isOnField: 1
+    isActing: 0
+    isDead: 0
+    isPlayer: 0
+    battleEnded: 0
+    intent: 0
+  - characterId: boss_001
+    Team: 1
+    Name: boss_001
+    MaxHp: 350
+    Hp: 350
+    MaxMp: 0
+    Mp: 0
+    Level: 3
+    Exp: 0
+    Attack: 70
+    Speed: 80
+    ActionValue: 0
+    MaxActionValue: 200
+    Portrait: {fileID: 21300000, guid: 531c2ee4a983c1744ac374c09e1791f1, type: 3}
     isOnField: 1
     isActing: 0
     isDead: 0

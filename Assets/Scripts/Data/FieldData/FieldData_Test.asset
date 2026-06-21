@@ -17,7 +17,7 @@ MonoBehaviour:
   - spawnId: test_field_spawn_001
     encounterId: encounter_Test_001
     fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
-    position: {x: 0, y: 0.5, z: 7}
+    position: {x: 0, y: 0.5, z: 5}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
     enemyId: 
@@ -32,4 +32,13 @@ MonoBehaviour:
     enemyId: 
     respawnType: 1
     respawnSeconds: 30
+  - spawnId: test_field_spawn_003
+    encounterId: encounter_boss_001
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: 0, y: 0.5, z: 9}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 0
+    respawnSeconds: 0
   fieldObjects: []
