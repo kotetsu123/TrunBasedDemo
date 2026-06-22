@@ -26,7 +26,7 @@ MonoBehaviour:
     Speed: 55
     ActionValue: 0
     MaxActionValue: 200
-    Portrait: {fileID: 21300000, guid: 5c8611d5945ace04f9177b334a6217b2, type: 3}
+    Portrait: {fileID: 21300000, guid: f64590402d88d7f4f811915f9fb637d1, type: 3}
     isOnField: 0
     isActing: 0
     isDead: 0

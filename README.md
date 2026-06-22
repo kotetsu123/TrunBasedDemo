@@ -114,6 +114,16 @@ SaveSystem 会把运行时数据保存成 JSON，包括：
 - 已清除 SpawnPoint
 - Timed respawn 的清除时间
 
+### Demo 路线
+
+当前 demo 场景可以按一条简单路线体验：
+
+- 第一个点：`encounter_slime_3`，用于测试普通小怪和 timed respawn。
+- 第二个点：`encounter_Test_001`，用于测试 encounter table 生成多名敌人。
+- 第三个点：`encounter_boss_001`，用于测试 boss 遭遇、永久清除和较高奖励。
+
+这条路线的目标是展示 FieldData、SpawnPoint、EncounterData、BattleSpawner、Reward 和 Save/Load 之间的完整闭环。
+
 ### 当前状态
 
 已实现：
@@ -258,6 +268,16 @@ Current save data includes:
 - cleared spawn timestamps for timed respawn
 
 The project uses runtime databases to restore saved item ids and character ids back into gameplay data.
+
+## Demo Route
+
+The current demo scene can be played as a simple route:
+
+- First point: `encounter_slime_3`, used for regular enemy and timed respawn testing.
+- Second point: `encounter_Test_001`, used for multi-enemy encounter table testing.
+- Third point: `encounter_boss_001`, used for boss encounter, permanent clear, and higher reward testing.
+
+This route is meant to demonstrate the full loop between FieldData, SpawnPoint, EncounterData, BattleSpawner, rewards, and save/load state.
 
 ## High-Level Data Flow
 
