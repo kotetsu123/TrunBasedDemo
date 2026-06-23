@@ -4464,6 +4464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fieldData: {fileID: 11400000, guid: 323c35cbb76fd834c9934723dacdcfe8, type: 2}
   generatedSpawnPointRoot: {fileID: 1818626006}
+  generatedObjectRoot: {fileID: 0}
   player: {fileID: 1753244267}
   playerStartPoint: {fileID: 951993408}
   enemySpawnManager: {fileID: 1164361663}
@@ -4472,6 +4473,10 @@ MonoBehaviour:
   initialItems:
   - item: {fileID: 11400000, guid: 1dd1fab1a86b02e469020980ac42b0aa, type: 2}
     count: 3
+  - item: {fileID: 11400000, guid: a49a2d6a79804c56a32d241a509c682f, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: 7b9602cd91f7418e9a520d58dbb19415, type: 2}
+    count: 1
 --- !u!1 &1570286942
 GameObject:
   m_ObjectHideFlags: 0

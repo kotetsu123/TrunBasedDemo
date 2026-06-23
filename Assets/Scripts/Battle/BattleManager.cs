@@ -510,12 +510,13 @@ public class BattleManager : MonoBehaviour
                 {
                     var target = _currentTarget;
 
-                    if (targetSelector.IsValidAllyTarget(actor, target))
+                    if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
                     {
-                        UseItem(actor, _selectedItem, target);
-
-                        CheckBattleEnd(actor, target);
-                        actionChosen = true;
+                        if (UseItem(actor, _selectedItem, target))
+                        {
+                            CheckBattleEnd(actor, target);
+                            actionChosen = true;
+                        }
                     }
                 }
             }
@@ -826,31 +827,70 @@ public class BattleManager : MonoBehaviour
         //广播战斗结束
         OnBattleEnded?.Invoke(payload);
     }
-    private void UseItem(BaseController actor,ItemData item,BaseController target)
+    private bool UseItem(BaseController actor,ItemData item,BaseController target)
     {
-        if(actor==null||item==null||target==null) return;
+        if(actor==null||item==null||target==null) return false;
 
         if (!CanUseItem(item))
         {
             Debug.Log($"[Item]{item.itemName}is out of stock");
-            return;
+            return false;
+        }
+
+        // Check the effect before consuming the item, so full HP/MP or placeholder Buff items do not waste inventory.
+        if (!CanApplyBattleItemEffect(item, target))
+        {
+            Debug.Log($"[Item] {item.itemName} cannot be used on {target.data?.Name}");
+            return false;
         }
 
         if (!ConsumeItem(item))
         {
             Debug.Log($"[Item] failed to consume {item.itemName}");
-            return;
+            return false;
         }
-        ShowSkillName(item.itemName);
 
+        ShowSkillName(item.itemName);
+        ApplyBattleItemEffect(item, target);
+        return true;
+    }
+    private bool CanApplyBattleItemEffect(ItemData item, BaseController target)
+    {
+        if (item == null || target == null || target.data == null)
+            return false;
+
+        switch (item.itemtype)
+        {
+            case ItemType.Heal:
+                return !target.data.isDead && target.data.Hp > 0 && target.data.Hp < target.data.MaxHp;
+            case ItemType.RestoreMp:
+                return !target.data.isDead && target.data.Hp > 0 && target.data.Mp < target.data.MaxMp;
+            case ItemType.Revive:
+                return target.data.isDead || target.data.Hp <= 0;
+            case ItemType.Buff:
+                Debug.Log("[Item] Buff item type is only a placeholder for now.");
+                return false;
+            default:
+                return false;
+        }
+    }
+    private void ApplyBattleItemEffect(ItemData item, BaseController target)
+    {
         switch (item.itemtype)
         {
             case ItemType.Heal:
                 target.Heal(item.power);
                 Debug.Log($"[ItemHeal]{_currentActor.name} used item {_currentTarget.name} has healed {item.power}HP {_currentTarget.name} current HP={_currentTarget.data.Hp} ");
                 break;
+            case ItemType.RestoreMp:
+                target.RestoreMp(item.power);
+                Debug.Log($"[ItemMP]{_currentActor.name} used item {_currentTarget.name} restored {item.power}MP {_currentTarget.name} current MP={_currentTarget.data.Mp} ");
+                break;
+            case ItemType.Revive:
+                target.Revive(item.power);
+                Debug.Log($"[ItemRevive]{_currentActor.name} used item {_currentTarget.name} revived with {item.power}HP.");
+                break;
         }
-      
     }
     private List<CharacterResultSnapshot> BuildPartySnapShots()
     {
@@ -1230,6 +1270,17 @@ public class BattleManager : MonoBehaviour
                     cameraDirector?.FocusPlayerGroup();
                 }
             }
+            else if (_currentCommand == CommandType.Item && _selectedItem != null)
+            {
+                if (_currentTargetType == SkillTargetType.EnemySingle)
+                {
+                    cameraDirector?.FocusPlayerSideTargetPreviewShot(_currentActor, _previewTarget);
+                }
+                if (_currentTargetType == SkillTargetType.AllySingle || _currentTargetType == SkillTargetType.AllyDeadSingle)
+                {
+                    cameraDirector?.FocusPlayerGroup();
+                }
+            }
         }
     }
     private bool CanTargetSelect()
@@ -1499,10 +1550,36 @@ public class BattleManager : MonoBehaviour
         switch (item.itemtype)
         {
             case ItemType.Heal:
+            case ItemType.RestoreMp:
                 _currentTargetType = SkillTargetType.AllySingle;
                 targetSelector.AutoPickAllyTargetIfNeeded(_currentActor);
-               
+                if (_currentTarget != null)
+                {
+                    SetPreviewTarget(_currentTarget);
+                    OnTargetChanged?.Invoke(_currentTarget);
+                }
                 break;
+            case ItemType.Revive:
+                _currentTargetType = SkillTargetType.AllyDeadSingle;
+                targetSelector.AutoPickDeadAllyTargetIfNeeded(_currentActor);
+                if (_currentTarget != null)
+                {
+                    SetPreviewTarget(_currentTarget);
+                    OnTargetChanged?.Invoke(_currentTarget);
+                }
+                break;
+            case ItemType.Buff:
+                Debug.Log("[Item] Buff item type is only a placeholder for now.");
+                _selectedItem = null;
+                _currentCommand = CommandType.None;
+                itemPanel.Show();
+                NotifyInputState();
+                return;
+            default:
+                _selectedItem = null;
+                _currentCommand = CommandType.None;
+                NotifyInputState();
+                return;
         }
         NotifyInputState();
     }
@@ -1687,7 +1764,16 @@ public class BattleManager : MonoBehaviour
     public bool CanUseItem(ItemData item)
     {
         /*return GetItemCount(item) > 0;*/
-        return InventoryRuntimeState.CanUseItem(item);
+        return IsBattleUsableItem(item) && InventoryRuntimeState.CanUseItem(item);
+    }
+    private bool IsBattleUsableItem(ItemData item)
+    {
+        if (item == null)
+            return false;
+
+        return item.itemtype == ItemType.Heal ||
+            item.itemtype == ItemType.RestoreMp ||
+            item.itemtype == ItemType.Revive;
     }
     //使用消耗道具
     private bool ConsumeItem(ItemData item)

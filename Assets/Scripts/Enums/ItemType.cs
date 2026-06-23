@@ -4,7 +4,10 @@ using UnityEngine;
 
 public enum ItemType
 {
-    None,
-    Heal,
+    None = 0,
+    Heal = 1,
+    RestoreMp = 2,
+    Revive = 3,
+    Buff = 4,
 }
 

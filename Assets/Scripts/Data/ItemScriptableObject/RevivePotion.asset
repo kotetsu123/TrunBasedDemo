@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a265e37c5a3f52409641fdeb997ae30, type: 3}
-  m_Name: Potion
+  m_Name: RevivePotion
   m_EditorClassIdentifier: 
-  itemId: Potion
-  itemName: Potion
-  itemtype: 1
-  power: 100
+  itemId: RevivePotion
+  itemName: Revive Potion
+  itemtype: 3
+  power: 30
   icon: {fileID: 21300000, guid: e9fd5d246e1b4594e839c3ceb864d699, type: 3}
-  description: 'it''s just a potion
+  description: 'Revives one defeated party member.
 
 '
   buffId: 

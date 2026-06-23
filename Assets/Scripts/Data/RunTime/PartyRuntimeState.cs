@@ -154,6 +154,43 @@ public class PartyRuntimeState
         return true;
     }
 
+    public static bool TryRestoreMpMember(Character member, int amount)
+    {
+        if (member == null || amount <= 0)
+            return false;
+        if (!partyMembers.Contains(member))
+            return false;
+        if (member.isDead || member.Hp <= 0)
+            return false;
+        if (member.Mp >= member.MaxMp)
+            return false;
+
+        int prevMp = member.Mp;
+        member.Mp = Mathf.Min(member.Mp + amount, member.MaxMp);
+        member.NotifyMpChange(prevMp, member.Mp);
+
+        Debug.Log($"[PartyRuntimeState] Restored MP {member.Name}: {prevMp}->{member.Mp}");
+        return true;
+    }
+
+    public static bool TryReviveMember(Character member, int amount)
+    {
+        if (member == null || amount <= 0)
+            return false;
+        if (!partyMembers.Contains(member))
+            return false;
+        if (!member.isDead && member.Hp > 0)
+            return false;
+
+        int prevHp = member.Hp;
+        member.isDead = false;
+        member.Hp = Mathf.Clamp(amount, 1, member.MaxHp);
+        member.NotifyHpChange(prevHp, member.Hp);
+
+        Debug.Log($"[PartyRuntimeState] Revived {member.Name}: {prevHp}->{member.Hp}");
+        return true;
+    }
+
     public static void Clear()
     {
         partyMembers.Clear();

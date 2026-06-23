@@ -18,6 +18,12 @@ public class ItemData : ScriptableObject
     [TextArea]
     public string description;
 
+    [Header("Buff Placeholder")]
+    // Buff is only a reserved data entry for now.
+    // The actual buff system can read these fields later without changing ItemData again.
+    public string buffId;
+    public int buffTurns;
+
     private void OnValidate()
     {
         // 旧的 ItemData 资产可能还没有手动填写 itemId。

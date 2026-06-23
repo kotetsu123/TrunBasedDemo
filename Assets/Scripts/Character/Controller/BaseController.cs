@@ -75,6 +75,21 @@ public abstract class BaseController : MonoBehaviour
 
         data.NotifyHpChange(prevHp, data.Hp);
     }
+    public void RestoreMp(int amount)
+    {
+        if (data == null || amount <= 0) return;
+
+        int prevMp = data.Mp;
+        data.Mp = Mathf.Min(data.MaxMp, data.Mp + amount);
+
+        int actualRestore = data.Mp - prevMp;
+        if (actualRestore > 0)
+        {
+            ShowFloatingText($"+{actualRestore} MP", Color.cyan);
+        }
+
+        data.NotifyMpChange(prevMp, data.Mp);
+    }
     public void Revive(int amount)
     {
         if (data == null) return;

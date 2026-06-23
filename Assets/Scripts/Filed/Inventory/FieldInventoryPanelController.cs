@@ -128,7 +128,12 @@ public class FieldInventoryPanelController : BasePanel
         switch (selectedItem.itemtype)
         {
             case ItemType.Heal:
+            case ItemType.RestoreMp:
+            case ItemType.Revive:
                 StartTargetSelection();
+                break;
+            case ItemType.Buff:
+                Debug.Log("[FieldInventory] Buff item is reserved, but buff effect is not implemented yet.");
                 break;
         }
     }
@@ -154,14 +159,14 @@ public class FieldInventoryPanelController : BasePanel
         if (selectedItem == null || !InventoryRuntimeState.CanUseItem(selectedItem))
             return;
 
-        UseHealItemOnTarget(selectedItem, target);
+        UseSelectedItemOnTarget(selectedItem, target);
     }
-    private void UseHealItemOnTarget(ItemData item, Character target)
+    private void UseSelectedItemOnTarget(ItemData item, Character target)
     {
         if (item == null || target == null)
             return;
 
-        if (!PartyRuntimeState.TryHealMember(target, item.power))
+        if (!TryApplyFieldItemEffect(item, target))
         {
             Debug.Log("[FieldInventory] Selected party member cannot use this item.");
             return;
@@ -188,14 +193,41 @@ public class FieldInventoryPanelController : BasePanel
             HideDescription();
         }
     }
+    private bool TryApplyFieldItemEffect(ItemData item, Character target)
+    {
+        // Field item effects operate directly on PartyRuntimeState because there is no battle controller here.
+        switch (item.itemtype)
+        {
+            case ItemType.Heal:
+                return PartyRuntimeState.TryHealMember(target, item.power);
+            case ItemType.RestoreMp:
+                return PartyRuntimeState.TryRestoreMpMember(target, item.power);
+            case ItemType.Revive:
+                return PartyRuntimeState.TryReviveMember(target, item.power);
+            case ItemType.Buff:
+                Debug.Log("[FieldInventory] Buff item type is only a placeholder for now.");
+                return false;
+            default:
+                return false;
+        }
+    }
     private bool CanUseSelectedItem()
     {
         if (selectedItem == null)
             return false;
 
         return !isSelectingTarget &&
-            selectedItem.itemtype == ItemType.Heal &&
+            IsFieldUsableItem(selectedItem) &&
             InventoryRuntimeState.CanUseItem(selectedItem);
+    }
+    private bool IsFieldUsableItem(ItemData item)
+    {
+        if (item == null)
+            return false;
+
+        return item.itemtype == ItemType.Heal ||
+            item.itemtype == ItemType.RestoreMp ||
+            item.itemtype == ItemType.Revive;
     }
     private void SetUseButtonInteractable(bool interactable)
     {
