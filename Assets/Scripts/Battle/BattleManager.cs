@@ -1150,7 +1150,8 @@ public class BattleManager : MonoBehaviour
             SetCurrentActor(null);
   
         //从所有逻辑入口中移除（最关键）//时间轴
-        controllers.Remove(dead);
+        if (dead.data.Team == Team.Enemy)
+            controllers.Remove(dead);
 
         //ui和列表移除，避免后续tick/行动中被访问到
         //ui层.移除时间轴图标
@@ -1652,13 +1653,39 @@ public class BattleManager : MonoBehaviour
         if (ctrl == null || ctrl.data == null) return;
         if (ctrl.data.isDead || ctrl.data.Hp <= 0) return;
 
+        ctrl.enabled = true;
 
-       if(!controllers.Contains(ctrl))
-        //重新加入时间轴
-        RegisterController(ctrl);
-       _timelineDirty = true;//角色复活后需要刷新时间轴
-       // RequestReorder();
+        if (!controllers.Contains(ctrl))
+        {
+            // Older death flow removed dead players from controllers, so keep this fallback compatible.
+            RegisterController(ctrl);
+        }
+        else if (!timeLineIcons.ContainsKey(ctrl))
+        {
+            RebuildTimelineIcon(ctrl);
+        }
 
+        _timelineDirty = true;//角色复活后需要刷新时间轴
+        RequestReorder();
+    }
+    private void RebuildTimelineIcon(BaseController ctrl)
+    {
+        if (ctrl == null || timeLineIconPrefab == null || iconVisualRoot == null)
+            return;
+        if (timeLineIcons.ContainsKey(ctrl))
+            return;
+
+        GameObject iconObj = Instantiate(timeLineIconPrefab, iconVisualRoot);
+        TimeLineIcon icon = iconObj.GetComponent<TimeLineIcon>();
+        if (icon == null)
+        {
+            Destroy(iconObj);
+            return;
+        }
+
+        icon.Bind(ctrl);
+        timeLineIcons.Add(ctrl, icon);
+        FindObjectOfType<TimeLineUI>()?.BuildCache();
     }
     public void ShowSkillName(string skillName)
     {
