@@ -28,6 +28,7 @@ public class BattleCameraDirector : MonoBehaviour
     private bool _isLocked;
 
     public bool IsLocked => _isLocked;
+    public bool IsMoving => _cameraMoveRoutine != null;
 
     private void OnEnable()
     {

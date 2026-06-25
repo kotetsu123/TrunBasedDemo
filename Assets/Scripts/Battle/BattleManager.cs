@@ -465,6 +465,12 @@ public class BattleManager : MonoBehaviour
                 // °´¿Õ¸ñ¹¥»÷
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
+                    if (!CanConfirmAction())
+                    {
+                        yield return null;
+                        continue;
+                    }
+
                     var target = _currentTarget;
                     if (targetSelector.IsValidEnemyTarget(actor, target))
                     {
@@ -484,6 +490,12 @@ public class BattleManager : MonoBehaviour
                 targetSelector.HandleTargetSelectionInput(actor, _currentTargetType);
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
+                    if (!CanConfirmAction())
+                    {
+                        yield return null;
+                        continue;
+                    }
+
                     var target = _currentTarget;
                     if (_currentTargetType == SkillTargetType.Self)
                     {
@@ -508,6 +520,12 @@ public class BattleManager : MonoBehaviour
 
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
+                    if (!CanConfirmAction())
+                    {
+                        yield return null;
+                        continue;
+                    }
+
                     var target = _currentTarget;
 
                     if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
@@ -1304,6 +1322,10 @@ public class BattleManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+    private bool CanConfirmAction()
+    {
+        return cameraDirector == null || !cameraDirector.IsMoving;
     }
     private void NotifyInputState()
     {
