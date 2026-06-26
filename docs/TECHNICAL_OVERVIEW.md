@@ -153,6 +153,23 @@ rotationEuler
 scale
 ```
 
+当前已接入的 FieldObject：
+
+```text
+FieldChestController
+ -> player enters trigger
+ -> press E
+ -> InventoryRuntimeState.AddItem()
+ -> FieldBattleContext.MarkChestOpened(chestId)
+ -> SaveSystem writes openedChestIds
+```
+
+说明：
+
+- `FieldData.FieldObjectEntry.objectId` 会在生成后写入 `FieldChestController.chestId`。
+- 手动摆在场景里的宝箱也可以直接在 Inspector 填 `chestId`。
+- `chestId` 是一次性宝箱的稳定存档 ID，打开后会保存到 `FieldSaveData.openedChestIds`。
+
 设计意图：
 
 - 3D demo 中，不强制用 FieldData runtime 生成整个世界。
@@ -362,6 +379,8 @@ Assets/Scripts/Battle/BattleManager.cs
 - 管理当前行动者、目标、预览目标。
 - 接收 Battle UI 指令。
 - 执行 Attack / Skill / Item。
+- 在镜头移动中拦截 Attack / Skill / Item 的最终确认。
+- 处理角色死亡、复活、Timeline icon 重建。
 - 处理战斗结束。
 - 广播 `OnBattleEnded`。
 
@@ -383,6 +402,65 @@ Lose / Retry：
 
 - Lose 不回写 PartyRuntimeState。
 - Retry 使用进入战斗前的 runtime state。
+
+输入确认与镜头移动：
+
+```text
+Player selects Attack / Skill / Item
+ -> BattleManager updates current target / preview target
+ -> BattleCameraDirector starts camera transition
+ -> Player may still change selection while camera is moving
+ -> Space confirmation is ignored until BattleCameraDirector.IsMoving == false
+ -> Action resolves only after the preview camera reaches its target
+```
+
+设计原因：
+
+- 目标选择和 UI 操作保持响应，不强制锁死玩家输入。
+- Attack / Skill / Item 的最终确认必须等待镜头移动结束。
+- 避免技能或道具已经结算，但镜头还在移动，造成表现延迟和镜头冲突。
+- 在 coroutine 中阻止确认时必须先 `yield return null` 再 `continue`，避免同一帧无限循环导致 Unity Editor 卡死。
+
+相关文件：
+
+```text
+BattleCameraDirector.IsMoving
+BattleManager.CanConfirmAction()
+```
+
+玩家死亡与复活数据保留：
+
+```text
+Player HP reaches 0
+ -> BaseController.OnDeath()
+ -> BattleManager.NotifyDeath()
+ -> HandleDeathCoroutine()
+ -> mark isDead / Hp = 0
+ -> disable player controller
+ -> remove timeline icon
+ -> keep player controller in BattleManager.controllers
+ -> PartyRuntimeState.UpdateFromBattleController()
+ -> FieldPartyHud still receives the dead member data
+```
+
+设计原因：
+
+- 玩家死亡后不能从 `BattleManager.controllers` 中移除，否则胜利回写时会把该队员当成“不存在”。
+- 保留死亡玩家的 controller 数据，可以让 `PartyRuntimeState` 保存 `isDead / Hp = 0`。
+- Field HUD 仍然能显示死亡队员，Field 背包也才能继续选中该队员使用复活道具。
+- 敌人死亡仍然会从 controller 列表移除，并释放 formation slot，方便 `BattleSpawner.TryFillOneEnemy()` 补位。
+
+复活流程：
+
+```text
+Revive item / skill
+ -> BaseController.Revive()
+ -> OnRevied
+ -> BattleManager.HandleCharacterRevived()
+ -> ctrl.enabled = true
+ -> rebuild timeline icon if it was removed by death flow
+ -> RequestReorder()
+```
 
 ### 4.3 BattleFormation
 
@@ -589,7 +667,63 @@ Assets/Scripts/Filed/Inventory/InventoryRuntimeState.cs
 - 空 slot 会保留 index。
 - 容量满时当前版本会扩容并 warning。
 
-### 6.2 PartyRuntimeState
+### 6.2 Item Type / Item Usage
+
+文件：
+
+```text
+Assets/Scripts/Enums/ItemType.cs
+Assets/Scripts/Data/ItemData/ItemData.cs
+Assets/Scripts/Filed/Inventory/FieldInventoryPanelController.cs
+Assets/Scripts/Battle/BattleManager.cs
+```
+
+当前 `ItemType` 使用显式数字：
+
+```text
+None = 0
+Heal = 1
+RestoreMp = 2
+Revive = 3
+Buff = 4
+```
+
+设计原因：
+
+- Unity 会把 enum 序列化成数字。
+- 旧 Potion asset 中已经保存了 `itemtype: 1`。
+- 给 enum 写显式数字，可以避免以后插入新类型时让旧 asset 的含义发生偏移。
+
+当前已实现：
+
+- `Heal`：恢复 HP。
+- `RestoreMp`：恢复 MP。
+- `Revive`：复活死亡角色，并恢复一定 HP。
+
+当前预留：
+
+- `Buff`：`ItemData` 中已有 `buffId / buffTurns` 字段。
+- Buff 目前只是接口占位，尚未接入实际 buff runtime / 状态机。
+- Field 和 Battle 中遇到 Buff item 时，不会实际生效，也不应该消耗道具。
+
+Battle 使用规则：
+
+```text
+Select Item
+ -> Decide target type by ItemType
+ -> Validate target
+ -> Apply effect
+ -> Consume inventory item
+ -> End turn
+```
+
+如果目标无效：
+
+- 不消耗 item。
+- 不结束回合。
+- 保持在当前道具选择流程。
+
+### 6.3 PartyRuntimeState
 
 文件：
 
@@ -603,7 +737,7 @@ Assets/Scripts/Data/RunTime/PartyRuntimeState.cs
 
 - 初始化队伍。
 - 从 Battle Controller 回写队伍。
-- Field 中使用道具治疗队伍成员。
+- Field 中使用道具恢复 HP / MP 或复活队伍成员。
 - 保存为 PartySaveData。
 - 从 PartySaveData 恢复。
 
@@ -752,6 +886,8 @@ Assets/Scripts/Filed/Inventory/FieldInventoryPartyTargetPanelController.cs
 - 空 slot 隐藏 icon/count。
 - 点击 item 显示 description。
 - Use 后弹出 party target panel。
+- 可对队伍成员使用 HP 恢复、MP 恢复、复活道具。
+- Buff item 目前只作为预留类型，不在 Field 中实际生效。
 - 拖拽 item root 交换 slot。
 - Esc / B 控制背包关闭。
 
@@ -770,6 +906,12 @@ ResultCharacterPanelController
 ```
 
 Battle UI 通过事件与 `BattleManager` 交互。
+
+当前输入约束：
+
+- 目标切换和 UI 光标移动可以在镜头移动中继续响应。
+- Attack / Skill / Item 的最终确认会等待 `BattleCameraDirector.IsMoving == false`。
+- 这样可以避免技能或道具已经结算，但镜头还没移动到目标位置的表现冲突。
 
 ## 9. Data Asset Map
 
@@ -902,8 +1044,12 @@ BattleSpawner 找不到 EncounterData:
 - `EncounterData` 的敌人生成主流程已经改为 `enemyEntries -> EnemyCharacterDataBase -> Character template`。
 - 旧 `enemyChatacters` 字段仍保留为 legacy fallback，避免破坏已有 Unity asset。
 - `FieldData` 目前是 gameplay table，不是完整 3D map generator。
-- Field object entry 只是入口，宝箱/NPC/传送点等交互逻辑还未细化。
+- Field object entry 已接入宝箱第一版，NPC/传送点等交互逻辑还未细化。
 - Inventory full flow 目前是自动扩容并 warning。
+- HP / MP / Revive item 已经能在 Field 和 Battle 中使用。
+- Buff item 已有数据入口，但还没有实际 buff runtime、持续回合、状态图标和结算逻辑。
+- 玩家死亡后会保留在 Battle controller 列表中，用于胜利后正确回写死亡状态和 Field HUD。
+- Battle 镜头移动中只拦截最终确认，不锁死目标选择和 UI 移动。
 - Reward UI 已有第一版，但还可以继续做更完整的奖励面板。
 
 ### 推荐后续扩展
@@ -912,7 +1058,7 @@ BattleSpawner 找不到 EncounterData:
    全部 Encounter 迁移稳定后，可以考虑隐藏或移除 legacy enemyChatacters 字段。
 
 2. Interactable Data  
-   在 FieldData 中增加 chest / NPC / portal 等 gameplay object 类型。
+   在 FieldData 中继续扩展 NPC / portal / event trigger 等 gameplay object 类型。
 
 3. Reward Panel 第二版  
    统一 EXP、Item、Gold、LevelUp 的展示顺序。

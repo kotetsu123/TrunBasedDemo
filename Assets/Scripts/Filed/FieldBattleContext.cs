@@ -21,6 +21,7 @@ public static class FieldBattleContext
 
     private static readonly HashSet<string> clearedSpawnIds= new HashSet<string>();
     private static readonly Dictionary<string, DateTime> clearedSpawnUtcTimes = new Dictionary<string, DateTime>();
+    private static readonly HashSet<string> openedChestIds = new HashSet<string>();
 
     //存档的数据相关。
     public static bool HasSavedPlayerTransform { get; private set; }
@@ -28,6 +29,7 @@ public static class FieldBattleContext
     public static Quaternion SavedPlayerRot { get; private set; }
 
     public static IReadOnlyCollection<string> ClearedSpawnIds => clearedSpawnIds;
+    public static IReadOnlyCollection<string> OpenedChestIds => openedChestIds;
     public static bool IsEncounterCooldownActive => Time.time < EncounterCooldownUntilTime;
     //保存进入战斗前的FieldScene名称，玩家位置朝向
     public static void SaveFieldReturnData(string fieldSceneName,Vector3 playerPos,Quaternion playerRot,string triggeredSpawnId,string encounterId)
@@ -65,6 +67,23 @@ public static class FieldBattleContext
             return false;
 
         return clearedSpawnIds.Contains(spawnId);
+    }
+    //宝箱相关的记录，标记某个宝箱已经被打开过了
+    public static void MarkChestOpened(string chestId)
+    {
+        if (string.IsNullOrWhiteSpace(chestId))
+            return;
+
+        openedChestIds.Add(chestId);
+        Debug.Log($"[FieldBattleContext] Marked chest as opened: {chestId}");
+    }
+
+    public static bool IsChestOpened(string chestId)
+    {
+        if (string.IsNullOrWhiteSpace(chestId))
+            return false;
+
+        return openedChestIds.Contains(chestId);
     }
     // EnemySpawnManager 会在生成每个 SpawnPoint 前问这里：这个点现在要不要跳过生成？
     // 返回 true  = 这次不要生成。
@@ -125,6 +144,13 @@ public static class FieldBattleContext
         FieldSaveData saveData = new FieldSaveData();
 
 
+        foreach (string chestId in openedChestIds)
+        {
+            if (string.IsNullOrWhiteSpace(chestId))
+                continue;
+
+            saveData.openedChestIds.Add(chestId);
+        }
         //HaseSet is good for runtime lookup, but save data uses List so JsonUtility can serialize it
         foreach(string spawnId in clearedSpawnIds)
         {
@@ -151,6 +177,7 @@ public static class FieldBattleContext
     {
         clearedSpawnIds.Clear();
         clearedSpawnUtcTimes.Clear();
+        openedChestIds.Clear();
         ClearReturnData();
         EncounterCooldownUntilTime = 0f;
 
@@ -160,6 +187,17 @@ public static class FieldBattleContext
 
         if (saveData == null)
             return;
+
+        if (saveData.openedChestIds != null)
+        {
+            foreach (string chestId in saveData.openedChestIds)
+            {
+                if (string.IsNullOrWhiteSpace(chestId))
+                    continue;
+
+                openedChestIds.Add(chestId);
+            }
+        }
 
         if (saveData.clearedSpawnRecords != null && saveData.clearedSpawnRecords.Count > 0)
         {
@@ -212,6 +250,7 @@ public static class FieldBattleContext
         ClearSavedPlayerTransform();
         clearedSpawnIds.Clear();
         clearedSpawnUtcTimes.Clear();
+        openedChestIds.Clear();
         EncounterCooldownUntilTime = 0f;
     }
 

@@ -130,6 +130,10 @@ public class FieldCreator : MonoBehaviour
                 : entry.ObjectId;
             fieldObject.transform.localScale = entry.Scale;
             fieldObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
+
+            FieldChestController chest = fieldObject.GetComponent<FieldChestController>();
+            if (chest != null)
+                chest.Configure(entry.ObjectId);
         }
     }
 }

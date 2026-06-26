@@ -19,6 +19,10 @@ public class FieldSaveData
     // JsonUtility cannot serialize Dictionary, so save it as a list of records.
     public List<FieldClearedSpawnSaveData> clearedSpawnRecords = new List<FieldClearedSpawnSaveData>();
 
+    // Opened one-time field objects, such as treasure chests.
+    // Chest runtime lookup uses a HashSet, but JsonUtility needs a serializable List.
+    public List<string> openedChestIds = new List<string>();
+
     //保存玩家所在的field场景名。
     //之后多地图时，Title Load 可以根据这个字段回到正确场景。
     public string sceneName;
