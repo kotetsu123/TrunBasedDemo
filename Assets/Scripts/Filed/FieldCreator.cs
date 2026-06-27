@@ -128,7 +128,15 @@ public class FieldCreator : MonoBehaviour
             fieldObject.name = string.IsNullOrWhiteSpace(entry.ObjectId)
                 ? entry.Prefab.name
                 : entry.ObjectId;
-            fieldObject.transform.localScale = entry.Scale;
+            // Validate scale to avoid zero scale issues.
+            Vector3 objectScale = entry.Scale;
+            if(objectScale == Vector3.zero)
+            {
+                Debug.LogWarning($"[FieldCreator] Field object scale is zero. Use Vector3.one instead. objectId={entry.ObjectId}");
+                objectScale = Vector3.one;
+            }
+
+            fieldObject.transform.localScale = objectScale;
             fieldObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
 
             FieldChestController chest = fieldObject.GetComponent<FieldChestController>();
