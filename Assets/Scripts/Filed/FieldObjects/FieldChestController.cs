@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class FieldChestController : MonoBehaviour
@@ -8,11 +9,18 @@ public class FieldChestController : MonoBehaviour
     [SerializeField] private List<InitialItemStack> rewards = new List<InitialItemStack>();
     [SerializeField] private GameObject closedVisual;
     [SerializeField] private GameObject openedVisual;
+    [Header("Lid Animation")]
+    [SerializeField] private Transform lidTransform;
+    [SerializeField] private Vector3 closedLidEuler = Vector3.zero;
+    [SerializeField] private Vector3 openedLidEuler = new Vector3(-90f, 0f, 0f);
+    [SerializeField] private float openDuration = 0.35f;
+    [SerializeField] private Ease openEase = Ease.OutCubic;
     [SerializeField] private bool disableColliderAfterOpen = false;
 
     private bool isPlayerInRange;
     private bool isOpened;
     private Collider cachedCollider;
+    private Tween lidTween;
 
     public string ChestId => chestId;
 
@@ -30,6 +38,11 @@ public class FieldChestController : MonoBehaviour
         }
 
         ApplyOpenedState(FieldBattleContext.IsChestOpened(chestId));
+    }
+
+    private void OnDestroy()
+    {
+        lidTween?.Kill();
     }
 
     private void Update()
@@ -91,8 +104,31 @@ public class FieldChestController : MonoBehaviour
         if (openedVisual != null)
             openedVisual.SetActive(isOpened);
 
+        ApplyLidState(isOpened, Application.isPlaying);
+
         if (disableColliderAfterOpen && cachedCollider != null)
             cachedCollider.enabled = !isOpened;
+    }
+
+    private void ApplyLidState(bool opened, bool animate)
+    {
+        if (lidTransform == null)
+            return;
+
+        lidTween?.Kill();
+
+        Vector3 targetEuler = opened ? openedLidEuler : closedLidEuler;
+
+        if (!animate || openDuration <= 0f)
+        {
+            lidTransform.localEulerAngles = targetEuler;
+            return;
+        }
+
+        lidTween = lidTransform
+            .DOLocalRotate(targetEuler, openDuration)
+            .SetEase(openEase)
+            .SetLink(gameObject);
     }
 
     private void OnTriggerEnter(Collider other)

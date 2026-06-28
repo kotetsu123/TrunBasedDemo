@@ -45,5 +45,5 @@ MonoBehaviour:
   - objectId: Chest_001
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
     position: {x: 5, y: 0.5, z: 0}
-    rotationEuler: {x: 0, y: 0, z: 0}
+    rotationEuler: {x: 0, y: 90, z: 0}
     scale: {x: 1, y: 1, z: 1}
