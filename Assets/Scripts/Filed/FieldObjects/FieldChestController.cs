@@ -6,9 +6,12 @@ public class FieldChestController : MonoBehaviour
 {
     [SerializeField] private string chestId;
     [SerializeField] private KeyCode interactKey = KeyCode.E;
+    [SerializeField] private string interactPrompt = "Press E";
+    [SerializeField] private FieldInteractionPromptController promptController;
     [SerializeField] private List<InitialItemStack> rewards = new List<InitialItemStack>();
     [SerializeField] private GameObject closedVisual;
     [SerializeField] private GameObject openedVisual;
+
     [Header("Lid Animation")]
     [SerializeField] private Transform lidTransform;
     [SerializeField] private Vector3 closedLidEuler = Vector3.zero;
@@ -31,6 +34,9 @@ public class FieldChestController : MonoBehaviour
 
     private void Start()
     {
+        if (promptController == null)
+            promptController = FieldInteractionPromptController.Current;
+
         if (string.IsNullOrWhiteSpace(chestId))
         {
             chestId = gameObject.name;
@@ -78,6 +84,7 @@ public class FieldChestController : MonoBehaviour
         GiveRewards();
         FieldBattleContext.MarkChestOpened(chestId);
         ApplyOpenedState(true);
+        HidePrompt();
 
         Debug.Log($"[FieldChest] Opened chest: {chestId}");
     }
@@ -133,14 +140,22 @@ public class FieldChestController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (IsPlayer(other))
-            isPlayerInRange = true;
+        if (!IsPlayer(other))
+            return;
+
+        isPlayerInRange = true;
+
+        if (!isOpened)
+            ShowPrompt();
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (IsPlayer(other))
-            isPlayerInRange = false;
+        if (!IsPlayer(other))
+            return;
+
+        isPlayerInRange = false;
+        HidePrompt();
     }
 
     private bool IsPlayer(Collider other)
@@ -152,5 +167,18 @@ public class FieldChestController : MonoBehaviour
             return true;
 
         return other.GetComponentInParent<SimplePlayerMovement>() != null;
+    }
+
+    private void ShowPrompt()
+    {
+        if (promptController == null)
+            promptController = FieldInteractionPromptController.Current;
+
+        promptController?.Show(this, interactPrompt);
+    }
+
+    private void HidePrompt()
+    {
+        promptController?.Hide(this);
     }
 }
