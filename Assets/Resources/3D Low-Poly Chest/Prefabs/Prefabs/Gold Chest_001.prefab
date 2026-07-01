@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4513996156394719694}
   - component: {fileID: 1882051769844382721}
   - component: {fileID: 8050647260297964935}
+  - component: {fileID: 5326918458847144390}
   m_Layer: 0
   m_Name: Gold Chest_001
   m_TagString: Untagged
@@ -49,6 +50,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chestId: 
   interactKey: 101
+  interactPrompt: Press E
+  promptController: {fileID: 0}
   rewards:
   - item: {fileID: 11400000, guid: 7b9602cd91f7418e9a520d58dbb19415, type: 2}
     count: 2
@@ -61,6 +64,7 @@ MonoBehaviour:
   openedLidEuler: {x: -90, y: 0, z: 0}
   openDuration: 0.35
   openEase: 9
+  blockingCollider: {fileID: 5326918458847144390}
   disableColliderAfterOpen: 1
 --- !u!65 &8050647260297964935
 BoxCollider:
@@ -83,6 +87,27 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.4370494, y: 0.9926039, z: 1}
   m_Center: {x: -0.017991304, y: -0.007239282, z: 0}
+--- !u!65 &5326918458847144390
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 45645056354724239}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1512538649182768284
 GameObject:
   m_ObjectHideFlags: 0

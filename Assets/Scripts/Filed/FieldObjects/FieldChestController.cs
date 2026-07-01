@@ -18,6 +18,8 @@ public class FieldChestController : MonoBehaviour
     [SerializeField] private Vector3 openedLidEuler = new Vector3(-90f, 0f, 0f);
     [SerializeField] private float openDuration = 0.35f;
     [SerializeField] private Ease openEase = Ease.OutCubic;
+    [Header("Collision")]
+    [SerializeField] private Collider blockingCollider;
     [SerializeField] private bool disableColliderAfterOpen = false;
 
     private bool isPlayerInRange;
@@ -30,6 +32,9 @@ public class FieldChestController : MonoBehaviour
     private void Awake()
     {
         cachedCollider = GetComponent<Collider>();
+
+        if (blockingCollider == null)
+            blockingCollider = FindBlockingCollider();
     }
 
     private void Start()
@@ -113,8 +118,25 @@ public class FieldChestController : MonoBehaviour
 
         ApplyLidState(isOpened, Application.isPlaying);
 
+        if (blockingCollider != null)
+            blockingCollider.enabled = !isOpened;
+
         if (disableColliderAfterOpen && cachedCollider != null)
             cachedCollider.enabled = !isOpened;
+    }
+
+    private Collider FindBlockingCollider()
+    {
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider col in colliders)
+        {
+            if (col == null || col.isTrigger)
+                continue;
+
+            return col;
+        }
+
+        return null;
     }
 
     private void ApplyLidState(bool opened, bool animate)
