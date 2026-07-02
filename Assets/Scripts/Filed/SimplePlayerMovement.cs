@@ -1,5 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SimplePlayerMovement : MonoBehaviour
@@ -10,21 +8,20 @@ public class SimplePlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private Vector3 moveInput;
 
+    public Vector3 MoveInput => moveInput;
 
-    public Vector3 MoveInput=> moveInput;
     private void Awake()
     {
-        rb=GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
-        //暂停判断
         if (FieldPauseState.IsPaused)
             return;
 
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
 
         Vector3 cameraForward = cameraTransform.forward;
         cameraForward.y = 0f;
@@ -35,7 +32,6 @@ public class SimplePlayerMovement : MonoBehaviour
         cameraRight.Normalize();
 
         moveInput = (cameraForward * v + cameraRight * h).normalized;
-        
     }
 
     private void FixedUpdate()
@@ -45,15 +41,15 @@ public class SimplePlayerMovement : MonoBehaviour
             Vector3 move = moveInput * moveSpeed;
             rb.velocity = new Vector3(move.x, rb.velocity.y, move.z);
 
-            Quaternion targetRot=Quaternion.LookRotation(moveInput);
-            Quaternion smoothRot=Quaternion.Slerp(
+            Quaternion targetRot = Quaternion.LookRotation(moveInput);
+            Quaternion smoothRot = Quaternion.Slerp(
                 transform.rotation,
                 targetRot,
-                10f*Time.fixedDeltaTime);
+                10f * Time.fixedDeltaTime);
             rb.MoveRotation(smoothRot);
         }
         else
-        {// 界岺彊틱盧땡，뎃괏넣뉩殮醵똑（흔契禿）꼇긴
+        {
             rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
         }
     }
