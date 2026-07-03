@@ -9,6 +9,49 @@ public class PartyRuntimeState
     public static IReadOnlyList<Character> PartyMembers => partyMembers;
     public static bool HasPartyData => partyMembers.Count > 0;
 
+    public static bool HasMember(string characterId)
+    {
+        if (string.IsNullOrWhiteSpace(characterId))
+            return false;
+
+        foreach (Character member in partyMembers)
+        {
+            if (member == null)
+                continue;
+
+            if (member.characterId == characterId)
+                return true;
+        }
+
+        return false;
+    }
+
+    public static bool TryRecruitMember(Character characterTemplate, out Character recruitedMember)
+    {
+        recruitedMember = null;
+
+        if (characterTemplate == null)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(characterTemplate.characterId))
+        {
+            Debug.LogWarning($"[PartyRuntimeState] Recruit failed because characterId is empty. name={characterTemplate.Name}");
+            return false;
+        }
+
+        if (HasMember(characterTemplate.characterId))
+        {
+            Debug.Log($"[PartyRuntimeState] Recruit skipped because member already exists. characterId={characterTemplate.characterId}");
+            return false;
+        }
+
+        recruitedMember = characterTemplate.Copy();
+        partyMembers.Add(recruitedMember);
+
+        Debug.Log($"[PartyRuntimeState] Recruited member. characterId={recruitedMember.characterId}, name={recruitedMember.Name}, count={partyMembers.Count}");
+        return true;
+    }
+
     public static void InitializeIfEmpty(IEnumerable<Character> initialMembers)
     {
         if (HasPartyData)
