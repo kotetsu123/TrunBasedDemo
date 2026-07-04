@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Game/Data/Character DataBase")]
 public class CharacterDataBase : ScriptableObject
 {
+    [SerializeField] private List<Character> characters = new List<Character>();
     [SerializeField] private PartyInitialData partyInitialData;
 
     // Save data only stores characterId, so loading needs this lookup to restore Character data.
@@ -10,6 +12,15 @@ public class CharacterDataBase : ScriptableObject
     {
         if (string.IsNullOrWhiteSpace(characterId))
             return null;
+
+        foreach (var character in characters)
+        {
+            if (character == null)
+                continue;
+
+            if (character.characterId == characterId)
+                return character;
+        }
 
         if (partyInitialData == null || partyInitialData.Members == null)
         {

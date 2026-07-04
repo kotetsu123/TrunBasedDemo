@@ -33,23 +33,3 @@ MonoBehaviour:
     isPlayer: 1
     battleEnded: 0
     intent: 0
-  - characterId: Argo_002
-    Team: 0
-    Name: Argo
-    MaxHp: 200
-    Hp: 200
-    MaxMp: 100
-    Mp: 100
-    Level: 1
-    Exp: 0
-    Attack: 100
-    Speed: 100
-    ActionValue: 0
-    MaxActionValue: 200
-    Portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
-    isOnField: 0
-    isActing: 0
-    isDead: 0
-    isPlayer: 1
-    battleEnded: 0
-    intent: 0
