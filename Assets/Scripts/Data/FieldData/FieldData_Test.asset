@@ -47,3 +47,13 @@ MonoBehaviour:
     position: {x: 5, y: 0.5, z: 0}
     rotationEuler: {x: 0, y: 180, z: 0}
     scale: {x: 1, y: 1, z: 1}
+  recruitPoints:
+  - recruitId: recruit_argo_001
+    characterId: Argo_002
+    pointPrefab: {fileID: 0}
+    visualPrefab: {fileID: 5272708649635298671, guid: 5f1bf910e6fa8a8488764160c8dbb4d0, type: 3}
+    position: {x: 10.55, y: 1, z: -5.45}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    interactPrompt: Recruit
+    disableAfterRecruit: 0

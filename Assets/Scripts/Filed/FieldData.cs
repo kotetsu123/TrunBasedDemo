@@ -41,14 +41,40 @@ public class FieldObjectEntry
     public Vector3 Scale => scale;
 }
 
+[System.Serializable]
+public class FieldRecruitPointEntry
+{
+    [SerializeField] private string recruitId;
+    [SerializeField] private string characterId;
+    [SerializeField] private GameObject pointPrefab;
+    [SerializeField] private GameObject visualPrefab;
+    [SerializeField] private Vector3 position;
+    [SerializeField] private Vector3 rotationEuler;
+    [SerializeField] private Vector3 scale = Vector3.one;
+    [SerializeField] private string interactPrompt = "Recruit";
+    [SerializeField] private bool disableAfterRecruit = true;
+
+    public string RecruitId => recruitId;
+    public string CharacterId => characterId;
+    public GameObject PointPrefab => pointPrefab;
+    public GameObject VisualPrefab => visualPrefab;
+    public Vector3 Position => position;
+    public Quaternion Rotation => Quaternion.Euler(rotationEuler);
+    public Vector3 Scale => scale;
+    public string InteractPrompt => interactPrompt;
+    public bool DisableAfterRecruit => disableAfterRecruit;
+}
+
 [CreateAssetMenu(fileName = "FieldData_", menuName = "Game Data/Field Data")]
 public class FieldData : ScriptableObject
 {
     [SerializeField] private string fieldId;
     [SerializeField] private List<FieldSpawnPointEntry> spawnPoints = new List<FieldSpawnPointEntry>();
     [SerializeField] private List<FieldObjectEntry> fieldObjects = new List<FieldObjectEntry>();
+    [SerializeField] private List<FieldRecruitPointEntry> recruitPoints = new List<FieldRecruitPointEntry>();
 
     public string FieldId => fieldId;
     public IReadOnlyList<FieldSpawnPointEntry> SpawnPoints => spawnPoints;
     public IReadOnlyList<FieldObjectEntry> FieldObjects => fieldObjects;
+    public IReadOnlyList<FieldRecruitPointEntry> RecruitPoints => recruitPoints;
 }

@@ -19,6 +19,37 @@ public class FieldRecruitController : MonoBehaviour
 
     private void Awake()
     {
+        CacheReferences();
+    }
+
+    public void Configure(
+        FieldRecruitPointEntry entry,
+        CharacterDataBase newCharacterDataBase,
+        FieldPartyHudController newPartyHudController,
+        GameObject newVisualRoot)
+    {
+        if (entry == null)
+            return;
+
+        recruitId = entry.RecruitId;
+        characterId = entry.CharacterId;
+        interactPrompt = entry.InteractPrompt;
+        disableAfterRecruit = entry.DisableAfterRecruit;
+        characterDataBase = newCharacterDataBase;
+        partyHudController = newPartyHudController;
+
+        if (newVisualRoot != null)
+            visualRoot = newVisualRoot;
+
+        if (string.IsNullOrWhiteSpace(recruitId))
+            recruitId = gameObject.name;
+
+        CacheReferences();
+        RefreshRecruitState();
+    }
+
+    private void CacheReferences()
+    {
         if (interactionCollider == null)
             interactionCollider = GetComponent<Collider>();
 

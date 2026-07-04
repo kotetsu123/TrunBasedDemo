@@ -10,6 +10,7 @@ public class FieldCreator : MonoBehaviour
     [SerializeField] private Transform player;
     [SerializeField] private Transform playerStartPoint;
     [SerializeField] private EnemySpawnManager enemySpawnManager;
+    [SerializeField] private CharacterDataBase characterDataBase;
 
 
    
@@ -31,6 +32,7 @@ public class FieldCreator : MonoBehaviour
 
         CreateSpawnPointsFromFieldData();
         CreateObjectsFromFieldData();
+        CreateRecruitPointsFromFieldData();
         SetupPlayer();
         SpwanEnemies();
 
@@ -143,5 +145,68 @@ public class FieldCreator : MonoBehaviour
             if (chest != null)
                 chest.Configure(entry.ObjectId);
         }
+    }
+
+    private void CreateRecruitPointsFromFieldData()
+    {
+        if (fieldData == null)
+            return;
+
+        foreach (FieldRecruitPointEntry entry in fieldData.RecruitPoints)
+        {
+            if (entry == null)
+                continue;
+
+            GameObject recruitPointObject = entry.PointPrefab != null
+                ? Instantiate(entry.PointPrefab, entry.Position, entry.Rotation)
+                : CreateDefaultRecruitPoint(entry);
+
+            recruitPointObject.name = string.IsNullOrWhiteSpace(entry.RecruitId)
+                ? $"RecruitPoint_{entry.CharacterId}"
+                : entry.RecruitId;
+
+            Vector3 pointScale = entry.Scale;
+            if (pointScale == Vector3.zero)
+            {
+                Debug.LogWarning($"[FieldCreator] Recruit point scale is zero. Use Vector3.one instead. recruitId={entry.RecruitId}");
+                pointScale = Vector3.one;
+            }
+
+            recruitPointObject.transform.localScale = pointScale;
+            recruitPointObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
+
+            FieldRecruitController recruitController = recruitPointObject.GetComponent<FieldRecruitController>();
+            if (recruitController == null)
+                recruitController = recruitPointObject.AddComponent<FieldRecruitController>();
+
+            GameObject visualRoot = null;
+            if (entry.VisualPrefab != null)
+            {
+                visualRoot = Instantiate(entry.VisualPrefab, recruitPointObject.transform);
+                visualRoot.name = $"Visual_{entry.CharacterId}";
+                visualRoot.transform.localPosition = Vector3.zero;
+                visualRoot.transform.localRotation = Quaternion.identity;
+                visualRoot.transform.localScale = Vector3.one;
+            }
+
+            recruitController.Configure(entry, characterDataBase, partyHudController, visualRoot);
+        }
+    }
+
+    private GameObject CreateDefaultRecruitPoint(FieldRecruitPointEntry entry)
+    {
+        GameObject recruitPointObject = new GameObject(string.IsNullOrWhiteSpace(entry.RecruitId)
+            ? $"RecruitPoint_{entry.CharacterId}"
+            : entry.RecruitId);
+
+        recruitPointObject.transform.SetPositionAndRotation(entry.Position, entry.Rotation);
+
+        CapsuleCollider trigger = recruitPointObject.AddComponent<CapsuleCollider>();
+        trigger.isTrigger = true;
+        trigger.radius = 0.75f;
+        trigger.height = 2f;
+        trigger.direction = 1;
+
+        return recruitPointObject;
     }
 }
