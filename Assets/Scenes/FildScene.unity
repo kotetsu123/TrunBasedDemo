@@ -676,6 +676,8 @@ MonoBehaviour:
   promptController: {fileID: 0}
   partyHudController: {fileID: 1294726527}
   disableAfterRecruit: 1
+  visualRoot: {fileID: 0}
+  interactionCollider: {fileID: 0}
 --- !u!114 &301242755 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7370442242792256692, guid: b9ed3c20454b26d44a48725ff7c0a85d, type: 3}

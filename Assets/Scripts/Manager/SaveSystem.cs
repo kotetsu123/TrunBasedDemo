@@ -91,6 +91,9 @@ public static class SaveSystem
         // Title Load has no FieldSaveContext, so FieldCreator will apply it after the Field scene loads.
         FieldSaveContext.Current?.TryApplySavedPlayerTransform();
 
+        // Loading can roll back party members. Refresh recruit triggers so NPCs reappear when their character is no longer in party.
+        FieldRecruitController.RefreshAllRecruitStates();
+
         Debug.Log($"[SaveSystem] Loaded game from: {SavePath}");
         return true;
     }

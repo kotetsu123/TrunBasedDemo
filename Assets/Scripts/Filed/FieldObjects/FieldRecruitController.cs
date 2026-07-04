@@ -10,9 +10,22 @@ public class FieldRecruitController : MonoBehaviour
     [SerializeField] private FieldInteractionPromptController promptController;
     [SerializeField] private FieldPartyHudController partyHudController;
     [SerializeField] private bool disableAfterRecruit = true;
+    [SerializeField] private GameObject visualRoot;
+    [SerializeField] private Collider interactionCollider;
 
     private bool isPlayerInRange;
     private bool isRecruited;
+    private Renderer[] cachedRenderers;
+
+    private void Awake()
+    {
+        if (interactionCollider == null)
+            interactionCollider = GetComponent<Collider>();
+
+        cachedRenderers = visualRoot != null
+            ? visualRoot.GetComponentsInChildren<Renderer>(true)
+            : GetComponentsInChildren<Renderer>(true);
+    }
 
     private void Start()
     {
@@ -25,8 +38,27 @@ public class FieldRecruitController : MonoBehaviour
         if (string.IsNullOrWhiteSpace(recruitId))
             recruitId = gameObject.name;
 
-        isRecruited = PartyRuntimeState.HasMember(characterId);
-        ApplyRecruitedState(isRecruited);
+        RefreshRecruitState();
+    }
+
+    public static void RefreshAllRecruitStates()
+    {
+        FieldRecruitController[] controllers = FindObjectsOfType<FieldRecruitController>(true);
+        foreach (FieldRecruitController controller in controllers)
+        {
+            if (controller == null)
+                continue;
+
+            if (!controller.gameObject.activeSelf)
+                controller.gameObject.SetActive(true);
+
+            controller.RefreshRecruitState();
+        }
+    }
+
+    public void RefreshRecruitState()
+    {
+        ApplyRecruitedState(PartyRuntimeState.HasMember(characterId));
     }
 
     private void Update()
@@ -74,10 +106,38 @@ public class FieldRecruitController : MonoBehaviour
         isRecruited = recruited;
 
         if (isRecruited)
+        {
+            isPlayerInRange = false;
             HidePrompt();
+        }
 
         if (disableAfterRecruit && isRecruited)
-            gameObject.SetActive(false);
+            SetRecruitVisible(false);
+        else
+            SetRecruitVisible(true);
+    }
+
+    private void SetRecruitVisible(bool visible)
+    {
+        if (visualRoot != null && visualRoot != gameObject)
+        {
+            visualRoot.SetActive(visible);
+            return;
+        }
+
+        // Fallback for temporary scene objects that do not have a dedicated visualRoot yet.
+        // Once a RecruitPoint has a child model assigned as visualRoot, only that child is toggled.
+        foreach (Renderer cachedRenderer in cachedRenderers)
+        {
+            if (cachedRenderer == null)
+                continue;
+
+            cachedRenderer.enabled = visible;
+        }
+
+        // Only disable the point collider in fallback mode. With visualRoot setup, the point stays alive for Load refresh.
+        if (interactionCollider != null)
+            interactionCollider.enabled = visible;
     }
 
     private void OnTriggerEnter(Collider other)
