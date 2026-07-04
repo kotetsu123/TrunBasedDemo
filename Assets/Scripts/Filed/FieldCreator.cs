@@ -139,7 +139,7 @@ public class FieldCreator : MonoBehaviour
             }
 
             fieldObject.transform.localScale = objectScale;
-            fieldObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
+            fieldObject.transform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
 
             FieldChestController chest = fieldObject.GetComponent<FieldChestController>();
             if (chest != null)
@@ -173,24 +173,53 @@ public class FieldCreator : MonoBehaviour
             }
 
             recruitPointObject.transform.localScale = pointScale;
-            recruitPointObject.transform.SetParent(generatedObjectRoot != null ? generatedObjectRoot : transform);
+            // RecruitPoint 和 EnemySpawnPoint 一样属于“场景生成点”，统一挂到 SpawnPointRoot 下方便管理。
+            recruitPointObject.transform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
 
             FieldRecruitController recruitController = recruitPointObject.GetComponent<FieldRecruitController>();
             if (recruitController == null)
                 recruitController = recruitPointObject.AddComponent<FieldRecruitController>();
 
-            GameObject visualRoot = null;
-            if (entry.VisualPrefab != null)
-            {
-                visualRoot = Instantiate(entry.VisualPrefab, recruitPointObject.transform);
-                visualRoot.name = $"Visual_{entry.CharacterId}";
-                visualRoot.transform.localPosition = Vector3.zero;
-                visualRoot.transform.localRotation = Quaternion.identity;
-                visualRoot.transform.localScale = Vector3.one;
-            }
+            GameObject visualRoot = CreateRecruitVisual(entry, recruitPointObject.transform);
 
             recruitController.Configure(entry, characterDataBase, partyHudController, visualRoot);
         }
+    }
+
+    private GameObject CreateRecruitVisual(FieldRecruitPointEntry entry, Transform parent)
+    {
+        if (entry.VisualPrefab == null)
+            return null;
+
+        GameObject visualRoot = Instantiate(entry.VisualPrefab, parent);
+        visualRoot.name = $"Visual_{entry.CharacterId}";
+        visualRoot.transform.localPosition = Vector3.zero;
+        visualRoot.transform.localRotation = Quaternion.identity;
+        visualRoot.transform.localScale = Vector3.one;
+
+        // FieldData 里配置的 visualPrefab 只应该负责显示。
+        // 如果临时把完整 NPC prefab 当成 visual 使用，这里会关掉子物体上的交互脚本，避免生成两个入队点。
+        FieldRecruitController[] nestedRecruitControllers = visualRoot.GetComponentsInChildren<FieldRecruitController>(true);
+        foreach (FieldRecruitController nestedRecruitController in nestedRecruitControllers)
+        {
+            if (nestedRecruitController == null)
+                continue;
+
+            nestedRecruitController.enabled = false;
+            Debug.LogWarning($"[FieldCreator] Visual prefab contains FieldRecruitController. Disabled nested controller. recruitId={entry.RecruitId}, characterId={entry.CharacterId}");
+        }
+
+        // visualPrefab 作为显示子物体时不负责触发交互；交互范围统一交给父级 RecruitPoint。
+        Collider[] nestedColliders = visualRoot.GetComponentsInChildren<Collider>(true);
+        foreach (Collider nestedCollider in nestedColliders)
+        {
+            if (nestedCollider == null)
+                continue;
+
+            nestedCollider.enabled = false;
+        }
+
+        return visualRoot;
     }
 
     private GameObject CreateDefaultRecruitPoint(FieldRecruitPointEntry entry)
