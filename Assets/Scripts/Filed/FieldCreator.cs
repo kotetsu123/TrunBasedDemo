@@ -6,7 +6,8 @@ public class FieldCreator : MonoBehaviour
 {
     [SerializeField] private FieldData fieldData;
     [SerializeField] private Transform generatedSpawnPointRoot;
-    [SerializeField] private Transform generatedObjectRoot;
+    [SerializeField] private Transform generatedInteractableRoot;
+    [SerializeField] private Transform generatedEnvironmentRoot;
     [SerializeField] private Transform player;
     [SerializeField] private Transform playerStartPoint;
     [SerializeField] private EnemySpawnManager enemySpawnManager;
@@ -98,7 +99,7 @@ public class FieldCreator : MonoBehaviour
 
             GameObject spawnPointObject = new GameObject($"SpawnPoint_{entry.SpawnId}");
             Transform spawnPointTransform = spawnPointObject.transform;
-            spawnPointTransform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
+            spawnPointTransform.SetParent(GetSpawnPointRoot());
 
             EnemySpawnPoint spawnPoint = spawnPointObject.AddComponent<EnemySpawnPoint>();
             spawnPoint.Configure(entry);
@@ -138,12 +139,18 @@ public class FieldCreator : MonoBehaviour
                 objectScale = Vector3.one;
             }
 
-            fieldObject.transform.localScale = objectScale;
-            fieldObject.transform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
-
             FieldChestController chest = fieldObject.GetComponent<FieldChestController>();
             if (chest != null)
+            {
+                fieldObject.transform.SetParent(GetInteractableRoot());
                 chest.Configure(entry.ObjectId);
+            }
+            else
+            {
+                fieldObject.transform.SetParent(GetEnvironmentRoot());
+            }
+
+            fieldObject.transform.localScale = objectScale;
         }
     }
 
@@ -173,8 +180,8 @@ public class FieldCreator : MonoBehaviour
             }
 
             recruitPointObject.transform.localScale = pointScale;
-            // RecruitPoint 和 EnemySpawnPoint 一样属于“场景生成点”，统一挂到 SpawnPointRoot 下方便管理。
-            recruitPointObject.transform.SetParent(generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform);
+            // RecruitPoint 是玩家可以按 E 互动的点，统一挂到 InteractableRoot 下方便和敌人 SpawnPoint 区分。
+            recruitPointObject.transform.SetParent(GetInteractableRoot());
 
             FieldRecruitController recruitController = recruitPointObject.GetComponent<FieldRecruitController>();
             if (recruitController == null)
@@ -220,6 +227,27 @@ public class FieldCreator : MonoBehaviour
         }
 
         return visualRoot;
+    }
+
+    private Transform GetSpawnPointRoot()
+    {
+        return generatedSpawnPointRoot != null ? generatedSpawnPointRoot : transform;
+    }
+
+    private Transform GetInteractableRoot()
+    {
+        if (generatedInteractableRoot != null)
+            return generatedInteractableRoot;
+
+        return GetSpawnPointRoot();
+    }
+
+    private Transform GetEnvironmentRoot()
+    {
+        if (generatedEnvironmentRoot != null)
+            return generatedEnvironmentRoot;
+
+        return transform;
     }
 
     private GameObject CreateDefaultRecruitPoint(FieldRecruitPointEntry entry)
