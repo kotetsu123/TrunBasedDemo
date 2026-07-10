@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5e177e0ca6d904e865729cce963e93, type: 3}
+  m_Name: Dialogue_Argo_FirstTalk
+  m_EditorClassIdentifier: 
+  dialogueId: argo_first_talk
+  lines:
+  - speakerId: Argo_002
+    speakerName: Argo
+    portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
+    text: Hey, Paul. You finally made it.
+  - speakerId: Paul_001
+    speakerName: Paul
+    portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
+    text: Argo? What are you doing here?
+  - speakerId: Argo_002
+    speakerName: Argo
+    portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
+    text: Waiting. Mostly. Also trying not to get eaten.
