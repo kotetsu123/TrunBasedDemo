@@ -42,7 +42,7 @@ public class DialoguePanelController : BasePanel
         if (!IsOpen)
             return;
 
-        // 第一版只做“下一句/结束”，后续教程系统可以复用同一个推进入口。
+        // First version only advances or completes the current dialogue.
         if (Input.GetKeyDown(nextKey) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
             Advance();
 

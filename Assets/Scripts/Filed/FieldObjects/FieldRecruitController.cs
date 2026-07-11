@@ -8,6 +8,8 @@ public class FieldRecruitController : MonoBehaviour
     [SerializeField] private string interactPrompt = "Recruit";
     [SerializeField] private CharacterDataBase characterDataBase;
     [SerializeField] private FieldInteractionPromptController promptController;
+    [SerializeField] private DialoguePanelController dialoguePanel;
+    [SerializeField] private DialogueData preRecruitDialogue;
     [SerializeField] private FieldPartyHudController partyHudController;
     [SerializeField] private bool disableAfterRecruit = true;
     [SerializeField] private GameObject visualRoot;
@@ -15,6 +17,8 @@ public class FieldRecruitController : MonoBehaviour
 
     private bool isPlayerInRange;
     private bool isRecruited;
+    private bool isPlayingRecruitDialogue;
+    private bool hasPlayedPreRecruitDialogue;
     private Renderer[] cachedRenderers;
 
     private void Awake()
@@ -34,6 +38,7 @@ public class FieldRecruitController : MonoBehaviour
         recruitId = entry.RecruitId;
         characterId = entry.CharacterId;
         interactPrompt = entry.InteractPrompt;
+        preRecruitDialogue = entry.PreRecruitDialogue;
         disableAfterRecruit = entry.DisableAfterRecruit;
         characterDataBase = newCharacterDataBase;
         partyHudController = newPartyHudController;
@@ -66,6 +71,9 @@ public class FieldRecruitController : MonoBehaviour
         if (partyHudController == null)
             partyHudController = FindObjectOfType<FieldPartyHudController>();
 
+        if (dialoguePanel == null)
+            dialoguePanel = DialoguePanelController.Current;
+
         if (string.IsNullOrWhiteSpace(recruitId))
             recruitId = gameObject.name;
 
@@ -94,11 +102,42 @@ public class FieldRecruitController : MonoBehaviour
 
     private void Update()
     {
-        if (isRecruited || !isPlayerInRange)
+        if (isRecruited || isPlayingRecruitDialogue || !isPlayerInRange)
             return;
 
         if (Input.GetKeyDown(interactKey))
+            StartRecruitInteraction();
+    }
+
+    private void StartRecruitInteraction()
+    {
+        if (preRecruitDialogue == null || hasPlayedPreRecruitDialogue)
+        {
             TryRecruit();
+            return;
+        }
+
+        if (dialoguePanel == null)
+            dialoguePanel = DialoguePanelController.Current;
+
+        if (dialoguePanel == null)
+        {
+            Debug.LogWarning($"[FieldRecruit] DialoguePanelController is missing. Recruit will continue without dialogue. recruitId={recruitId}, characterId={characterId}");
+            TryRecruit();
+            return;
+        }
+
+        isPlayingRecruitDialogue = true;
+        HidePrompt();
+        dialoguePanel.Play(preRecruitDialogue, OnPreRecruitDialogueComplete);
+    }
+
+    private void OnPreRecruitDialogueComplete()
+    {
+        isPlayingRecruitDialogue = false;
+        hasPlayedPreRecruitDialogue = true;
+
+        TryRecruit();
     }
 
     public void TryRecruit()
@@ -109,6 +148,8 @@ public class FieldRecruitController : MonoBehaviour
         if (characterDataBase == null)
         {
             Debug.LogWarning($"[FieldRecruit] CharacterDataBase is null. recruitId={recruitId}, characterId={characterId}");
+            if (isPlayerInRange)
+                ShowPrompt();
             return;
         }
 
@@ -116,6 +157,8 @@ public class FieldRecruitController : MonoBehaviour
         if (characterTemplate == null)
         {
             Debug.LogWarning($"[FieldRecruit] Character not found. recruitId={recruitId}, characterId={characterId}");
+            if (isPlayerInRange)
+                ShowPrompt();
             return;
         }
 

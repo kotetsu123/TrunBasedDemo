@@ -52,6 +52,7 @@ public class FieldRecruitPointEntry
     [SerializeField] private Vector3 rotationEuler;
     [SerializeField] private Vector3 scale = Vector3.one;
     [SerializeField] private string interactPrompt = "Recruit";
+    [SerializeField] private DialogueData preRecruitDialogue;
     [SerializeField] private bool disableAfterRecruit = true;
 
     public string RecruitId => recruitId;
@@ -62,6 +63,7 @@ public class FieldRecruitPointEntry
     public Quaternion Rotation => Quaternion.Euler(rotationEuler);
     public Vector3 Scale => scale;
     public string InteractPrompt => interactPrompt;
+    public DialogueData PreRecruitDialogue => preRecruitDialogue;
     public bool DisableAfterRecruit => disableAfterRecruit;
 }
 

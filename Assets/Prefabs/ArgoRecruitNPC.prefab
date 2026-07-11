@@ -126,6 +126,8 @@ MonoBehaviour:
   interactPrompt: Recruit
   characterDataBase: {fileID: 11400000, guid: ba7c5627880e59a4dabcdf461e9deb20, type: 2}
   promptController: {fileID: 0}
+  dialoguePanel: {fileID: 0}
+  preRecruitDialogue: {fileID: 11400000, guid: a480a5b38ef67784ab411c1b4ed83a8a, type: 2}
   partyHudController: {fileID: 0}
   disableAfterRecruit: 1
   visualRoot: {fileID: 0}

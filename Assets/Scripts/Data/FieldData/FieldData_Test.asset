@@ -56,4 +56,5 @@ MonoBehaviour:
     rotationEuler: {x: 0, y: 0, z: 0}
     scale: {x: 1, y: 1, z: 1}
     interactPrompt: Recruit
+    preRecruitDialogue: {fileID: 11400000, guid: a480a5b38ef67784ab411c1b4ed83a8a, type: 2}
     disableAfterRecruit: 0
