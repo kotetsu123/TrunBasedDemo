@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 8415885543846320163}
   - component: {fileID: 4444101282972795661}
   - component: {fileID: 58314011806511986}
-  - component: {fileID: 4514569500237790776}
-  - component: {fileID: 8514247457135017831}
   m_Layer: 0
   m_Name: ArgoRecruitNPC
   m_TagString: Untagged
@@ -85,50 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &4514569500237790776
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5272708649635298671}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8514247457135017831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5272708649635298671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2831b791c421f76458a639e4e36330f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  recruitId: recruit_argo_001
-  characterId: Argo_002
-  interactKey: 101
-  interactPrompt: Recruit
-  characterDataBase: {fileID: 11400000, guid: ba7c5627880e59a4dabcdf461e9deb20, type: 2}
-  promptController: {fileID: 0}
-  dialoguePanel: {fileID: 0}
-  preRecruitDialogue: {fileID: 11400000, guid: a480a5b38ef67784ab411c1b4ed83a8a, type: 2}
-  partyHudController: {fileID: 0}
-  disableAfterRecruit: 1
-  visualRoot: {fileID: 0}
-  interactionCollider: {fileID: 0}

@@ -50,11 +50,11 @@ MonoBehaviour:
   recruitPoints:
   - recruitId: recruit_argo_001
     characterId: Argo_002
-    pointPrefab: {fileID: 0}
+    pointPrefab: {fileID: 8966164576812052412, guid: 0bcaf25a10d0d52458302334f1bc117c, type: 3}
     visualPrefab: {fileID: 5272708649635298671, guid: 5f1bf910e6fa8a8488764160c8dbb4d0, type: 3}
     position: {x: 10.55, y: 1, z: -5.45}
     rotationEuler: {x: 0, y: 0, z: 0}
     scale: {x: 1, y: 1, z: 1}
     interactPrompt: Recruit
     preRecruitDialogue: {fileID: 11400000, guid: a480a5b38ef67784ab411c1b4ed83a8a, type: 2}
-    disableAfterRecruit: 0
+    disableAfterRecruit: 1
