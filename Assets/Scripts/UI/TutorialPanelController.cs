@@ -1,6 +1,8 @@
 using System;
 using TMPro;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TutorialPanelController : BasePanel
@@ -9,12 +11,16 @@ public class TutorialPanelController : BasePanel
     [SerializeField] private TMP_Text messageText;
     [SerializeField] private Button nextButton;
     [SerializeField] private Button skipButton;
+    [SerializeField] private GameObject skipConfirmRoot;
+    [SerializeField] private Button confirmSkipButton;
+    [SerializeField] private Button cancelSkipButton;
     [SerializeField] private KeyCode nextKey = KeyCode.Space;
     [SerializeField] private KeyCode skipKey = KeyCode.Escape;
 
     private TutorialData currentTutorial;
     private Action onComplete;
     private int currentStepIndex;
+    private bool isSkipConfirmOpen;
 
     public static TutorialPanelController Current { get; private set; }
 
@@ -29,6 +35,14 @@ public class TutorialPanelController : BasePanel
 
         if (skipButton != null)
             skipButton.onClick.AddListener(Skip);
+
+        if (confirmSkipButton != null)
+            confirmSkipButton.onClick.AddListener(ConfirmSkip);
+
+        if (cancelSkipButton != null)
+            cancelSkipButton.onClick.AddListener(CancelSkip);
+
+        HideSkipConfirm();
     }
 
     private void OnDestroy()
@@ -41,6 +55,12 @@ public class TutorialPanelController : BasePanel
 
         if (skipButton != null)
             skipButton.onClick.RemoveListener(Skip);
+
+        if (confirmSkipButton != null)
+            confirmSkipButton.onClick.RemoveListener(ConfirmSkip);
+
+        if (cancelSkipButton != null)
+            cancelSkipButton.onClick.RemoveListener(CancelSkip);
     }
 
     private void Update()
@@ -48,7 +68,21 @@ public class TutorialPanelController : BasePanel
         if (!IsOpen)
             return;
 
+        if (isSkipConfirmOpen)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+                ConfirmSkip();
+
+            if (Input.GetKeyDown(skipKey))
+                CancelSkip();
+
+            return;
+        }
+
         if (Input.GetKeyDown(nextKey) || Input.GetKeyDown(KeyCode.Return))
+            Next();
+
+        if (Input.GetMouseButtonDown(0) && !IsPointerOverButton())
             Next();
 
         if (Input.GetKeyDown(skipKey))
@@ -67,6 +101,7 @@ public class TutorialPanelController : BasePanel
         currentTutorial = tutorialData;
         onComplete = completeCallback;
         currentStepIndex = 0;
+        HideSkipConfirm();
 
         FieldPauseState.SetPaused(true);
         Show();
@@ -94,7 +129,28 @@ public class TutorialPanelController : BasePanel
         if (currentTutorial == null)
             return;
 
+        if (skipConfirmRoot == null)
+        {
+            Debug.LogWarning("[TutorialPanel] Skip confirm root is missing. Skip immediately.");
+            CompleteTutorial();
+            return;
+        }
+
+        isSkipConfirmOpen = true;
+        skipConfirmRoot.SetActive(true);
+    }
+
+    public void ConfirmSkip()
+    {
+        if (currentTutorial == null)
+            return;
+
         CompleteTutorial();
+    }
+
+    public void CancelSkip()
+    {
+        HideSkipConfirm();
     }
 
     private void RefreshStep()
@@ -117,9 +173,40 @@ public class TutorialPanelController : BasePanel
         currentTutorial = null;
         onComplete = null;
         currentStepIndex = 0;
+        HideSkipConfirm();
 
         Hide();
         FieldPauseState.SetPaused(false);
         completeCallback?.Invoke();
+    }
+
+    private void HideSkipConfirm()
+    {
+        isSkipConfirmOpen = false;
+
+        if (skipConfirmRoot != null)
+            skipConfirmRoot.SetActive(false);
+    }
+
+    private bool IsPointerOverButton()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (results[i].gameObject.GetComponentInParent<Button>() != null)
+                return true;
+        }
+
+        return false;
     }
 }
