@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e208ff7074ed7c74f8447d8e400193c6, type: 3}
+  m_Name: TutorialData_
+  m_EditorClassIdentifier: 
+  tutorialId: TotalTutorial_Test001
+  steps:
+  - title: Movement
+    message: "About Movement:\n You can use \"W\" \"A\" \"S\" \"D\" to move your
+      character. Use right mouse button can change your\nangle of view"
+  - title: Interaction
+    message: You can Press "E" button to interact with Npc,Chest.
+  - title: Battle
+    message: When you come close to Enemy, you will enter the battle
+  - title: Save/Load
+    message: At map you can use "Esc" button call the menu, in there you can do the
+      save load.
