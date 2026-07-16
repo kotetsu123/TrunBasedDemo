@@ -30,6 +30,7 @@ public class TitleMenuController : MonoBehaviour
         PartyRuntimeState.Clear();
         InventoryRuntimeState.Clear();
         FieldBattleContext.ClearAll();
+        TutorialRuntimeState.Clear();
 
         SceneManager.LoadScene(fildSceneName);
     }

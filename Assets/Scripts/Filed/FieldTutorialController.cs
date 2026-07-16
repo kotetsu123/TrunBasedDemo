@@ -40,7 +40,22 @@ public class FieldTutorialController : MonoBehaviour
             return;
         }
 
+        if (TutorialRuntimeState.IsCompleted(tutorialData.TutorialId))
+        {
+            hasPlayed = true;
+            Debug.Log($"[FieldTutorial] Tutorial already completed. tutorialId={tutorialData.TutorialId}");
+            return;
+        }
+
         hasPlayed = true;
-        tutorialPanel.Play(tutorialData);
+        tutorialPanel.Play(tutorialData, OnTutorialComplete);
+    }
+
+    private void OnTutorialComplete()
+    {
+        if (tutorialData == null)
+            return;
+
+        TutorialRuntimeState.MarkCompleted(tutorialData.TutorialId);
     }
 }

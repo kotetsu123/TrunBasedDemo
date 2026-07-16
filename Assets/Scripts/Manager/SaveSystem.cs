@@ -24,6 +24,7 @@ public static class SaveSystem
             inventory = InventoryRuntimeState.ToSaveData(),
             party = PartyRuntimeState.ToSaveData(),
             field=fieldSaveData,
+            tutorial = TutorialRuntimeState.ToSaveData(),
         };
     }
 
@@ -86,6 +87,9 @@ public static class SaveSystem
 
         //Field state restores cleared spawn IDs so defeated enemies do not respawn after Load.
         FieldBattleContext.LoadFromSaveData(saveData.field);
+
+        // Tutorial state keeps one-time tutorials from playing again after Load.
+        TutorialRuntimeState.LoadFromSaveData(saveData.tutorial);
 
         // If Load is called while already in a Field scene, apply the saved player transform immediately.
         // Title Load has no FieldSaveContext, so FieldCreator will apply it after the Field scene loads.
