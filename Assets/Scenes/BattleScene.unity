@@ -1910,7 +1910,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee49dddf2018f9742ac7afdfd6abcb34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tutorialData: {fileID: 0}
+  tutorialData: {fileID: 11400000, guid: bccd80b64c7e17e44a79bf6160ade468, type: 2}
   tutorialPanel: {fileID: 2146728243}
   playOnStart: 1
   startDelay: 0.5
