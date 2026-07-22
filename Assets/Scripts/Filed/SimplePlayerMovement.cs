@@ -18,7 +18,10 @@ public class SimplePlayerMovement : MonoBehaviour
     private void Update()
     {
         if (FieldPauseState.IsPaused)
+        {
+            StopHorizontalMovement();
             return;
+        }
 
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
@@ -36,6 +39,12 @@ public class SimplePlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (FieldPauseState.IsPaused)
+        {
+            StopHorizontalMovement();
+            return;
+        }
+
         if (moveInput.magnitude > 0.1f)
         {
             Vector3 move = moveInput * moveSpeed;
@@ -52,5 +61,15 @@ public class SimplePlayerMovement : MonoBehaviour
         {
             rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
         }
+    }
+
+    private void StopHorizontalMovement()
+    {
+        moveInput = Vector3.zero;
+
+        if (rb == null)
+            return;
+
+        rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
     }
 }
