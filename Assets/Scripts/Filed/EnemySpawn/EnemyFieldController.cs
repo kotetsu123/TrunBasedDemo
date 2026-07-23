@@ -1,6 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+public enum EnemyFieldState
+{
+    Wander,
+    Chase
+}
 
 public class EnemyFieldController : MonoBehaviour
 {
@@ -16,91 +20,111 @@ public class EnemyFieldController : MonoBehaviour
     [SerializeField] private string playerTag = "Player";
 
     private Vector3 wanderCenter;
+    private Vector3 wanderTarget;
     private float wanderRadius = 3f;
+    private float waitTimer;
     private string spawnId;
     private string encounterId;
     private Transform playerTarget;
+    private EnemyFieldState currentState = EnemyFieldState.Wander;
 
-    public string SpawnId=> spawnId;
-    public string EncounterId => encounterId;   
-    public void SetWanderCenter(Vector3 center,float radius)
+    public string SpawnId => spawnId;
+    public string EncounterId => encounterId;
+    public EnemyFieldState CurrentState => currentState;
+    public bool IsChasing => currentState == EnemyFieldState.Chase;
+
+    public void SetWanderCenter(Vector3 center, float radius)
     {
-        wanderCenter= center;
-        wanderRadius= radius;
-
-        StopAllCoroutines();
-        StartCoroutine(WanderRoutine());
+        wanderCenter = center;
+        wanderRadius = radius;
+        ResetWander();
     }
-    public void Init(string id,string encounter,Vector3 center,float radius)
-    {
-        spawnId= id;
-        encounterId= encounter;
-        wanderCenter= center;
-        wanderRadius= radius;
 
-        StopAllCoroutines();
-        StartCoroutine(WanderRoutine());
-    }
-    private IEnumerator WanderRoutine()
+    public void Init(string id, string encounter, Vector3 center, float radius)
     {
-        while (true)
+        spawnId = id;
+        encounterId = encounter;
+        wanderCenter = center;
+        wanderRadius = radius;
+        ResetWander();
+    }
+
+    private void Update()
+    {
+        if (FieldPauseState.IsPaused)
+            return;
+
+        switch (currentState)
         {
-            if (FieldPauseState.IsPaused)
-            {
-                yield return null;
-                continue;
-            }
-            if (ShouldStartChase())
-            {
-                yield return ChaseRoutine();
-                continue;
-            }
-
-            Vector3 target = GetRandomPoint();
-            while (Vector3.Distance(transform.position, target) > 0.1f)
-            {
-                if (FieldPauseState.IsPaused)
-                {
-                    yield return null;
-                    continue;
-                }
-                if (ShouldStartChase())
-                {
-                    yield return ChaseRoutine();
-                    break;
-                }
-
-                MoveTowards(target, moveSpeed);
-                yield return null;
-            }
-            yield return new WaitForSeconds(waitTime);
-        }
-    }
-    private IEnumerator ChaseRoutine()
-    {
-        while (CanKeepChasing())
-        {
-            if (FieldPauseState.IsPaused)
-            {
-                yield return null;
-                continue;
-            }
-
-            Vector3 target = playerTarget.position;
-            target.y = transform.position.y;
-
-            MoveTowards(target, chaseSpeed);
-            yield return null;
+            case EnemyFieldState.Wander:
+                UpdateWander();
+                break;
+            case EnemyFieldState.Chase:
+                UpdateChase();
+                break;
         }
     }
 
-    private Vector3 GetRandomPoint()
+    private void UpdateWander()
+    {
+        if (ShouldStartChase())
+        {
+            ChangeState(EnemyFieldState.Chase);
+            return;
+        }
+
+        if (waitTimer > 0f)
+        {
+            waitTimer -= Time.deltaTime;
+            return;
+        }
+
+        if (Vector3.Distance(transform.position, wanderTarget) <= 0.1f)
+        {
+            PickNewWanderTarget();
+            waitTimer = waitTime;
+            return;
+        }
+
+        MoveTowards(wanderTarget, moveSpeed);
+    }
+
+    private void UpdateChase()
+    {
+        if (!CanKeepChasing())
+        {
+            ResetWander();
+            ChangeState(EnemyFieldState.Wander);
+            return;
+        }
+
+        Vector3 target = playerTarget.position;
+        target.y = transform.position.y;
+        MoveTowards(target, chaseSpeed);
+    }
+
+    private void ChangeState(EnemyFieldState nextState)
+    {
+        if (currentState == nextState)
+            return;
+
+        currentState = nextState;
+    }
+
+    private void ResetWander()
+    {
+        PickNewWanderTarget();
+        waitTimer = 0f;
+        ChangeState(EnemyFieldState.Wander);
+    }
+
+    private void PickNewWanderTarget()
     {
         Vector2 random = Random.insideUnitCircle * wanderRadius;
-
-        return new Vector3(wanderCenter.x+random.x,
+        wanderTarget = new Vector3(
+            wanderCenter.x + random.x,
             transform.position.y,
-            wanderCenter.z+random.y);
+            wanderCenter.z + random.y);
     }
 
     private bool ShouldStartChase()
