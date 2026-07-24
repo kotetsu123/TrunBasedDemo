@@ -32,6 +32,9 @@ public class BattleSpawner : MonoBehaviour
     private readonly System.Collections.Generic.Queue<SpawnRequest> _enemyReserve = new();
 
     public EncounterData CurrentEncounterData { get; private set; }
+    public IReadOnlyList<EncounterData> CurrentEncounterDatas => currentEncounterDatas;
+
+    private readonly List<EncounterData> currentEncounterDatas = new List<EncounterData>();
 
     private void Awake()
     {
@@ -136,6 +139,7 @@ public class BattleSpawner : MonoBehaviour
 
         _enemyReserve.Clear();
         CurrentEncounterData = null;
+        currentEncounterDatas.Clear();
 
         Debug.Log($"[SpawnInitial] called frame={Time.frameCount} queue={_enemyReserve.Count}");
         //Player: ∞¥À≥–Ú»˚£®0-3£©//‘≠œ»µƒ≤‚ ‘≈‰÷√
@@ -212,29 +216,31 @@ public class BattleSpawner : MonoBehaviour
      }*/
     private bool TrySpawnEnemiesFromEncounter()
     {
-        Debug.Log($"[BattleSpawner] TrySpawnEnemiesFromEncounter encounterId={FieldBattleContext.CurrentEncounterId}");
+        Debug.Log($"[BattleSpawner] TrySpawnEnemiesFromEncounter encounterId={FieldBattleContext.CurrentEncounterId}, encounterCount={FieldBattleContext.CurrentEncounterIds.Count}");
         if (encounterDatabase == null)
         {
             Debug.LogWarning($"[BattleSpawner] EncounterDataBase is null.use InitialEnemies fallback");
             return false;
         }
-        string encounterId = FieldBattleContext.CurrentEncounterId;
-        if (string.IsNullOrEmpty(encounterId))
+
+        List<string> encounterIds = new List<string>();
+        if (FieldBattleContext.CurrentEncounterIds != null && FieldBattleContext.CurrentEncounterIds.Count > 0)
+        {
+            foreach (string encounterId in FieldBattleContext.CurrentEncounterIds)
+            {
+                if (string.IsNullOrWhiteSpace(encounterId))
+                    continue;
+
+                encounterIds.Add(encounterId);
+            }
+        }
+
+        if (encounterIds.Count == 0 && !string.IsNullOrWhiteSpace(FieldBattleContext.CurrentEncounterId))
+            encounterIds.Add(FieldBattleContext.CurrentEncounterId);
+
+        if (encounterIds.Count == 0)
         {
             Debug.Log("[BattleSpawner no CurrentEncoutnerId. use InitialEnemies fallback]");
-            return false;
-        }
-        EncounterData encounterData = encounterDatabase.FindeById(encounterId);
-
-        if (encounterData == null)
-        {
-            Debug.LogWarning($"[BattleSpawner] EncounterData not found: {encounterId}. Use initialEnemies fallback.");
-            return false;
-        }
-
-        if (!encounterData.ValidateConfig())
-        {
-            Debug.LogWarning($"[BattleSpawner] EncounterData is invalid: {encounterId}. Use initialEnemies fallback.");
             return false;
         }
 
@@ -243,38 +249,63 @@ public class BattleSpawner : MonoBehaviour
             Debug.LogWarning("[BattleSpawner] enemyPrefab is null. Use initialEnemies fallback.");
             return false;
         }
-        CurrentEncounterData = encounterData;
 
         int spawnedEnemyCount = 0;
 
-        if (encounterData.HasEnemyEntries)
+        foreach (string encounterId in encounterIds)
         {
-            Debug.Log($"[BattleSpawner] Use enemyEntries table. encounterId={encounterId}, entryCount={encounterData.EnemyEntries.Count}");
-            spawnedEnemyCount = SpawnEnemyEntries(encounterData);
-        }
+            EncounterData encounterData = encounterDatabase.FindeById(encounterId);
 
-        if (spawnedEnemyCount <= 0 && allowLegacyEnemyCharactersFallback)
-        {
-            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemy characters fallback. encounterId={encounterId}");
-            spawnedEnemyCount = SpawnLegacyEnemyCharacters(encounterData);
-        }
-        else if (spawnedEnemyCount <= 0)
-        {
-            Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies and legacy fallback is disabled. encounterId={encounterId}");
+            if (encounterData == null)
+            {
+                Debug.LogWarning($"[BattleSpawner] EncounterData not found: {encounterId}. Skip this encounter.");
+                continue;
+            }
+
+            if (!encounterData.ValidateConfig())
+            {
+                Debug.LogWarning($"[BattleSpawner] EncounterData is invalid: {encounterId}. Skip this encounter.");
+                continue;
+            }
+
+            if (CurrentEncounterData == null)
+                CurrentEncounterData = encounterData;
+
+            currentEncounterDatas.Add(encounterData);
+
+            int spawnedCountForEncounter = 0;
+
+            if (encounterData.HasEnemyEntries)
+            {
+                Debug.Log($"[BattleSpawner] Use enemyEntries table. encounterId={encounterId}, entryCount={encounterData.EnemyEntries.Count}");
+                spawnedCountForEncounter = SpawnEnemyEntries(encounterData);
+            }
+
+            if (spawnedCountForEncounter <= 0 && allowLegacyEnemyCharactersFallback)
+            {
+                Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies. Use legacy enemy characters fallback. encounterId={encounterId}");
+                spawnedCountForEncounter = SpawnLegacyEnemyCharacters(encounterData);
+            }
+            else if (spawnedCountForEncounter <= 0)
+            {
+                Debug.LogWarning($"[BattleSpawner] Enemy entries produced 0 enemies and legacy fallback is disabled. encounterId={encounterId}");
+            }
+
+            spawnedEnemyCount += spawnedCountForEncounter;
         }
 
         if (spawnedEnemyCount <= 0)
         {
             CurrentEncounterData = null;
-            Debug.LogWarning($"[BattleSpawner] EncounterData has no spawnable enemies: {encounterId}. Use initialEnemies fallback.");
+            currentEncounterDatas.Clear();
+            Debug.LogWarning("[BattleSpawner] EncounterData list has no spawnable enemies. Use initialEnemies fallback.");
             return false;
         }
 
-        Debug.Log($"[BattleSpawner] Spawned encounter enemies: {encounterId}, count={spawnedEnemyCount}");
+        Debug.Log($"[BattleSpawner] Spawned encounter enemies: encounterCount={currentEncounterDatas.Count}, enemyCount={spawnedEnemyCount}");
 
         return true;
     }
-
     private int SpawnEnemyEntries(EncounterData encounterData)
     {
         if (encounterData == null || encounterData.EnemyEntries == null)
@@ -346,3 +377,5 @@ public class BattleSpawner : MonoBehaviour
         EnqueueOrSpawn(req);
     }
 }
+
+

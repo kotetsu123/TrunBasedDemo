@@ -824,7 +824,7 @@ public class BattleManager : MonoBehaviour
             FieldBattleContext.MarkTriggerdEnemyCleared();
             const int fallbackRewardExp = 120;
              rewardResult = EncounterRewardService.GrantRewards(
-                spawner != null ? spawner.CurrentEncounterData : null,
+                spawner != null ? spawner.CurrentEncounterDatas : null,
                 controllers,
                 fallbackRewardExp);
             _lastLevelUpResults.AddRange(rewardResult.levelUpResults);

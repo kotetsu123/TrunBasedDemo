@@ -22,6 +22,8 @@ public static class FieldBattleContext
     private static readonly HashSet<string> clearedSpawnIds= new HashSet<string>();
     private static readonly Dictionary<string, DateTime> clearedSpawnUtcTimes = new Dictionary<string, DateTime>();
     private static readonly HashSet<string> openedChestIds = new HashSet<string>();
+    private static readonly List<string> triggeredSpawnIds = new List<string>();
+    private static readonly List<string> currentEncounterIds = new List<string>();
 
     //存档的数据相关。
     public static bool HasSavedPlayerTransform { get; private set; }
@@ -30,18 +32,65 @@ public static class FieldBattleContext
 
     public static IReadOnlyCollection<string> ClearedSpawnIds => clearedSpawnIds;
     public static IReadOnlyCollection<string> OpenedChestIds => openedChestIds;
+    public static IReadOnlyList<string> TriggeredSpawnIds => triggeredSpawnIds;
+    public static IReadOnlyList<string> CurrentEncounterIds => currentEncounterIds;
     public static bool IsEncounterCooldownActive => Time.time < EncounterCooldownUntilTime;
     //保存进入战斗前的FieldScene名称，玩家位置朝向
     public static void SaveFieldReturnData(string fieldSceneName,Vector3 playerPos,Quaternion playerRot,string triggeredSpawnId,string encounterId)
+    {
+        List<string> spawnIds = new List<string>();
+        List<string> encounterIds = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(triggeredSpawnId))
+            spawnIds.Add(triggeredSpawnId);
+
+        if (!string.IsNullOrWhiteSpace(encounterId))
+            encounterIds.Add(encounterId);
+
+        SaveFieldReturnData(fieldSceneName, playerPos, playerRot, spawnIds, encounterIds);
+    }
+
+    public static void SaveFieldReturnData(
+        string fieldSceneName,
+        Vector3 playerPos,
+        Quaternion playerRot,
+        IReadOnlyList<string> newTriggeredSpawnIds,
+        IReadOnlyList<string> newEncounterIds)
     {
         LastFieldSceneName = fieldSceneName;
         PlayerPositionBeforeBattle = playerPos;
         PlayerRotationBeforeBattle = playerRot;
         HasFieldReturnData = true;
-        TriggeredSpawnId = triggeredSpawnId;
-        CurrentEncounterId = encounterId;
 
-        Debug.Log($"[FieldBattleContext] Saved return data: Scene={fieldSceneName}, spawnID={triggeredSpawnId},encounterID={encounterId}");
+        triggeredSpawnIds.Clear();
+        currentEncounterIds.Clear();
+
+        if (newTriggeredSpawnIds != null)
+        {
+            foreach (string spawnId in newTriggeredSpawnIds)
+            {
+                if (string.IsNullOrWhiteSpace(spawnId) || triggeredSpawnIds.Contains(spawnId))
+                    continue;
+
+                triggeredSpawnIds.Add(spawnId);
+            }
+        }
+
+        if (newEncounterIds != null)
+        {
+            foreach (string encounterId in newEncounterIds)
+            {
+                if (string.IsNullOrWhiteSpace(encounterId))
+                    continue;
+
+                currentEncounterIds.Add(encounterId);
+            }
+        }
+
+        TriggeredSpawnId = triggeredSpawnIds.Count > 0 ? triggeredSpawnIds[0] : null;
+        CurrentEncounterId = currentEncounterIds.Count > 0 ? currentEncounterIds[0] : null;
+
+        Debug.Log($"[FieldBattleContext] Saved return data: Scene={fieldSceneName}, spawnCount={triggeredSpawnIds.Count}, encounterCount={currentEncounterIds.Count}");
     }
     public static void StartEncounterCooldown(float seconds = DefaultEncounterCooldownSeconds)
     {
@@ -53,12 +102,22 @@ public static class FieldBattleContext
     //把刚才打败的怪物ID 记录到已击败名单里
     public static void MarkTriggerdEnemyCleared()
     {
-        if (string.IsNullOrEmpty(TriggeredSpawnId))
+        if (triggeredSpawnIds.Count == 0 && string.IsNullOrEmpty(TriggeredSpawnId))
             return;
-        clearedSpawnIds.Add(TriggeredSpawnId);
-        clearedSpawnUtcTimes[TriggeredSpawnId] = DateTime.UtcNow;
 
-        Debug.Log($"[FieldBattleContext] Marked spawn ID as cleared: {TriggeredSpawnId}");
+        if (triggeredSpawnIds.Count == 0)
+            triggeredSpawnIds.Add(TriggeredSpawnId);
+
+        foreach (string spawnId in triggeredSpawnIds)
+        {
+            if (string.IsNullOrWhiteSpace(spawnId))
+                continue;
+
+            clearedSpawnIds.Add(spawnId);
+            clearedSpawnUtcTimes[spawnId] = DateTime.UtcNow;
+
+            Debug.Log($"[FieldBattleContext] Marked spawn ID as cleared: {spawnId}");
+        }
     }
     //检查某个spawnPoint的怪物是不是已经被打败过
     public static bool IsSpawnCleard(string spawnId)
@@ -138,6 +197,8 @@ public static class FieldBattleContext
         TriggeredSpawnId = null;
         HasFieldReturnData = false;
         CurrentEncounterId = null;
+        triggeredSpawnIds.Clear();
+        currentEncounterIds.Clear();
     }
     public static FieldSaveData ToSaveData()
     {
@@ -261,3 +322,6 @@ public static class FieldBattleContext
     }
 
 }
+
+
+

@@ -160,11 +160,35 @@ public static class EncounterRewardService
         IEnumerable<BaseController> controllers,
         int fallbackExp)
     {
+        List<EncounterData> encounterDatas = new List<EncounterData>();
+        if (encounterData != null)
+            encounterDatas.Add(encounterData);
+
+        return GrantRewards(encounterDatas, controllers, fallbackExp);
+    }
+
+    public static EncounterRewardResult GrantRewards(
+        IEnumerable<EncounterData> encounterDatas,
+        IEnumerable<BaseController> controllers,
+        int fallbackExp)
+    {
         EncounterRewardResult result = new EncounterRewardResult();
 
-        // If the battle came from an EncounterData asset, use its configured EXP.
-        // If not, keep the old 120 EXP behavior as a fallback.
-        int rewardExp = encounterData != null ? encounterData.RewardExp : fallbackExp;
+        List<EncounterData> validEncounterDatas = new List<EncounterData>();
+        if (encounterDatas != null)
+        {
+            foreach (EncounterData encounterData in encounterDatas)
+            {
+                if (encounterData == null)
+                    continue;
+
+                validEncounterDatas.Add(encounterData);
+            }
+        }
+
+        int rewardExp = validEncounterDatas.Count > 0
+            ? SumRewardExp(validEncounterDatas)
+            : fallbackExp;
         result.exp = Mathf.Max(0, rewardExp);
 
         // EXP is still awarded before PartyRuntimeState.UpdateFromBattleController,
@@ -172,7 +196,7 @@ public static class EncounterRewardService
         result.levelUpResults.AddRange(AwardPartyExp(controllers, result.exp));
 
         // Roll every configured item drop independently, then write successful drops into runtime inventory.
-        foreach (InitialItemStack itemReward in RollItemRewards(encounterData))
+        foreach (InitialItemStack itemReward in RollItemRewards(validEncounterDatas))
         {
             InventoryRuntimeState.AddItem(itemReward.item, itemReward.count);
             result.itemRewards.Add(itemReward);
@@ -180,6 +204,21 @@ public static class EncounterRewardService
 
         LogRewardResult(result);
         return result;
+    }
+
+    private static int SumRewardExp(IEnumerable<EncounterData> encounterDatas)
+    {
+        int totalExp = 0;
+
+        foreach (EncounterData encounterData in encounterDatas)
+        {
+            if (encounterData == null)
+                continue;
+
+            totalExp += Mathf.Max(0, encounterData.RewardExp);
+        }
+
+        return totalExp;
     }
 
     private static List<LevelUpResult> AwardPartyExp(IEnumerable<BaseController> controllers, int amount)
@@ -212,19 +251,34 @@ public static class EncounterRewardService
 
     private static List<InitialItemStack> RollItemRewards(EncounterData encounterData)
     {
+        List<EncounterData> encounterDatas = new List<EncounterData>();
+        if (encounterData != null)
+            encounterDatas.Add(encounterData);
+
+        return RollItemRewards(encounterDatas);
+    }
+
+    private static List<InitialItemStack> RollItemRewards(IEnumerable<EncounterData> encounterDatas)
+    {
         List<InitialItemStack> rewards = new List<InitialItemStack>();
 
-        // No EncounterData means this battle uses fallback enemies, so there are no configured item drops.
-        if (encounterData == null || encounterData.ItemDrops == null)
+        if (encounterDatas == null)
             return rewards;
 
-        // Each drop row rolls separately. Multiple rows can drop at the same time.
-        foreach (EncounterItemDrop drop in encounterData.ItemDrops)
+        foreach (EncounterData encounterData in encounterDatas)
         {
-            if (drop == null)
+            // No EncounterData means this battle uses fallback enemies, so there are no configured item drops.
+            if (encounterData == null || encounterData.ItemDrops == null)
                 continue;
-            if (drop.TryRoll(out InitialItemStack reward))
-                rewards.Add(reward);
+
+            // Each drop row rolls separately. Multiple rows can drop at the same time.
+            foreach (EncounterItemDrop drop in encounterData.ItemDrops)
+            {
+                if (drop == null)
+                    continue;
+                if (drop.TryRoll(out InitialItemStack reward))
+                    rewards.Add(reward);
+            }
         }
 
         return rewards;
