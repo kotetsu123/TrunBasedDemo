@@ -49,7 +49,7 @@ public class BattleManager : MonoBehaviour
     
     public IReadOnlyDictionary<BaseController,TimeLineIcon>TimeLineIcons=>timeLineIcons;
 
-    private int tick = 0;//时间刻度
+    [SerializeField] private float actionValueDecreasePerSecond = 10f / 0.75f; // 连续推进行动值，数值等价于旧版每 0.1 秒扣 Speed / 0.75。
 
     private bool _reorderRequested;
     private readonly List<BaseController> _lastPublishedOrdered = new();
@@ -172,23 +172,18 @@ public class BattleManager : MonoBehaviour
         if (isActing) return;//正在行动中，跳过本次更新
         if (!isBattleReady) return;//战斗未准备好，跳过本次更新
 
-        tick++;
-        //每隔10个时间刻度，所有角色增加行动值
-        if (tick % 10 == 0)
-        {
-            updateActionValues();
-        }
-             
+        updateActionValues(Time.deltaTime);
+
     }
     private void LateUpdate()
     {
         if (!_reorderRequested) return;
         _reorderRequested = false;
 
-        //统一计算本帧最终顺序
+        //统一计算本帧最终顺序//UI的发布顺序
         var ordered = controllers
             .Where(c => c != null && !c.isDead && c.data != null && !c.data.isDead)
-            .OrderBy(c => c.data.ActionValue)
+            .OrderBy(GetTurnOrderValue)
             .ToList();
 
         //顺序完全没变：不发布，不做重排/动画（解决每个回合卡一下）
@@ -311,24 +306,36 @@ public class BattleManager : MonoBehaviour
         UpdateTimeLineUI(ordered);
         OnTimeLineOrdered?.Invoke(ordered);
     }
-    void updateActionValues()
+    private float GetTurnOrderValue(BaseController controller)
+    {
+        if(controller==null||controller.data==null)
+            return float.MaxValue;
+        if(controller.isDead||controller.data.isDead||!controller.data.isOnField)
+            return float.MaxValue;
+        if(controller.data.ActionValue<=0f)
+            return controller.data.ActionValue;
+        if(controller.data.Speed<=0f)
+            return float.MaxValue;
+
+        return controller.data.ActionValue / controller.data.Speed;
+    }
+    void updateActionValues(float deltaTime)
     {
         controllers.RemoveAll(c => c == null); //移除已销毁的角色//清掉Destroy后留下的空位，防止空引用
         if (isActing) return;
-        //减少行动值，当行动值到达0或这者低于0时，触发行动
+        // 每帧按真实经过时间推进行动值，避免固定刷新间隔造成角色突然插队。
         foreach (var c in controllers)
         {
             if (c == null || c.data == null) continue;
             if (c.isDead) continue; //死亡角色不行动
             if (!c.data.isOnField) continue;
-            //速度越快，行动值减少越快
-            c.data.ActionValue -= c.data.Speed / 0.75f;           
+            // 速度越快，行动值减少越快。
+            c.data.ActionValue -= c.data.Speed * actionValueDecreasePerSecond * deltaTime;
         }
-
         //找出行动值最小的角色(谁最接近0)
         var ordered = controllers
-            .Where(c => !c.isDead&&c.data!=null&&c!=null&&c.data.isOnField)
-            .OrderBy(c => c.data.ActionValue)
+            .Where(c => c != null && !c.isDead&&c.data!=null&&c.data.isOnField)
+            .OrderBy(GetTurnOrderValue)
             .ToList();
        // Debug.Log("Ordered:" + string.Join(",", ordered.Select(x => x.data.Name)));
        
