@@ -7,18 +7,166 @@ public class EncounterTrigger : MonoBehaviour
 {
     [SerializeField] private string battleSceneName = "BattleScene";
     [SerializeField] private SceneTransitionController transitionController;
+    [Header("Group Encounter")]
     [SerializeField] private float groupEncounterRadius = 4f;
+    [SerializeField] private Color groupRadiusGizmoColor = new Color(1f, 0.85f, 0.2f, 0.35f);
+    [SerializeField] private Color groupLinkGizmoColor = new Color(1f, 0.45f, 0.1f, 0.9f);
 
+    [Header("Runtime Group Link")]
+    [SerializeField] private bool showGroupLinksInGame = true;
+    [SerializeField] private bool showGroupLinksOnlyWhileChasing = true;
+    [SerializeField] private float groupLinkRefreshInterval = 0.1f;
+    [SerializeField] private float groupLinkHeight = 1.2f;
+    [SerializeField] private float groupLinkWidth = 0.04f;
+    [SerializeField] private Color groupRuntimeLinkColor = new Color(1f, 0.45f, 0.1f, 0.9f);
+    [SerializeField] private Material groupLinkMaterial;
+
+    private readonly List<LineRenderer> groupLinkRenderers = new List<LineRenderer>();
     private bool triggerd;
+    private float nextGroupLinkRefreshTime;
+    private Material runtimeGroupLinkMaterial;
+    private EnemyFieldController cachedFieldEnemy;
 
     private void Awake()
     {
+        cachedFieldEnemy = GetComponent<EnemyFieldController>();
+
         if (transitionController == null)
         {
             transitionController = FindObjectOfType<SceneTransitionController>();
         }
     }
 
+
+    private void Update()
+    {
+        UpdateGroupEncounterLinks();
+    }
+
+    private void OnDisable()
+    {
+        HideAllGroupLinks();
+    }
+
+    private void UpdateGroupEncounterLinks()
+    {
+        if (!showGroupLinksInGame || groupEncounterRadius <= 0f)
+        {
+            HideAllGroupLinks();
+            return;
+        }
+
+        if (cachedFieldEnemy == null)
+            cachedFieldEnemy = GetComponent<EnemyFieldController>();
+
+        if (cachedFieldEnemy == null)
+        {
+            HideAllGroupLinks();
+            return;
+        }
+
+        if (showGroupLinksOnlyWhileChasing && !cachedFieldEnemy.IsChasing)
+        {
+            HideAllGroupLinks();
+            return;
+        }
+
+        if (Time.time < nextGroupLinkRefreshTime)
+            return;
+
+        nextGroupLinkRefreshTime = Time.time + Mathf.Max(0.02f, groupLinkRefreshInterval);
+
+        EnemyFieldController[] fieldEnemies = FindObjectsOfType<EnemyFieldController>();
+        float sqrRadius = groupEncounterRadius * groupEncounterRadius;
+        Vector3 center = GetRuntimeLinkPoint(cachedFieldEnemy.transform);
+        int visibleLineCount = 0;
+
+        foreach (EnemyFieldController enemy in fieldEnemies)
+        {
+            if (enemy == null || enemy == cachedFieldEnemy || !enemy.gameObject.activeInHierarchy)
+                continue;
+
+            Vector3 offset = enemy.transform.position - cachedFieldEnemy.transform.position;
+            offset.y = 0f;
+
+            if (offset.sqrMagnitude > sqrRadius)
+                continue;
+
+            LineRenderer line = GetOrCreateGroupLinkRenderer(visibleLineCount);
+            line.gameObject.SetActive(true);
+            line.SetPosition(0, center);
+            line.SetPosition(1, GetRuntimeLinkPoint(enemy.transform));
+            visibleLineCount++;
+        }
+
+        HideGroupLinksFromIndex(visibleLineCount);
+    }
+
+    private Vector3 GetRuntimeLinkPoint(Transform target)
+    {
+        return target.position + Vector3.up * groupLinkHeight;
+    }
+
+    private LineRenderer GetOrCreateGroupLinkRenderer(int index)
+    {
+        while (groupLinkRenderers.Count <= index)
+        {
+            GameObject lineObject = new GameObject($"GroupEncounterLink_{groupLinkRenderers.Count}");
+            lineObject.transform.SetParent(transform, false);
+
+            LineRenderer line = lineObject.AddComponent<LineRenderer>();
+            line.positionCount = 2;
+            line.useWorldSpace = true;
+            line.startWidth = groupLinkWidth;
+            line.endWidth = groupLinkWidth;
+            line.startColor = groupRuntimeLinkColor;
+            line.endColor = groupRuntimeLinkColor;
+            line.material = GetGroupLinkMaterial();
+            line.numCapVertices = 4;
+            line.numCornerVertices = 2;
+            lineObject.SetActive(false);
+
+            groupLinkRenderers.Add(line);
+        }
+
+        LineRenderer renderer = groupLinkRenderers[index];
+        renderer.startWidth = groupLinkWidth;
+        renderer.endWidth = groupLinkWidth;
+        renderer.startColor = groupRuntimeLinkColor;
+        renderer.endColor = groupRuntimeLinkColor;
+        renderer.material = GetGroupLinkMaterial();
+        return renderer;
+    }
+
+    private Material GetGroupLinkMaterial()
+    {
+        if (groupLinkMaterial != null)
+            return groupLinkMaterial;
+
+        if (runtimeGroupLinkMaterial == null)
+        {
+            Shader shader = Shader.Find("Sprites/Default");
+            runtimeGroupLinkMaterial = new Material(shader);
+        }
+
+        return runtimeGroupLinkMaterial;
+    }
+
+    private void HideAllGroupLinks()
+    {
+        HideGroupLinksFromIndex(0);
+    }
+
+    private void HideGroupLinksFromIndex(int startIndex)
+    {
+        for (int i = startIndex; i < groupLinkRenderers.Count; i++)
+        {
+            if (groupLinkRenderers[i] == null)
+                continue;
+
+            groupLinkRenderers[i].gameObject.SetActive(false);
+        }
+    }
     private void OnTriggerEnter(Collider other)
         
     {
@@ -111,5 +259,41 @@ public class EncounterTrigger : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(enemy.EncounterId))
             encounterIds.Add(enemy.EncounterId);
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (groupEncounterRadius <= 0f)
+            return;
+
+        EnemyFieldController triggerEnemy = GetComponent<EnemyFieldController>();
+        if (triggerEnemy == null)
+            return;
+
+        Vector3 center = transform.position;
+
+        Gizmos.color = groupRadiusGizmoColor;
+        Gizmos.DrawWireSphere(center, groupEncounterRadius);
+
+        EnemyFieldController[] fieldEnemies = FindObjectsOfType<EnemyFieldController>();
+        float sqrRadius = groupEncounterRadius * groupEncounterRadius;
+
+        Gizmos.color = groupLinkGizmoColor;
+
+        foreach (EnemyFieldController enemy in fieldEnemies)
+        {
+            if (enemy == null || enemy == triggerEnemy || !enemy.gameObject.activeInHierarchy)
+                continue;
+
+            Vector3 offset = enemy.transform.position - center;
+            offset.y = 0f;
+
+            if (offset.sqrMagnitude > sqrRadius)
+                continue;
+
+            Gizmos.DrawLine(center, enemy.transform.position);
+            Gizmos.DrawSphere(enemy.transform.position + Vector3.up * 0.4f, 0.15f);
+        }
+    }
 }
+
 
