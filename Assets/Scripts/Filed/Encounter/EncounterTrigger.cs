@@ -22,6 +22,7 @@ public class EncounterTrigger : MonoBehaviour
     [SerializeField] private Material groupLinkMaterial;
 
     private readonly List<LineRenderer> groupLinkRenderers = new List<LineRenderer>();
+    private readonly List<EnemyFieldController> groupLinkTargets = new List<EnemyFieldController>();
     private bool triggerd;
     private float nextGroupLinkRefreshTime;
     private Material runtimeGroupLinkMaterial;
@@ -40,7 +41,12 @@ public class EncounterTrigger : MonoBehaviour
 
     private void Update()
     {
-        UpdateGroupEncounterLinks();
+        RefreshGroupEncounterLinkTargets();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateGroupEncounterLinkPositions();
     }
 
     private void OnDisable()
@@ -48,38 +54,32 @@ public class EncounterTrigger : MonoBehaviour
         HideAllGroupLinks();
     }
 
-    private void UpdateGroupEncounterLinks()
+    private void RefreshGroupEncounterLinkTargets()
     {
         if (!showGroupLinksInGame || groupEncounterRadius <= 0f)
         {
             HideAllGroupLinks();
+            groupLinkTargets.Clear();
             return;
         }
 
-        if (cachedFieldEnemy == null)
-            cachedFieldEnemy = GetComponent<EnemyFieldController>();
-
-        if (cachedFieldEnemy == null)
+        if (!CanShowGroupLinks())
         {
             HideAllGroupLinks();
+            groupLinkTargets.Clear();
             return;
         }
 
-        if (showGroupLinksOnlyWhileChasing && !cachedFieldEnemy.IsChasing)
-        {
-            HideAllGroupLinks();
-            return;
-        }
-
+        // 查找附近敌人比较贵，所以只按间隔刷新目标列表。
+        // 线条的位置会在 LateUpdate 每帧更新，移动时会比第一版更顺。
         if (Time.time < nextGroupLinkRefreshTime)
             return;
 
         nextGroupLinkRefreshTime = Time.time + Mathf.Max(0.02f, groupLinkRefreshInterval);
+        groupLinkTargets.Clear();
 
         EnemyFieldController[] fieldEnemies = FindObjectsOfType<EnemyFieldController>();
         float sqrRadius = groupEncounterRadius * groupEncounterRadius;
-        Vector3 center = GetRuntimeLinkPoint(cachedFieldEnemy.transform);
-        int visibleLineCount = 0;
 
         foreach (EnemyFieldController enemy in fieldEnemies)
         {
@@ -92,16 +92,52 @@ public class EncounterTrigger : MonoBehaviour
             if (offset.sqrMagnitude > sqrRadius)
                 continue;
 
+            groupLinkTargets.Add(enemy);
+        }
+
+        HideGroupLinksFromIndex(groupLinkTargets.Count);
+    }
+
+    private void UpdateGroupEncounterLinkPositions()
+    {
+        if (!showGroupLinksInGame || groupEncounterRadius <= 0f || !CanShowGroupLinks())
+        {
+            HideAllGroupLinks();
+            return;
+        }
+
+        Vector3 center = GetRuntimeLinkPoint(cachedFieldEnemy.transform);
+        int visibleLineCount = 0;
+
+        for (int i = 0; i < groupLinkTargets.Count; i++)
+        {
+            EnemyFieldController target = groupLinkTargets[i];
+            if (target == null || !target.gameObject.activeInHierarchy)
+                continue;
+
             LineRenderer line = GetOrCreateGroupLinkRenderer(visibleLineCount);
             line.gameObject.SetActive(true);
             line.SetPosition(0, center);
-            line.SetPosition(1, GetRuntimeLinkPoint(enemy.transform));
+            line.SetPosition(1, GetRuntimeLinkPoint(target.transform));
             visibleLineCount++;
         }
 
         HideGroupLinksFromIndex(visibleLineCount);
     }
 
+    private bool CanShowGroupLinks()
+    {
+        if (cachedFieldEnemy == null)
+            cachedFieldEnemy = GetComponent<EnemyFieldController>();
+
+        if (cachedFieldEnemy == null)
+            return false;
+
+        if (showGroupLinksOnlyWhileChasing && !cachedFieldEnemy.IsChasing)
+            return false;
+
+        return true;
+    }
     private Vector3 GetRuntimeLinkPoint(Transform target)
     {
         return target.position + Vector3.up * groupLinkHeight;
@@ -295,5 +331,7 @@ public class EncounterTrigger : MonoBehaviour
         }
     }
 }
+
+
 
 
