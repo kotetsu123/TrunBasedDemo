@@ -298,6 +298,7 @@ public class BattleManager : MonoBehaviour
         {
             yield return StartCoroutine(cameraDirector.PlayBattleStartSequence(firstPlayer, firstEnemy));
         }
+        TryShowGroupEncounterPopup();
         _battleStartSequencePlayed = true;
     }
     //每次算出ordered，都统一走一个函数
@@ -1718,8 +1719,23 @@ public class BattleManager : MonoBehaviour
     }
     public void ShowSkillName(string skillName)
     {
+        ShowBattlePopup(skillName);
+    }
+    public void ShowBattlePopup(string message)
+    {
         if (skillNamePopUp != null)
-            skillNamePopUp.Play(skillName);
+            skillNamePopUp.Play(message);
+    }
+    private void TryShowGroupEncounterPopup()
+    {
+        int groupCount = Mathf.Max(
+            FieldBattleContext.TriggeredSpawnIds.Count,
+            FieldBattleContext.CurrentEncounterIds.Count);
+
+        if (groupCount <= 1)
+            return;
+
+        ShowBattlePopup($"Group Encounter x{groupCount}");
     }
     public void CancelSkillSelection()
     {
@@ -1845,6 +1861,7 @@ public class BattleManager : MonoBehaviour
        return consumed;
     }
 }
+
 
 
 

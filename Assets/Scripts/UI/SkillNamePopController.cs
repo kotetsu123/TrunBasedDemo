@@ -16,16 +16,16 @@ public class SkillNamePopController : BasePanel
         base.Awake();
         HideImmediate();
     }
-  public void Play(string skillName)
+  public void Play(string message)
     {
         if (_showRoutine != null)
             StopCoroutine(_showRoutine);
 
-        _showRoutine = StartCoroutine(PlayRoutine(skillName));
+        _showRoutine = StartCoroutine(PlayRoutine(message));
     }
-    private IEnumerator PlayRoutine(string skillName)
+    private IEnumerator PlayRoutine(string message)
     {
-        skillNameText.text = skillName;
+        skillNameText.text = message;
 
         base.Show();
 
