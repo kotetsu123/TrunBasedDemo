@@ -296,10 +296,20 @@ public class BattleManager : MonoBehaviour
 
         if (cameraDirector != null && firstPlayer != null && firstEnemy != null)
         {
-            yield return StartCoroutine(cameraDirector.PlayBattleStartSequence(firstPlayer, firstEnemy));
+            BattleIntroCameraType introCameraType = spawner != null ? spawner.GetIntroCameraType() : BattleIntroCameraType.Normal;
+            BaseController normalFocusActor = GetNextActionFriendlyActor();
+            BaseController normalFocusTarget = GetFirstAliveTargetByTeam(Team.Enemy);
+            yield return StartCoroutine(cameraDirector.PlayBattleStartSequence(firstPlayer, firstEnemy, introCameraType, normalFocusActor, normalFocusTarget));
         }
         TryShowGroupEncounterPopup();
         _battleStartSequencePlayed = true;
+    }
+    private BaseController GetNextActionFriendlyActor()
+    {
+        return controllers
+            .Where(c => c != null && c.data != null && c.data.Team == Team.Player && !c.isDead && !c.data.isDead && c.data.isOnField)
+            .OrderBy(GetTurnOrderValue)
+            .FirstOrDefault();
     }
     //每次算出ordered，都统一走一个函数
     private void PublishOrdered(List<BaseController> ordered)
@@ -1861,6 +1871,9 @@ public class BattleManager : MonoBehaviour
        return consumed;
     }
 }
+
+
+
 
 
 

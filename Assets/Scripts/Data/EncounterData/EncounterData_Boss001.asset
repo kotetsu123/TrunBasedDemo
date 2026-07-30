@@ -23,3 +23,4 @@ MonoBehaviour:
     minCount: 1
     maxCount: 2
     dropChance: 1
+  introCameraType: 1

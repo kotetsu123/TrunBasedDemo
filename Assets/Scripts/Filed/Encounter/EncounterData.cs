@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BattleIntroCameraType
+{
+    Normal,
+    Boss
+}
+
 [System.Serializable]
 public class EncounterItemDrop
 {
@@ -73,12 +79,15 @@ public class EncounterData : ScriptableObject
     // Reward service returns this result package to BattleManager after reward calculation.
     [SerializeField] private int rewardExp = 120;
     [SerializeField] private List<EncounterItemDrop> itemDrops = new List<EncounterItemDrop>();
+    [Header("Battle Presentation")]
+    [SerializeField] private BattleIntroCameraType introCameraType = BattleIntroCameraType.Normal;
 
     public string EncounterId => encounterId;
     public IReadOnlyList<EncounterEnemyEntry> EnemyEntries => enemyEntries;
     public List<Character> LegacyEnemyCharacters => enemyChatacters;
     public int RewardExp => rewardExp;
     public IReadOnlyList<EncounterItemDrop> ItemDrops => itemDrops;
+    public BattleIntroCameraType IntroCameraType => introCameraType;
     public bool HasEnemyEntries => enemyEntries != null && enemyEntries.Count > 0;
 
     public bool ValidateConfig()

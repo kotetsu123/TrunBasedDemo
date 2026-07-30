@@ -36,6 +36,22 @@ public class BattleSpawner : MonoBehaviour
 
     private readonly List<EncounterData> currentEncounterDatas = new List<EncounterData>();
 
+    public BattleIntroCameraType GetIntroCameraType()
+    {
+        foreach (EncounterData encounterData in currentEncounterDatas)
+        {
+            if (encounterData == null)
+                continue;
+
+            if (encounterData.IntroCameraType == BattleIntroCameraType.Boss)
+                return BattleIntroCameraType.Boss;
+        }
+
+        return CurrentEncounterData != null
+            ? CurrentEncounterData.IntroCameraType
+            : BattleIntroCameraType.Normal;
+    }
+
     private void Awake()
     {
         Debug.Log($"[BattleSpawner] Awake instanceID={GetInstanceID()} active={gameObject.activeInHierarchy}");
@@ -377,5 +393,6 @@ public class BattleSpawner : MonoBehaviour
         EnqueueOrSpawn(req);
     }
 }
+
 
 

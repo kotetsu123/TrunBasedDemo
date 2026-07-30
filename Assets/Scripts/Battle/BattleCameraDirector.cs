@@ -15,6 +15,7 @@ public class BattleCameraDirector : MonoBehaviour
     [Header("Move Settings")]
     [SerializeField]private float moveDuration = 0.35f;
     [SerializeField]private AnimationCurve moveCurve=AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField]private float normalStartSequenceDelay = 0.35f;
     [SerializeField]private float startSequenceFirstDelay = 1.5f;
     [SerializeField]private float startSequenceSecondDelay = 1.0f;
 
@@ -78,7 +79,30 @@ public class BattleCameraDirector : MonoBehaviour
             MoveToShot(anchor.TrunCameraPoint);
         }
     }
-    public IEnumerator PlayBattleStartSequence(BaseController player,BaseController target)
+    public IEnumerator PlayBattleStartSequence(BaseController player,BaseController target, BattleIntroCameraType introCameraType, BaseController normalFocusActor = null, BaseController normalFocusTarget = null)
+    {
+        if (introCameraType == BattleIntroCameraType.Boss)
+        {
+            yield return StartCoroutine(PlayBossBattleStartSequence(player, target));
+            yield break;
+        }
+
+        yield return StartCoroutine(PlayNormalBattleStartSequence(normalFocusActor, normalFocusTarget));
+    }
+
+    private IEnumerator PlayNormalBattleStartSequence(BaseController normalFocusActor, BaseController normalFocusTarget)
+    {
+        LockCamera();
+
+        if (normalFocusActor != null && normalFocusTarget != null)
+            FocusPlayerSideTargetPreviewShot(normalFocusActor, normalFocusTarget);
+        else
+            FocusDefault();
+
+        yield return new WaitForSeconds(normalStartSequenceDelay);
+        UnlockCamera();
+    }
+    private IEnumerator PlayBossBattleStartSequence(BaseController player,BaseController target)
     {
          LockCamera();
 
@@ -264,4 +288,8 @@ public class BattleCameraDirector : MonoBehaviour
         _cameraMoveRoutine = null;
     }
 }
+
+
+
+
 
