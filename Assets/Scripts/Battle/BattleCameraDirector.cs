@@ -83,10 +83,12 @@ public class BattleCameraDirector : MonoBehaviour
     {
         if (introCameraType == BattleIntroCameraType.Boss)
         {
+            Debug.Log($"[BattleIntro] Play Boss intro. player={player?.data?.Name}, target={target?.data?.Name}");
             yield return StartCoroutine(PlayBossBattleStartSequence(player, target));
             yield break;
         }
 
+        Debug.Log($"[BattleIntro] Play Normal intro. actor={normalFocusActor?.data?.Name}, target={normalFocusTarget?.data?.Name}");
         yield return StartCoroutine(PlayNormalBattleStartSequence(normalFocusActor, normalFocusTarget));
     }
 
@@ -95,9 +97,14 @@ public class BattleCameraDirector : MonoBehaviour
         LockCamera();
 
         if (normalFocusActor != null && normalFocusTarget != null)
+        {
             FocusPlayerSideTargetPreviewShot(normalFocusActor, normalFocusTarget);
+        }
         else
+        {
+            Debug.LogWarning($"[BattleIntro] Normal intro missing actor or target. fallback=DefaultShot, actor={normalFocusActor?.data?.Name}, target={normalFocusTarget?.data?.Name}");
             FocusDefault();
+        }
 
         yield return new WaitForSeconds(normalStartSequenceDelay);
         UnlockCamera();
@@ -288,6 +295,8 @@ public class BattleCameraDirector : MonoBehaviour
         _cameraMoveRoutine = null;
     }
 }
+
+
 
 
 

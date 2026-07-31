@@ -44,12 +44,20 @@ public class BattleSpawner : MonoBehaviour
                 continue;
 
             if (encounterData.IntroCameraType == BattleIntroCameraType.Boss)
+            {
+                Debug.Log($"[BattleIntro] Resolved introType=Boss, source={encounterData.name}, encounterId={encounterData.EncounterId}, encounterCount={currentEncounterDatas.Count}");
                 return BattleIntroCameraType.Boss;
+            }
         }
 
-        return CurrentEncounterData != null
-            ? CurrentEncounterData.IntroCameraType
-            : BattleIntroCameraType.Normal;
+        if (CurrentEncounterData != null)
+        {
+            Debug.Log($"[BattleIntro] Resolved introType={CurrentEncounterData.IntroCameraType}, source={CurrentEncounterData.name}, encounterId={CurrentEncounterData.EncounterId}, encounterCount={currentEncounterDatas.Count}");
+            return CurrentEncounterData.IntroCameraType;
+        }
+
+        Debug.LogWarning("[BattleIntro] No current EncounterData. Use Normal intro fallback.");
+        return BattleIntroCameraType.Normal;
     }
 
     private void Awake()
@@ -393,6 +401,7 @@ public class BattleSpawner : MonoBehaviour
         EnqueueOrSpawn(req);
     }
 }
+
 
 
 
