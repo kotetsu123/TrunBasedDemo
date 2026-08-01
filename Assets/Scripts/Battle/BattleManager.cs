@@ -1731,7 +1731,11 @@ public class BattleManager : MonoBehaviour
     {
         ShowBattlePopup(skillName);
     }
-    public void ShowBattlePopup(string message)
+    public void ShowBattleEventPopup(string message)
+    {
+        ShowBattlePopup(message);
+    }
+    private void ShowBattlePopup(string message)
     {
         if (skillNamePopUp != null)
             skillNamePopUp.Play(message);
@@ -1745,7 +1749,7 @@ public class BattleManager : MonoBehaviour
         if (groupCount <= 1)
             return;
 
-        ShowBattlePopup($"Group Encounter x{groupCount}");
+        ShowBattleEventPopup($"Group Encounter x{groupCount}");
     }
     public void CancelSkillSelection()
     {
@@ -1871,6 +1875,7 @@ public class BattleManager : MonoBehaviour
        return consumed;
     }
 }
+
 
 
 

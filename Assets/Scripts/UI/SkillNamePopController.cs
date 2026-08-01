@@ -4,6 +4,8 @@ using UnityEngine;
 using TMPro;
 
 
+// This component is still named SkillNamePopController to keep existing Unity bindings safe.
+// It now works as the shared battle popup panel for skill names and battle event messages.
 public class SkillNamePopController : BasePanel
 {   
     [SerializeField] private TMP_Text skillNameText;
@@ -39,3 +41,4 @@ public class SkillNamePopController : BasePanel
     }
    
 }
+
