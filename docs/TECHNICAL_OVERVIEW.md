@@ -1,40 +1,48 @@
 # Adventure of Paul Demo Technical Overview
 
-## 1. 文档目的
+## 1. Document Purpose
 
-本文档用于说明 `Adventure of Paul Demo` 当前项目的核心技术结构。
+This document summarizes the current technical structure of `Adventure of Paul Demo`.
 
-项目定位是一个 Unity 回合制 RPG 系统 demo，重点不是完整游戏内容，而是展示一套可以运行、可以扩展的 RPG gameplay loop：
+The project is a Unity turn-based RPG systems demo. The goal is not to ship a full game yet, but to connect common RPG systems into a playable and extensible loop:
 
 ```text
-Field 探索
- -> 敌人遭遇
- -> Battle 回合制战斗
- -> 奖励结算
- -> Party / Inventory 状态回写
+Field exploration
+ -> Field encounter / interactable
+ -> Battle scene
+ -> Reward / result flow
+ -> Runtime state writeback
  -> Save / Load
- -> 返回 Field
+ -> Return to Field
 ```
 
-## 2. 总体架构
-
-当前项目可以分成以下几个系统：
-
-| 系统 | 主要职责 | 代表脚本 |
-| --- | --- | --- |
-| Field System | Field 场景初始化、玩家位置、敌人生成点、遭遇入口 | `FieldCreator`, `FieldData`, `EnemySpawnManager`, `EncounterTrigger` |
-| Battle System | 回合制战斗、行动条、目标选择、战斗结束流程 | `BattleManager`, `BattleSpawner`, `BattleFormation`, `BattleTargetSelector` |
-| Runtime State | 跨场景保存运行时队伍和背包状态 | `PartyRuntimeState`, `InventoryRuntimeState` |
-| Encounter / Reward | 遭遇战数据、敌人队伍、EXP 和掉落 | `EncounterData`, `EncounterDataBase`, `EncounterRewardService` |
-| Save / Load | JSON 存档、运行时快照恢复 | `SaveSystem`, `GameSaveData`, `FieldSaveData`, `InventorySaveData`, `PartySaveData` |
-| UI System | 战斗 UI、Field 背包、奖励弹窗、结果面板 | `BasePanel`, `ResultCharacterPanelController`, `RewardPopController`, `FieldInventoryPanelController` |
-
-核心数据流：
+中文概括：
 
 ```text
-FieldData / EnemySpawnPoint
- -> EnemySpawnManager
- -> EnemyFieldController
+这是一个以作品集为目标的 Unity 回合制 RPG demo。
+当前重点是把 Field、Battle、Inventory、Party、Reward、Save/Load、Dialogue、Tutorial 等系统串成可体验流程。
+```
+
+## 2. High-Level Architecture
+
+| System | Responsibility | Main Scripts |
+| --- | --- | --- |
+| Field System | Field scene bootstrapping, player placement, generated spawn/interactable roots | `FieldCreator`, `FieldData`, `FieldSaveContext` |
+| Encounter System | Field enemy spawn, trigger, respawn, group encounter | `EnemySpawnManager`, `EnemySpawnPoint`, `EnemyFieldController`, `EncounterTrigger`, `FieldBattleContext` |
+| Battle System | Turn flow, timeline, target selection, battle camera, result handling | `BattleManager`, `BattleSpawner`, `BattleFormation`, `BattleTargetSelector`, `BattleCameraDirector` |
+| Runtime State | Cross-scene party, inventory, tutorial state | `PartyRuntimeState`, `InventoryRuntimeState`, `TutorialRuntimeState` |
+| Data Tables | ScriptableObject gameplay configuration | `FieldData`, `EncounterData`, `EncounterDataBase`, `EnemyCharacterDataBase`, `ItemDataBase`, `CharacterDataBase` |
+| Reward System | EXP, item drops, reward result payload | `EncounterRewardService`, `EncounterRewardResult`, `RewardPopController` |
+| Field Interactables | Chest, recruit point, dialogue trigger, E prompt | `FieldChestController`, `FieldRecruitController`, `FieldDialogueController`, `FieldInteractionPromptController` |
+| Save / Load | JSON save data and runtime restoration | `SaveSystem`, `GameSaveData`, `FieldSaveData`, `InventorySaveData`, `PartyMemberSaveData`, `TutorialSaveData` |
+| UI System | Battle UI, field inventory, result, reward, tutorial, dialogue | `BasePanel`, `DialoguePanelController`, `TutorialPanelController`, `RewardPopController`, `LevelUpPopController` |
+
+Core runtime data flow:
+
+```text
+FieldCreator
+ -> FieldData
+ -> EnemySpawnManager / Field Interactables
  -> EncounterTrigger
  -> FieldBattleContext
  -> BattleSpawner
@@ -42,33 +50,53 @@ FieldData / EnemySpawnPoint
  -> EncounterRewardService
  -> PartyRuntimeState / InventoryRuntimeState
  -> SaveSystem
+ -> FieldCreator
 ```
 
-## 3. Field System
+## 3. Field Scene Structure
 
-### 3.1 FieldCreator
+The current 3D field scene is treated as a hand-authored small world. Large visual and collision work stays in the Unity scene, while gameplay points can be driven by data.
 
-文件：
+Recommended hierarchy:
+
+```text
+FieldScene
+├─ Environment
+│  ├─ Ground
+│  ├─ Walls
+│  └─ Props
+├─ SpawnPoints
+│  ├─ EnemySpawnPoints
+│  ├─ ChestSpawnPoints
+│  ├─ RecruitSpawnPoints
+│  └─ DemoRouteMarkers
+├─ RuntimeGenerated
+│  ├─ GeneratedSpawnPoints
+│  ├─ GeneratedInteractables
+│  └─ GeneratedEnvironment
+└─ Managers
+   ├─ FieldCreator
+   ├─ EnemySpawnManager
+   └─ SceneTransitionController
+```
+
+Rule of thumb:
+
+- `Environment/Props`: static decoration, no save id, no gameplay state.
+- `SpawnPoints`: designer-placed gameplay markers.
+- `RuntimeGenerated`: objects created by `FieldCreator` or spawn managers.
+
+## 4. FieldCreator
+
+File:
 
 ```text
 Assets/Scripts/Filed/FieldCreator.cs
 ```
 
-`FieldCreator` 是 Field 场景初始化入口。
+`FieldCreator` is the Field scene boot entry.
 
-当前职责：
-
-- 清理 Field 暂停状态。
-- 初始化 `PartyRuntimeState`。
-- 初始化 `InventoryRuntimeState`。
-- 根据 `FieldData` 动态生成 SpawnPoint。
-- 根据 `FieldData` 动态生成 FieldObject。
-- 设置玩家初始位置。
-- 调用 `EnemySpawnManager.SpawnAll()` 生成 Field 敌人。
-- 刷新 Field Party HUD。
-- 处理战斗返回后的 encounter cooldown。
-
-初始化顺序：
+Current startup order:
 
 ```text
 FieldPauseState.Clear()
@@ -76,60 +104,51 @@ FieldPauseState.Clear()
  -> InventoryRuntimeState.InitializeIfEmpty()
  -> CreateSpawnPointsFromFieldData()
  -> CreateObjectsFromFieldData()
+ -> CreateRecruitPointsFromFieldData()
  -> SetupPlayer()
  -> EnemySpawnManager.SpawnAll()
- -> Party HUD Refresh
+ -> FieldPartyHudController.Refresh()
  -> Battle return cooldown
 ```
 
-玩家位置优先级：
+Player transform priority:
 
 ```text
 1. Battle return position
-2. Save / Load position
+2. Saved player transform from Load
 3. Scene playerStartPoint
 ```
 
-当前没有把 player start 放进 `FieldData`，因为本项目是 3D 箱庭式场景，出生点用 Scene 中的 Transform 手动摆放更直观。
+Generated root behavior:
 
-### 3.2 FieldData
+- Enemy spawn points are parented under `generatedSpawnPointRoot`.
+- Chests and recruit points are parented under `generatedInteractableRoot`.
+- Non-interactable field objects are parented under `generatedEnvironmentRoot`.
+- If a root is missing, the code falls back to a nearby root or the `FieldCreator` transform.
 
-文件：
+## 5. FieldData
+
+File:
 
 ```text
 Assets/Scripts/Filed/FieldData.cs
 ```
 
-`FieldData` 是当前 Field 场景的 gameplay table，不是完整 3D 地图生成器。
+In the current 3D demo, `FieldData` is a gameplay table, not a full map generator.
 
-在 3D 场景中：
-
-```text
-Unity Scene:
-- 地形
-- 建筑
-- 灯光
-- 摄像机
-- 静态碰撞
-- 大型静态场景物件
-
-FieldData:
-- 敌人生成点
-- encounterId
-- respawn 规则
-- gameplay object 生成入口
-```
-
-当前包含：
+It currently contains:
 
 ```text
 FieldData
-- fieldId
-- spawnPoints: List<FieldSpawnPointEntry>
-- fieldObjects: List<FieldObjectEntry>
+├─ fieldId
+├─ spawnPoints
+├─ fieldObjects
+└─ recruitPoints
 ```
 
-`FieldSpawnPointEntry` 字段：
+### 5.1 Spawn Points
+
+`FieldSpawnPointEntry` describes enemy encounter points:
 
 ```text
 spawnId
@@ -143,7 +162,24 @@ respawnType
 respawnSeconds
 ```
 
-`FieldObjectEntry` 字段：
+Recommended new flow:
+
+```text
+FieldSpawnPointEntry.encounterId
+ -> EncounterDataBase
+ -> EncounterData.enemyEntries
+ -> EnemyCharacterDataBase
+ -> Battle enemies
+```
+
+Legacy compatibility:
+
+- `enemyId` can still be used with `EnemyDataBase` to fill old field enemy settings.
+- New content should prefer `encounterId`.
+
+### 5.2 Field Objects
+
+`FieldObjectEntry` describes generated field objects:
 
 ```text
 objectId
@@ -153,532 +189,308 @@ rotationEuler
 scale
 ```
 
-当前已接入的 FieldObject：
+Current supported object:
 
 ```text
 FieldChestController
- -> player enters trigger
- -> press E
- -> InventoryRuntimeState.AddItem()
- -> FieldBattleContext.MarkChestOpened(chestId)
- -> SaveSystem writes openedChestIds
 ```
 
-说明：
+`objectId` becomes the chest save id when the generated prefab has `FieldChestController`.
 
-- `FieldData.FieldObjectEntry.objectId` 会在生成后写入 `FieldChestController.chestId`。
-- 手动摆在场景里的宝箱也可以直接在 Inspector 填 `chestId`。
-- `chestId` 是一次性宝箱的稳定存档 ID，打开后会保存到 `FieldSaveData.openedChestIds`。
+### 5.3 Recruit Points
 
-设计意图：
-
-- 3D demo 中，不强制用 FieldData runtime 生成整个世界。
-- FieldData 主要驱动 gameplay entity。
-- 以后迁移到 2D / tilemap / roguelike 时，可以扩展为更完整的 map table。
-
-### 3.3 EnemySpawnPoint
-
-文件：
+`FieldRecruitPointEntry` describes data-driven recruit points:
 
 ```text
-Assets/Scripts/Filed/EnemySpawn/EnemySpawnPoint.cs
+recruitId
+characterId
+pointPrefab
+visualPrefab
+position
+rotationEuler
+scale
+interactPrompt
+preRecruitDialogue
+disableAfterRecruit
 ```
 
-`EnemySpawnPoint` 是 Field 中敌人生成点配置。
+Recommended setup:
 
-关键字段：
+- `pointPrefab`: logic object with `FieldRecruitController` and trigger collider.
+- `visualPrefab`: model / animation only.
+- The generated visual is placed under the recruit point.
+- Nested `FieldRecruitController` and colliders inside the visual are disabled by `FieldCreator` to avoid duplicate interactions.
 
-```text
-spawnId
-encounterId
-fieldPrefab
-wanderRadius
-enemyId
-respawnType
-respawnSeconds
-```
+## 6. Field Encounter And Respawn
 
-`respawnType`：
+### 6.1 EnemySpawnManager
 
-```text
-Permanent: 战胜后永久清除，适合 boss / 一次性敌人
-Timed: 战胜后经过 respawnSeconds 后可以刷新，适合普通小怪
-```
-
-兼容策略：
-
-- 新流程优先使用 `encounterId + fieldPrefab`。
-- 老流程可以通过 `enemyId` 从 `EnemyDataBase` 中补充 `fieldPrefab / encounterId / wanderRadius`。
-
-### 3.4 EnemySpawnManager
-
-文件：
+File:
 
 ```text
 Assets/Scripts/Filed/EnemySpawn/EnemySpawnManager.cs
 ```
 
-`EnemySpawnManager` 负责把 `EnemySpawnPoint` 转成 Field 上可碰撞、可游荡的敌人实例。
+Responsibilities:
 
-核心职责：
+- Spawn enemies from scene or data-generated `EnemySpawnPoint`.
+- Keep `activeEnemiesBySpawnId` so one spawn point does not create duplicate active enemies.
+- Check `FieldBattleContext.ShouldSkipSpawn()` before spawning.
+- Support live timed respawn while the player stays in the same Field scene.
 
-- `SpawnAll()`：遍历当前 SpawnPoint 并生成敌人。
-- `SetSpawnPoints()`：接收 FieldData 动态生成的 SpawnPoint 列表。
-- `TrySpawnPoint()`：单个 SpawnPoint 生成流程。
-- Live Respawn：按 `liveRespawnCheckInterval` 定期检查 Timed SpawnPoint。
-- `activeEnemiesBySpawnId`：记录当前场景内每个 SpawnPoint 已经生成的敌人，避免重复生成。
+### 6.2 FieldBattleContext
 
-生成判断：
-
-```text
-HasActiveEnemy(spawnId)
- -> true: 当前场上已经有该 SpawnPoint 的敌人，不生成
- -> false: 继续判断清除/刷新规则
-
-FieldBattleContext.ShouldSkipSpawn(...)
- -> true: 当前仍应跳过生成
- -> false: 允许生成
-```
-
-### 3.5 FieldBattleContext
-
-文件：
+File:
 
 ```text
 Assets/Scripts/Filed/FieldBattleContext.cs
 ```
 
-`FieldBattleContext` 是 Field 与 Battle 之间的静态上下文。
+This is the static bridge between Field and Battle.
 
-保存内容：
+It stores:
 
-- 战斗前 Field scene 名称。
-- 战斗前玩家位置和朝向。
-- 触发战斗的 `spawnId`。
-- 当前 `encounterId`。
-- 战斗返回后的 encounter cooldown。
-- 已清除 SpawnPoint 集合。
-- Timed respawn 的清除时间。
-- 从存档恢复的玩家位置。
+- Last Field scene name.
+- Player position and rotation before battle.
+- Current `spawnId`.
+- Current `encounterId`.
+- Encounter cooldown after returning from battle.
+- Cleared spawn ids.
+- Cleared spawn UTC timestamps for timed respawn.
+- Opened chest ids.
+- Saved player transform from Load.
 
-核心方法：
-
-```text
-SaveFieldReturnData()
-MarkTriggerdEnemyCleared()
-ShouldSkipSpawn()
-ToSaveData()
-LoadFromSaveData()
-ClearReturnData()
-ClearAll()
-```
-
-Respawn 判断逻辑：
+Respawn logic:
 
 ```text
-没有 spawnId
- -> 不跳过，允许生成
+spawnId not cleared
+ -> spawn allowed
 
-spawnId 没在 clearedSpawnIds
- -> 没被打败过，允许生成
+spawnId cleared + Permanent
+ -> skip spawn
 
-已清除 + 不可刷新
- -> 跳过生成
+spawnId cleared + Timed + elapsed time < respawnSeconds
+ -> skip spawn
 
-已清除 + 可刷新 + 时间未到
- -> 跳过生成
-
-已清除 + 可刷新 + 时间已到
- -> 移除清除记录，允许生成
+spawnId cleared + Timed + elapsed time >= respawnSeconds
+ -> remove cleared record and spawn again
 ```
 
-### 3.6 EncounterTrigger
+### 6.3 EncounterTrigger
 
-文件：
+File:
 
 ```text
 Assets/Scripts/Filed/Encounter/EncounterTrigger.cs
 ```
 
-`EncounterTrigger` 负责 Field 敌人与玩家碰撞后进入 Battle。
+The trigger starts a battle when the player touches a field enemy.
 
-流程：
+It also supports group encounter visualization:
 
-```text
-Player enters trigger
- -> 检查 FieldPauseState
- -> 检查 encounter cooldown
- -> 从 EnemyFieldController 读取 spawnId / encounterId
- -> FieldBattleContext.SaveFieldReturnData()
- -> 禁用玩家移动
- -> SceneTransitionController.StartBattleTransition()
-```
+- Nearby enemies can be detected for group encounter.
+- Runtime `LineRenderer` links can show which enemies will join.
+- Link targets are cached and updated in `LateUpdate` to reduce visual jitter.
 
-## 4. Battle System
+## 7. Battle System
 
-### 4.1 BattleSpawner
+### 7.1 BattleSpawner
 
-文件：
+File:
 
 ```text
 Assets/Scripts/Battle/BattleSpawner.cs
 ```
 
-`BattleSpawner` 负责生成战斗单位。
+Player spawning:
 
-玩家生成：
+```text
+PartyRuntimeState.PartyMembers
+ -> clone Character data
+ -> instantiate player controller
+ -> BattleFormation player slots
+```
 
-- 从 `PartyRuntimeState.PartyMembers` 读取当前队伍。
-- 复制角色数据后生成 Battle Controller。
-- 按顺序放入 `BattleFormation`。
-
-敌人生成：
+Enemy spawning:
 
 ```text
 FieldBattleContext.CurrentEncounterId
- -> EncounterDataBase.FindeById()
- -> EncounterData.EnemyEntries
+ -> EncounterDataBase.FindById()
+ -> EncounterData.enemyEntries
  -> EnemyCharacterDataBase.FindByEnemyId()
- -> Character template
- -> enemyPrefab
- -> SpawnRequest
- -> BattleFormation slot
+ -> clone Character template
+ -> instantiate enemy controller
+ -> BattleFormation enemy slots
 ```
 
-Fallback：
+Fallback behavior:
 
-- 如果没有 `CurrentEncounterId`。
-- 如果 `EncounterDataBase` 为空。
-- 如果找不到 EncounterData。
-- 如果 EncounterData 配置无效。
-- 如果 `enemyPrefab` 为空。
-- 如果 `enemyEntries` 没有生成任何敌人，且 `allowLegacyEnemyCharactersFallback` 关闭。
+- If encounter data is missing or invalid, `initialEnemies` can still be used for testing.
+- `allowLegacyEnemyCharactersFallback` controls whether old serialized enemy character lists may be used.
 
-则使用 `initialEnemies` 测试配置。
+### 7.2 BattleManager
 
-Legacy fallback：
-
-- `allowLegacyEnemyCharactersFallback` 开启时，`enemyEntries` 生成 0 个敌人后会尝试旧的 `LegacyEnemyCharacters`。
-- `BattleScene` 当前关闭该 fallback，用于验证 Encounter 是否真正走 table 数据流。
-
-### 4.2 BattleManager
-
-文件：
+File:
 
 ```text
 Assets/Scripts/Battle/BattleManager.cs
 ```
 
-`BattleManager` 是战斗主流程控制器。
+Main responsibilities:
 
-当前职责：
+- Register battle actors.
+- Advance action values and timeline order.
+- Manage current actor, selected target, and preview target.
+- Execute attack / skill / item commands.
+- Handle death, revive, and timeline icon rebuild.
+- Resolve battle win / lose / escape.
+- Build result payload for result UI.
+- Show skill and battle event popup messages.
 
-- 注册角色 Controller。
-- 管理行动条和行动值。
-- 发布 Timeline 顺序。
-- 管理当前行动者、目标、预览目标。
-- 接收 Battle UI 指令。
-- 执行 Attack / Skill / Item。
-- 在镜头移动中拦截 Attack / Skill / Item 的最终确认。
-- 处理角色死亡、复活、Timeline icon 重建。
-- 处理战斗结束。
-- 广播 `OnBattleEnded`。
+Important rules:
 
-战斗结束流程：
+- Player death does not remove the player controller from the battle controller list.
+- Dead players stay in runtime data so Field HUD and revive items still work correctly.
+- Enemy death can remove enemy controllers and free formation slots.
+- Action confirmation is blocked while `BattleCameraDirector.IsMoving` is true.
+- Target switching can remain responsive while the camera is moving.
 
-```text
-CheckBattleEnd()
- -> HandleBattleEnd(result)
- -> Win:
-      FieldBattleContext.MarkTriggerdEnemyCleared()
-      EncounterRewardService.GrantRewards()
-      PartyRuntimeState.UpdateFromBattleController()
- -> BuildPartySnapShots()
- -> BattleResultPayload
- -> OnBattleEnded
-```
+### 7.3 Timeline
 
-Lose / Retry：
+The timeline displays the upcoming actor order based on action values and speed.
 
-- Lose 不回写 PartyRuntimeState。
-- Retry 使用进入战斗前的 runtime state。
+Recent behavior:
 
-输入确认与镜头移动：
+- UI order is updated from the same prediction logic used by battle turn selection.
+- This prevents the UI from showing one expected actor while the system resolves another.
+
+### 7.4 Battle Camera
+
+File:
 
 ```text
-Player selects Attack / Skill / Item
- -> BattleManager updates current target / preview target
- -> BattleCameraDirector starts camera transition
- -> Player may still change selection while camera is moving
- -> Space confirmation is ignored until BattleCameraDirector.IsMoving == false
- -> Action resolves only after the preview camera reaches its target
+Assets/Scripts/Battle/BattleCameraDirector.cs
 ```
 
-设计原因：
-
-- 目标选择和 UI 操作保持响应，不强制锁死玩家输入。
-- Attack / Skill / Item 的最终确认必须等待镜头移动结束。
-- 避免技能或道具已经结算，但镜头还在移动，造成表现延迟和镜头冲突。
-- 在 coroutine 中阻止确认时必须先 `yield return null` 再 `continue`，避免同一帧无限循环导致 Unity Editor 卡死。
-
-相关文件：
+Battle intro camera behavior is driven by `EncounterData`.
 
 ```text
-BattleCameraDirector.IsMoving
-BattleManager.CanConfirmAction()
+EncounterData.introCameraType
+ -> BattleSpawner.GetIntroCameraType()
+ -> BattleManager
+ -> BattleCameraDirector
 ```
 
-玩家死亡与复活数据保留：
+Current types:
+
+- `Normal`: skips the heavy boss-style intro and uses a player-side target preview shot.
+- `Boss`: uses the existing cinematic intro sequence.
+
+Normal intro currently focuses on:
 
 ```text
-Player HP reaches 0
- -> BaseController.OnDeath()
- -> BattleManager.NotifyDeath()
- -> HandleDeathCoroutine()
- -> mark isDead / Hp = 0
- -> disable player controller
- -> remove timeline icon
- -> keep player controller in BattleManager.controllers
- -> PartyRuntimeState.UpdateFromBattleController()
- -> FieldPartyHud still receives the dead member data
+next friendly actor + first alive enemy target
 ```
 
-设计原因：
+This gives regular encounters a faster start while preserving boss presentation.
 
-- 玩家死亡后不能从 `BattleManager.controllers` 中移除，否则胜利回写时会把该队员当成“不存在”。
-- 保留死亡玩家的 controller 数据，可以让 `PartyRuntimeState` 保存 `isDead / Hp = 0`。
-- Field HUD 仍然能显示死亡队员，Field 背包也才能继续选中该队员使用复活道具。
-- 敌人死亡仍然会从 controller 列表移除，并释放 formation slot，方便 `BattleSpawner.TryFillOneEnemy()` 补位。
+## 8. Encounter And Reward Data
 
-复活流程：
+### 8.1 EncounterData
+
+File:
 
 ```text
-Revive item / skill
- -> BaseController.Revive()
- -> OnRevied
- -> BattleManager.HandleCharacterRevived()
- -> ctrl.enabled = true
- -> rebuild timeline icon if it was removed by death flow
- -> RequestReorder()
+Assets/Scripts/Filed/Encounter/EncounterData.cs
 ```
 
-### 4.3 BattleFormation
-
-文件：
+Current fields:
 
 ```text
-Assets/Scripts/Battle/BattleFormation.cs
+encounterId
+enemyEntries
+legacy enemy characters
+rewardExp
+itemDrops
+introCameraType
 ```
 
-`BattleFormation` 管理战斗站位 slot。
-
-职责：
-
-- 查找空 slot。
-- 占用 slot。
-- 释放 slot。
-- 提供站位 anchor。
-- 在 slot 变化时通知 BattleSpawner 补位。
-
-### 4.4 Battle UI / Result Flow
-
-代表文件：
-
-```text
-Assets/Scripts/Manager/ResultCharacterPanelController.cs
-Assets/Scripts/UI/RewardPopController.cs
-Assets/Scripts/UI/LevelUpPopController.cs
-```
-
-结果流程：
-
-```text
-BattleEndPanel
- -> SettlePanel
- -> RewardPop
- -> LevelUpPop
- -> Return Field / Retry / Title / Load
-```
-
-RewardPop 使用 `EncounterRewardResult` 显示本场获得的 EXP 和掉落道具。
-
-## 5. Encounter / Reward System
-
-### 5.1 Encounter Table Flow
-
-Encounter table 是 Field 与 Battle 之间的核心连接层。
-
-Field 侧只负责决定“触发哪一场遭遇”，Battle 侧再根据 Encounter table 决定“这场战斗生成哪些敌人”。
-
-完整数据流：
-
-```text
-FieldData / EnemySpawnPoint
- -> spawnId
- -> encounterId
- -> EnemySpawnManager
- -> EnemyFieldController
- -> EncounterTrigger
- -> FieldBattleContext.CurrentEncounterId
- -> BattleSpawner
- -> EncounterDataBase
- -> EncounterData.enemyEntries
- -> EnemyCharacterDataBase
- -> Character template
- -> enemyPrefab
- -> BattleFormation
-```
-
-职责拆分：
-
-```text
-FieldData / EnemySpawnPoint:
-    管理 Field 场景中的敌人生成点、fieldPrefab、spawnId、encounterId、respawn 规则。
-
-EncounterData:
-    管理一场战斗的敌人队伍、经验奖励、掉落配置。
-
-EnemyCharacterDataBase:
-    管理 enemyId 对应的 Character 模板数据。
-```
-
-当前推荐配置：
+Recommended enemy table setup:
 
 ```text
 EncounterData.enemyEntries:
     enemyId: slime
     count: 3
 
-EnemyCharacterDataBase.enemies:
+EnemyCharacterDataBase:
     Character.characterId: slime
-    Name: slime
-    Hp / Attack / Speed ...
 ```
 
-注意：
+`EncounterEnemyEntry.enemyId` currently maps to `Character.characterId` inside `EnemyCharacterDataBase`.
 
-- `EncounterEnemyEntry.enemyId` 对应 `EnemyCharacterDataBase` 中的 `Character.characterId`。
-- `enemyEntries` 是新流程。
-- `enemyChatacters` 是旧流程留下的序列化字段，代码中通过 `LegacyEnemyCharacters` 暴露。
-- `allowLegacyEnemyCharactersFallback` 用来控制 table 配置失败时是否允许回退旧数据。
+### 8.2 Reward Flow
 
-### 5.2 EncounterData
-
-文件：
+Reward resolution:
 
 ```text
-Assets/Scripts/Filed/Encounter/EncounterData.cs
-```
-
-`EncounterData` 是遭遇战配置。
-
-字段：
-
-```text
-encounterId
-enemyEntries
-enemyChatacters / LegacyEnemyCharacters
-rewardExp
-itemDrops
-```
-
-说明：
-
-- 当前主流程使用 `enemyEntries` 配置敌人队伍。
-- `enemyEntries` 每一项包含 `enemyId` 和 `count`。
-- `enemyId` 会通过 `EnemyCharacterDataBase` 找到对应的 `Character` 模板。
-- `enemyChatacters` 保留为 legacy fallback，不推荐新 Encounter 继续使用。
-
-### 5.3 EncounterDataBase
-
-文件：
-
-```text
-Assets/Scripts/Filed/Encounter/EncounterDataBase.cs
-```
-
-`EncounterDataBase` 通过 `encounterId` 查找对应 EncounterData。
-
-已有防呆：
-
-- 空 id 警告。
-- 找不到 id 警告。
-- 重复 id 警告。
-
-### 5.4 EncounterRewardService
-
-文件：
-
-```text
-Assets/Scripts/Filed/Encounter/EncounterData.cs
-```
-
-`EncounterRewardService` 当前和 `EncounterData` 放在同一个文件中。
-
-职责：
-
-- 根据 EncounterData 决定 EXP。
-- 给玩家队伍 Battle Controller 加 EXP。
-- 收集 LevelUpResult。
-- Roll item drop。
-- 把掉落道具写入 `InventoryRuntimeState`。
-- 返回 `EncounterRewardResult` 给 BattleManager / UI。
-
-掉落逻辑：
-
-```text
-foreach EncounterItemDrop
- -> Random.value <= dropChance
- -> Random.Range(minCount, maxCount + 1)
+BattleManager handles Win
+ -> EncounterRewardService.GrantRewards()
+ -> add EXP to battle player controllers
+ -> roll item drops
  -> InventoryRuntimeState.AddItem()
+ -> EncounterRewardResult
+ -> RewardPopController
+ -> LevelUpPopController
 ```
 
-## 6. Runtime State
+Drop rule:
 
-### 6.1 InventoryRuntimeState
+```text
+Random.value <= dropChance
+ -> drop succeeds
+ -> Random.Range(minCount, maxCount + 1)
+ -> item added to inventory
+```
 
-文件：
+If no item drops, reward UI still shows the EXP result so the player receives visible feedback.
+
+## 9. Inventory And Item System
+
+### 9.1 InventoryRuntimeState
+
+File:
 
 ```text
 Assets/Scripts/Filed/Inventory/InventoryRuntimeState.cs
 ```
 
-当前背包以有序 slot 列表保存，而不是 Dictionary。
+Inventory is stored as ordered slots.
 
-原因：
+Reason:
 
-- UI slot 顺序需要稳定。
-- 拖拽换位需要保存 slot index。
-- Save / Load 需要恢复布局。
+- UI slot order must stay stable.
+- Drag and drop needs slot indexes.
+- Save / Load needs to restore item positions.
 
-核心能力：
+Current abilities:
 
-- 初始化固定容量。
-- 添加物品。
-- 消耗物品。
-- 查询数量。
-- slot swap。
-- 保存为 InventorySaveData。
-- 从 InventorySaveData 恢复。
+- Initialize fixed default capacity.
+- Keep empty slots.
+- Stack same item data.
+- Consume item count.
+- Swap slots.
+- Serialize to `InventorySaveData`.
+- Load from `InventorySaveData` using `ItemDataBase`.
 
-当前规则：
+### 9.2 Item Types
 
-- 相同 `ItemData` 会堆叠到已有 slot。
-- 空 slot 会保留 index。
-- 容量满时当前版本会扩容并 warning。
-
-### 6.2 Item Type / Item Usage
-
-文件：
+File:
 
 ```text
 Assets/Scripts/Enums/ItemType.cs
-Assets/Scripts/Data/ItemData/ItemData.cs
-Assets/Scripts/Filed/Inventory/FieldInventoryPanelController.cs
-Assets/Scripts/Battle/BattleManager.cs
 ```
 
-当前 `ItemType` 使用显式数字：
+Current item types:
 
 ```text
 None = 0
@@ -688,83 +500,144 @@ Revive = 3
 Buff = 4
 ```
 
-设计原因：
+Explicit enum values are used because Unity serializes enum values as numbers. This prevents old item assets from changing meaning when new enum entries are added.
 
-- Unity 会把 enum 序列化成数字。
-- 旧 Potion asset 中已经保存了 `itemtype: 1`。
-- 给 enum 写显式数字，可以避免以后插入新类型时让旧 asset 的含义发生偏移。
+Implemented:
 
-当前已实现：
+- HP recovery.
+- MP recovery.
+- Revive.
 
-- `Heal`：恢复 HP。
-- `RestoreMp`：恢复 MP。
-- `Revive`：复活死亡角色，并恢复一定 HP。
+Reserved:
 
-当前预留：
+- Buff item data fields exist, but buff runtime behavior is not implemented yet.
 
-- `Buff`：`ItemData` 中已有 `buffId / buffTurns` 字段。
-- Buff 目前只是接口占位，尚未接入实际 buff runtime / 状态机。
-- Field 和 Battle 中遇到 Buff item 时，不会实际生效，也不应该消耗道具。
+## 10. Party And Recruit System
 
-Battle 使用规则：
+### 10.1 PartyRuntimeState
 
-```text
-Select Item
- -> Decide target type by ItemType
- -> Validate target
- -> Apply effect
- -> Consume inventory item
- -> End turn
-```
-
-如果目标无效：
-
-- 不消耗 item。
-- 不结束回合。
-- 保持在当前道具选择流程。
-
-### 6.3 PartyRuntimeState
-
-文件：
+File:
 
 ```text
 Assets/Scripts/Data/RunTime/PartyRuntimeState.cs
 ```
 
-`PartyRuntimeState` 保存跨场景的队伍状态。
+Responsibilities:
 
-核心能力：
+- Initialize party from `PartyInitialData`.
+- Save / Load party members.
+- Write battle results back into runtime data.
+- Preserve party order.
+- Recruit new members.
+- Keep dead members visible for Field revive flow.
 
-- 初始化队伍。
-- 从 Battle Controller 回写队伍。
-- Field 中使用道具恢复 HP / MP 或复活队伍成员。
-- 保存为 PartySaveData。
-- 从 PartySaveData 恢复。
+Writeback matching:
 
-回写策略：
+```text
+characterId first
+ -> fallback by Name for older data
+ -> append new members
+```
 
-- 优先用 `characterId` 匹配原队伍成员。
-- fallback 到 `Name` 匹配旧数据。
-- 保持原始队伍顺序。
-- 新加入角色追加到队伍后面。
+### 10.2 FieldRecruitController
 
-## 7. Save / Load System
+File:
 
-### 7.1 SaveSystem
+```text
+Assets/Scripts/Filed/FieldObjects/FieldRecruitController.cs
+```
 
-文件：
+Recruit flow:
+
+```text
+Player enters trigger
+ -> show E prompt
+ -> optional preRecruitDialogue
+ -> CharacterDataBase.FindById(characterId)
+ -> PartyRuntimeState.TryRecruitMember()
+ -> refresh FieldPartyHud
+ -> hide visualRoot if disableAfterRecruit
+```
+
+Load rollback behavior:
+
+- `SaveSystem.Load()` calls `FieldRecruitController.RefreshAllRecruitStates()`.
+- If a loaded save no longer has the recruited member, the recruit point becomes visible again.
+- The logic point should stay active; only `visualRoot` should be hidden after recruit.
+
+## 11. Dialogue And Tutorial
+
+### 11.1 Dialogue
+
+Files:
+
+```text
+Assets/Scripts/Data/DialogueData/DialogueData.cs
+Assets/Scripts/Filed/FieldObjects/FieldDialogueController.cs
+Assets/Scripts/UI/DialoguePanelController.cs
+```
+
+Dialogue flow:
+
+```text
+FieldDialogueController
+ -> player enters trigger
+ -> E
+ -> DialoguePanelController.Play(dialogueData)
+ -> click / input advances line
+ -> callback on complete
+```
+
+Recruit points can optionally play dialogue before adding the party member.
+
+### 11.2 Tutorial
+
+Files:
+
+```text
+Assets/Scripts/Data/TutorialData/TutorialData.cs
+Assets/Scripts/Data/RunTime/TutorialRuntimeState.cs
+Assets/Scripts/Data/SaveData/TutorialSaveData.cs
+Assets/Scripts/Filed/FieldTutorialController.cs
+Assets/Scripts/Battle/BattleTutorialController.cs
+Assets/Scripts/UI/TutorialPanelController.cs
+```
+
+Tutorial flow:
+
+```text
+TutorialController
+ -> TutorialRuntimeState.IsCompleted(tutorialId)
+ -> TutorialPanelController.Play(tutorialData)
+ -> player reads pages
+ -> Skip can ask for confirmation
+ -> TutorialRuntimeState.MarkCompleted(tutorialId)
+ -> SaveSystem writes TutorialSaveData
+```
+
+Current tutorial support:
+
+- Field tutorial entry.
+- Battle tutorial entry.
+- Multi-step tutorial data.
+- Skip confirmation.
+- Save / Load completed tutorial ids.
+
+## 12. Save / Load System
+
+File:
 
 ```text
 Assets/Scripts/Manager/SaveSystem.cs
 ```
 
-存档文件：
+Save file:
 
 ```text
 Application.persistentDataPath/save.json
 ```
 
-保存流程：
+Save flow:
 
 ```text
 SaveSystem.Save()
@@ -773,317 +646,171 @@ SaveSystem.Save()
  -> PartyRuntimeState.ToSaveData()
  -> FieldBattleContext.ToSaveData()
  -> FieldSaveContext.TryFillFieldSaveData()
+ -> TutorialRuntimeState.ToSaveData()
  -> JsonUtility.ToJson()
  -> File.WriteAllText()
 ```
 
-读取流程：
+Load flow:
 
 ```text
-SaveSystem.Load(itemDatabase, characterDatabase)
+SaveSystem.Load(itemDataBase, characterDataBase)
  -> File.ReadAllText()
  -> JsonUtility.FromJson<GameSaveData>()
  -> InventoryRuntimeState.LoadFromSaveData()
  -> PartyRuntimeState.LoadFromSaveData()
  -> FieldBattleContext.LoadFromSaveData()
+ -> TutorialRuntimeState.LoadFromSaveData()
  -> FieldSaveContext.TryApplySavedPlayerTransform()
+ -> FieldRecruitController.RefreshAllRecruitStates()
 ```
 
-### 7.2 SaveData DTO
-
-文件：
+Saved data:
 
 ```text
-Assets/Scripts/Data/SaveData/GameSaveData.cs
-Assets/Scripts/Data/SaveData/InventorySaveData.cs
-Assets/Scripts/Data/SaveData/PartyMemberSaveData.cs
-Assets/Scripts/Data/SaveData/FieldSaveData.cs
+GameSaveData
+├─ version
+├─ inventory
+├─ party
+├─ field
+└─ tutorial
 ```
 
-`GameSaveData`：
-
-```text
-version
-inventory
-party
-field
-```
-
-`InventorySaveData`：
-
-```text
-slots[]
- -> itemId
- -> count
-```
-
-`PartySaveData`：
-
-```text
-members[]
- -> characterId
- -> hp / maxHp
- -> mp / maxMp
- -> level / exp
- -> isDead
-```
-
-`FieldSaveData`：
-
-```text
-clearedSpawnIds
-clearedSpawnRecords
-sceneName
-playerPos
-playerRotEuler
-hasPlayerTransform
-```
-
-### 7.3 Database 恢复
-
-存档不直接保存 ScriptableObject 引用，而保存稳定 id。
-
-恢复时：
+Stable id restoration:
 
 ```text
 itemId -> ItemDataBase -> ItemData
 characterId -> CharacterDataBase -> Character
+spawnId -> FieldBattleContext cleared spawn state
+chestId -> FieldBattleContext opened chest state
+tutorialId -> TutorialRuntimeState completed state
 ```
 
-这让 JSON 存档更稳定，也避免直接序列化 Unity Object 引用。
+## 13. UI System
 
-## 8. UI System
+### 13.1 BasePanel
 
-### 8.1 BasePanel
-
-文件：
+File:
 
 ```text
 Assets/Scripts/UI/BasePanel.cs
 ```
 
-`BasePanel` 统一面板显示/隐藏逻辑，通常通过 CanvasGroup 控制：
+`BasePanel` centralizes UI show/hide behavior through `CanvasGroup`:
 
-- alpha
-- interactable
-- blocksRaycasts
+- `alpha`
+- `interactable`
+- `blocksRaycasts`
 
-### 8.2 Field Inventory UI
+### 13.2 Field UI
 
-代表文件：
+Current Field UI:
+
+- Field party HP HUD.
+- Inventory panel.
+- Inventory description panel.
+- Party target panel for item usage.
+- ESC menu for save/load.
+- Interaction prompt for E interactions.
+- Dialogue panel.
+- Tutorial panel.
+
+### 13.3 Battle UI
+
+Current Battle UI:
+
+- Command panel.
+- Skill panel.
+- Item panel.
+- Timeline UI.
+- Skill / battle event popup.
+- Reward popup.
+- Level-up popup.
+- Result / settle panel.
+
+Popup semantics:
+
+- `ShowSkillName()` is for skill or action names.
+- `ShowBattleEventPopup()` is for event messages such as group encounter.
+- `SkillNamePopController` keeps its old class name to preserve Unity Inspector bindings, but now acts as a shared battle popup component.
+
+## 14. Demo Route
+
+The current demo is moving toward a simple route:
 
 ```text
-Assets/Scripts/Filed/Inventory/FieldInventoryPanelController.cs
-Assets/Scripts/Filed/Inventory/FieldInventoryItemView.cs
-Assets/Scripts/Filed/Inventory/DraggableItem.cs
-Assets/Scripts/Filed/Inventory/InventorySlot.cs
-Assets/Scripts/Filed/Inventory/FieldInventoryPartyTargetPanelController.cs
+Start
+ -> Slime
+ -> Chest
+ -> Recruit Argo
+ -> Group Encounter
+ -> Boss
 ```
 
-当前能力：
+Purpose:
 
-- 动态显示 InventoryRuntimeState slot。
-- 空 slot 隐藏 icon/count。
-- 点击 item 显示 description。
-- Use 后弹出 party target panel。
-- 可对队伍成员使用 HP 恢复、MP 恢复、复活道具。
-- Buff item 目前只作为预留类型，不在 Field 中实际生效。
-- 拖拽 item root 交换 slot。
-- Esc / B 控制背包关闭。
+- Slime: regular timed respawn enemy.
+- Chest: field interactable, item reward, opened state save.
+- Recruit Argo: party member join flow and load rollback test.
+- Group Encounter: nearby enemy group detection and visible link lines.
+- Boss: permanent clear, boss intro camera, stronger reward.
 
-### 8.3 Battle UI
+This route is meant to prove that the systems are connected, not to be final level art.
 
-代表文件：
+## 15. Compatibility And Current Boundaries
 
-```text
-BattleCommandPanel
-SkillPanelController
-ItemPanelController
-TimeLineUI
-RewardPopController
-LevelUpPopController
-ResultCharacterPanelController
-```
+Compatibility:
 
-Battle UI 通过事件与 `BattleManager` 交互。
+- FieldData can be missing; old scene-placed spawn points still work.
+- EncounterData prefers `enemyEntries`, but legacy enemy character fallback can still be enabled.
+- Save data uses stable ids instead of Unity object references.
+- Old cleared spawn ids can be restored even without timed respawn records.
 
-当前输入约束：
+Current boundaries:
 
-- 目标切换和 UI 光标移动可以在镜头移动中继续响应。
-- Attack / Skill / Item 的最终确认会等待 `BattleCameraDirector.IsMoving == false`。
-- 这样可以避免技能或道具已经结算，但镜头还没移动到目标位置的表现冲突。
+- FieldData is not a full 3D world generator.
+- Buff item type is reserved but not implemented.
+- Equipment system is planned but not implemented.
+- Dialogue and recruit are connected, but a full quest/event system does not exist yet.
+- Tutorial exists, but more content needs to be authored.
+- Demo scene layout is still graybox / route planning stage.
+- `EnemyFieldData` remains mainly for older field enemy compatibility.
 
-## 9. Data Asset Map
+## 16. Recommended Next Steps
 
-当前项目主要 ScriptableObject 数据：
+Short-term portfolio tasks:
 
-```text
-Character
-CharacterDataBase
-PartyInitialData
-ItemData
-ItemDataBase
-SkillData
-EnemyFieldData
-EnemyDataBase
-EnemyCharacterDataBase
-EncounterData
-EncounterDataBase
-FieldData
-```
+1. Finish the demo route layout and make the path readable.
+2. Author battle tutorial content for attack, skill, item, run, and target selection.
+3. Add a simple ending point after the boss.
+4. Polish reward popup text and result flow.
+5. Add screenshots or diagrams to README.
 
-推荐理解方式：
+Medium-term system tasks:
 
-```text
-CharacterDataBase:
-    角色模板恢复，用于 Party Save/Load。
+1. Convert field enemy behavior from coroutine-driven logic to a state machine.
+2. Add a first version of equipment data, equipment slots, and stat modifiers.
+3. Expand interactable data for portal / event / quest objects.
+4. Add save migration handling using `GameSaveData.version`.
+5. Clean up legacy encounter fields after all encounters use `enemyEntries`.
 
-ItemDataBase:
-    道具模板恢复，用于 Inventory Save/Load。
+## 17. Portfolio Summary
 
-EnemyDataBase / EnemyFieldData:
-    Field 旧流程兼容，用 enemyId 补充 fieldPrefab / encounterId。
+This project demonstrates:
 
-EnemyCharacterDataBase:
-    Battle 敌人模板表，用 enemyId 查找 Character 数据。
+- ScriptableObject data-driven RPG configuration.
+- Cross-scene Field and Battle state handoff.
+- Runtime party and inventory persistence.
+- Turn-based battle timeline and target selection.
+- Encounter table based enemy generation.
+- Reward service separation.
+- JSON save/load DTO design.
+- Permanent and timed respawn.
+- Chest, recruit, dialogue, and tutorial interaction flows.
+- Practical compatibility handling while migrating from scene-authored data to table-driven gameplay.
 
-EncounterDataBase:
-    Battle 生成入口，用 encounterId 找 EncounterData。
-
-FieldData:
-    Field scene gameplay table，用于生成 SpawnPoint 和 gameplay object。
-```
-
-## 10. 主要流程图
-
-### 10.1 Field 到 Battle
+One-sentence English summary:
 
 ```text
-FieldCreator
- -> EnemySpawnManager.SpawnAll()
- -> EnemyFieldController.Init(spawnId, encounterId)
- -> EncounterTrigger.OnTriggerEnter(Player)
- -> FieldBattleContext.SaveFieldReturnData()
- -> Load BattleScene
- -> BattleSpawner.SpawnInitial()
- -> BattleSpawner.TrySpawnEnemiesFromEncounter()
-```
-
-### 10.2 Battle 胜利到 Field
-
-```text
-BattleManager.CheckBattleEnd()
- -> HandleBattleEnd(Win)
- -> FieldBattleContext.MarkTriggerdEnemyCleared()
- -> EncounterRewardService.GrantRewards()
- -> PartyRuntimeState.UpdateFromBattleController()
- -> Result UI
- -> Return Field
- -> FieldCreator.SetupPlayer()
- -> EnemySpawnManager.SpawnAll()
- -> FieldBattleContext.ShouldSkipSpawn()
-```
-
-### 10.3 Save / Load
-
-```text
-Save:
-RuntimeState / FieldBattleContext
- -> GameSaveData
- -> JSON
- -> persistentDataPath/save.json
-
-Load:
-save.json
- -> GameSaveData
- -> ItemDataBase / CharacterDataBase restore
- -> InventoryRuntimeState / PartyRuntimeState / FieldBattleContext
- -> Field player transform apply
-```
-
-## 11. 当前兼容策略
-
-### FieldData 兼容
-
-```text
-FieldCreator.fieldData == null:
-    使用旧场景手摆 SpawnPoint。
-
-FieldCreator.fieldData != null:
-    使用 FieldData 动态生成 SpawnPoint，并覆盖 EnemySpawnManager 的 spawnPoints。
-```
-
-### Encounter 兼容
-
-```text
-BattleSpawner 找到 EncounterData:
-    优先使用 enemyEntries + EnemyCharacterDataBase 生成敌人。
-
-enemyEntries 生成 0 个敌人:
-    allowLegacyEnemyCharactersFallback 开启时，回退 LegacyEnemyCharacters。
-    allowLegacyEnemyCharactersFallback 关闭时，输出 warning 并继续 initialEnemies fallback。
-
-BattleSpawner 找不到 EncounterData:
-    fallback 到 initialEnemies。
-```
-
-### Save 兼容
-
-```text
-旧存档只有 clearedSpawnIds:
-    Load 时为 timed respawn 补当前 UTC 时间。
-
-新存档有 clearedSpawnRecords:
-    使用 saved clearedAtUtc 判断 respawn 时间。
-```
-
-## 12. 当前边界和后续扩展
-
-### 当前边界
-
-- `EncounterData` 的敌人生成主流程已经改为 `enemyEntries -> EnemyCharacterDataBase -> Character template`。
-- 旧 `enemyChatacters` 字段仍保留为 legacy fallback，避免破坏已有 Unity asset。
-- `FieldData` 目前是 gameplay table，不是完整 3D map generator。
-- Field object entry 已接入宝箱第一版，NPC/传送点等交互逻辑还未细化。
-- Inventory full flow 目前是自动扩容并 warning。
-- HP / MP / Revive item 已经能在 Field 和 Battle 中使用。
-- Buff item 已有数据入口，但还没有实际 buff runtime、持续回合、状态图标和结算逻辑。
-- 玩家死亡后会保留在 Battle controller 列表中，用于胜利后正确回写死亡状态和 Field HUD。
-- Battle 镜头移动中只拦截最终确认，不锁死目标选择和 UI 移动。
-- Reward UI 已有第一版，但还可以继续做更完整的奖励面板。
-
-### 推荐后续扩展
-
-1. Encounter data cleanup  
-   全部 Encounter 迁移稳定后，可以考虑隐藏或移除 legacy enemyChatacters 字段。
-
-2. Interactable Data  
-   在 FieldData 中继续扩展 NPC / portal / event trigger 等 gameplay object 类型。
-
-3. Reward Panel 第二版  
-   统一 EXP、Item、Gold、LevelUp 的展示顺序。
-
-4. Save Migration  
-   使用 `GameSaveData.version` 为未来存档格式变化做兼容。
-
-5. Portfolio Diagrams  
-   在 README 或 docs 中加入截图和架构图，展示完整 gameplay loop。
-
-## 13. 作品集说明角度
-
-这个项目适合强调以下技术点：
-
-- Unity ScriptableObject data-driven workflow。
-- Field 与 Battle 跨场景状态同步。
-- 回合制战斗 timeline 和 target selection。
-- Runtime inventory slot state。
-- JSON save/load DTO 设计。
-- Encounter reward service 解耦。
-- Permanent / Timed enemy respawn。
-- FieldData 作为 3D scene gameplay table 的工程判断。
-
-一句话概括：
-
-```text
-This project keeps heavy 3D scene authoring inside Unity scenes, while making RPG gameplay entities, encounters, rewards, runtime state, and save data configurable and reusable through data-driven systems.
+Adventure of Paul Demo keeps heavy 3D scene authoring inside Unity while making RPG gameplay entities, encounters, rewards, runtime state, tutorials, and save data configurable through reusable data-driven systems.
 ```
