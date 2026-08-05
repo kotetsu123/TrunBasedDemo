@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FieldEndingController : MonoBehaviour
@@ -7,36 +5,38 @@ public class FieldEndingController : MonoBehaviour
     [SerializeField] private DialogueData endingDialogue;
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string interactPrompt = "Finish";
+    [SerializeField] private bool disableAfterComplete = true;
     [SerializeField] private FieldInteractionPromptController promptController;
     [SerializeField] private DialoguePanelController dialoguePanel;
 
     private bool isPlayerInRange;
     private bool isPlayingEnding;
+    private bool isCompleted;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         if (promptController == null)
             promptController = FieldInteractionPromptController.Current;
 
-        if(dialoguePanel==null)
+        if (dialoguePanel == null)
             dialoguePanel = DialoguePanelController.Current;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (!isPlayerInRange || isPlayingEnding)
+        if (!isPlayerInRange || isPlayingEnding || isCompleted)
             return;
+
         if (Input.GetKeyDown(interactKey))
             StartEnding();
     }
+
     private void StartEnding()
     {
-        if (isPlayingEnding)
+        if (isPlayingEnding || isCompleted)
             return;
 
-        if(dialoguePanel==null)
+        if (dialoguePanel == null)
             dialoguePanel = DialoguePanelController.Current;
 
         if (dialoguePanel == null)
@@ -50,14 +50,23 @@ public class FieldEndingController : MonoBehaviour
             Debug.LogWarning($"[FieldEnding] Ending DialogueData is missing. object={gameObject.name}");
             return;
         }
+
         isPlayingEnding = true;
         HidePrompt();
 
         dialoguePanel.Play(endingDialogue, OnEndingComplete);
     }
+
     private void OnEndingComplete()
     {
         isPlayingEnding = false;
+
+        if (disableAfterComplete)
+        {
+            isCompleted = true;
+            HidePrompt();
+            return;
+        }
 
         if (isPlayerInRange)
             ShowPrompt();
@@ -70,7 +79,7 @@ public class FieldEndingController : MonoBehaviour
 
         isPlayerInRange = true;
 
-        if (!isPlayingEnding)
+        if (!isPlayingEnding && !isCompleted)
             ShowPrompt();
     }
 
