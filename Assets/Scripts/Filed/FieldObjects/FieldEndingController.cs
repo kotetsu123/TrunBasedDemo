@@ -2,12 +2,19 @@ using UnityEngine;
 
 public class FieldEndingController : MonoBehaviour
 {
+    [Header("Ending")]
     [SerializeField] private DialogueData endingDialogue;
+
+    [Header("Interaction")]
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string interactPrompt = "Finish";
+
+    [Header("Completion")]
     [SerializeField] private bool disableAfterComplete = true;
     [SerializeField] private bool hideVisualAfterComplete = true;
     [SerializeField] private bool disableColliderAfterComplete = true;
+
+    [Header("References")]
     [SerializeField] private GameObject visualRoot;
     [SerializeField] private Collider triggerCollider;
     [SerializeField] private FieldInteractionPromptController promptController;
