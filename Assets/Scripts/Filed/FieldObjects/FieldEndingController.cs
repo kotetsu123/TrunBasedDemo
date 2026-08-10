@@ -6,12 +6,22 @@ public class FieldEndingController : MonoBehaviour
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string interactPrompt = "Finish";
     [SerializeField] private bool disableAfterComplete = true;
+    [SerializeField] private bool hideVisualAfterComplete = true;
+    [SerializeField] private bool disableColliderAfterComplete = true;
+    [SerializeField] private GameObject visualRoot;
+    [SerializeField] private Collider triggerCollider;
     [SerializeField] private FieldInteractionPromptController promptController;
     [SerializeField] private DialoguePanelController dialoguePanel;
 
     private bool isPlayerInRange;
     private bool isPlayingEnding;
     private bool isCompleted;
+
+    private void Awake()
+    {
+        if (triggerCollider == null)
+            triggerCollider = GetComponent<Collider>();
+    }
 
     private void Start()
     {
@@ -64,7 +74,7 @@ public class FieldEndingController : MonoBehaviour
         if (disableAfterComplete)
         {
             isCompleted = true;
-            HidePrompt();
+            ApplyCompletedState();
             return;
         }
 
@@ -114,6 +124,17 @@ public class FieldEndingController : MonoBehaviour
     private void HidePrompt()
     {
         promptController?.Hide(this);
+    }
+
+    private void ApplyCompletedState()
+    {
+        HidePrompt();
+
+        if (hideVisualAfterComplete && visualRoot != null)
+            visualRoot.SetActive(false);
+
+        if (disableColliderAfterComplete && triggerCollider != null)
+            triggerCollider.enabled = false;
     }
 }
 
