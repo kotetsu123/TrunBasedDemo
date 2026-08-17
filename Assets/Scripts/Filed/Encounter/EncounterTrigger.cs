@@ -70,8 +70,8 @@ public class EncounterTrigger : MonoBehaviour
             return;
         }
 
-        // ²éÕÒ¸½½üµÐÈË±È½Ï¹ó£¬ËùÒÔÖ»°´¼ä¸ôË¢ÐÂÄ¿±êÁÐ±í¡£
-        // ÏßÌõµÄÎ»ÖÃ»áÔÚ LateUpdate Ã¿Ö¡¸üÐÂ£¬ÒÆ¶¯Ê±»á±ÈµÚÒ»°æ¸üË³¡£
+        // ï¿½ï¿½ï¿½Ò¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë±È½Ï¹ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã»ï¿½ï¿½ï¿½ LateUpdate Ã¿Ö¡ï¿½ï¿½ï¿½Â£ï¿½ï¿½Æ¶ï¿½Ê±ï¿½ï¿½Èµï¿½Ò»ï¿½ï¿½ï¿½Ë³ï¿½ï¿½
         if (Time.time < nextGroupLinkRefreshTime)
             return;
 
@@ -211,11 +211,17 @@ public class EncounterTrigger : MonoBehaviour
         if (FieldPauseState.IsPaused)
             return;
 
-        if (FieldBattleContext.IsEncounterCooldownActive)
-            return;
-       
         if (other.CompareTag("Player"))
         {
+            if (FieldBattleContext.IsEncounterCooldownActive)
+            {
+                // å†·å´æ—¶é—´å†…åªæŠŠæ•Œäººä»Žè¿½å‡»çŠ¶æ€æ‹‰å›žæ¸¸è¡ï¼Œä¸è¿›å…¥æˆ˜æ–—ã€‚
+                // è¿™ç›¸å½“äºŽ Run/Escape è¿”å›ž Field åŽçš„çŸ­æš‚æ— æ•Œå¸§ã€‚
+                EnemyFieldController cooldownEnemy = GetComponent<EnemyFieldController>();
+                cooldownEnemy?.ResetToWander();
+                return;
+            }
+
             triggerd = true;
             
             EnemyFieldController fieldEnemy= GetComponent<EnemyFieldController>();
@@ -233,7 +239,7 @@ public class EncounterTrigger : MonoBehaviour
             Rigidbody playerRigidbody = other.gameObject.GetComponent<Rigidbody>();
             if (playerController != null)
             {
-                playerRigidbody.velocity = Vector3.zero; // Í£Ö¹Íæ¼ÒÒÆ¶¯
+                playerRigidbody.velocity = Vector3.zero; // Í£Ö¹ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
                 playerController.enabled = false;
                 
             }

@@ -118,6 +118,11 @@ public class EnemyFieldController : MonoBehaviour
         ChangeState(EnemyFieldState.Wander);
     }
 
+    public void ResetToWander()
+    {
+        ResetWander();
+    }
+
     private void PickNewWanderTarget()
     {
         Vector2 random = Random.insideUnitCircle * wanderRadius;
@@ -181,3 +186,4 @@ public class EnemyFieldController : MonoBehaviour
         return Vector3.Distance(a, b);
     }
 }
+

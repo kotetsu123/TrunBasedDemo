@@ -14,6 +14,11 @@ public class FieldTutorialController : MonoBehaviour
         if (!playOnStart)
             return;
 
+        // Field 场景从 Battle 返回时也会重新 Start。
+        // 这时不应该自动弹教程，否则 TutorialPanel 会把 FieldPauseState 设成暂停。
+        if (FieldBattleContext.HasFieldReturnData || FieldBattleContext.IsEncounterCooldownActive)
+            return;
+
         if (startDelaySeconds > 0f)
             Invoke(nameof(PlayTutorial), startDelaySeconds);
         else

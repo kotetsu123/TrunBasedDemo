@@ -44,7 +44,17 @@ MonoBehaviour:
   fieldObjects:
   - objectId: Chest_001
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
-    position: {x: 5, y: 0.5, z: 0}
+    position: {x: 8.8, y: 0.5, z: -2.48}
+    rotationEuler: {x: 0, y: 180, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  - objectId: Chest_002
+    prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
+    position: {x: 3.6, y: 0.5, z: 11.47}
+    rotationEuler: {x: 0, y: 180, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+  - objectId: Chest_003
+    prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
+    position: {x: 3.6, y: 0.5, z: 11.47}
     rotationEuler: {x: 0, y: 180, z: 0}
     scale: {x: 1, y: 1, z: 1}
   recruitPoints:
