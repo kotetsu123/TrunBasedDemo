@@ -269,12 +269,12 @@ GameObject:
   - component: {fileID: 17979142}
   - component: {fileID: 17979141}
   m_Layer: 0
-  m_Name: slimespwanpoint
+  m_Name: encounter_slime_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &17979141
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -484,7 +484,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &48742951
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10531,12 +10531,12 @@ GameObject:
   - component: {fileID: 1844252376}
   - component: {fileID: 1844252375}
   m_Layer: 0
-  m_Name: slimespwanpoint
+  m_Name: encounter_Test_001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1844252375
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11034,7 +11034,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1931382614
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11139,7 +11139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1932871251
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11244,7 +11244,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1937898062
 BoxCollider:
   m_ObjectHideFlags: 0

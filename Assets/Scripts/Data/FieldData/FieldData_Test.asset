@@ -15,27 +15,54 @@ MonoBehaviour:
   fieldId: 
   spawnPoints:
   - spawnId: test_field_spawn_001
-    encounterId: encounter_Test_001
+    encounterId: encounter_slime_3
     fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
-    position: {x: 0, y: 0.5, z: 5}
+    position: {x: -10.19, y: 0.5, z: -9.42}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
     enemyId: 
-    respawnType: 1
+    respawnType: 0
     respawnSeconds: 30
   - spawnId: test_field_spawn_002
     encounterId: encounter_slime_3
     fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
-    position: {x: 0, y: 0.5, z: 2}
+    position: {x: -1.57, y: 0.5, z: -2.8}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
     enemyId: 
-    respawnType: 1
+    respawnType: 0
     respawnSeconds: 30
   - spawnId: test_field_spawn_003
+    encounterId: encounter_Test_001
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: 6.97, y: 0.5, z: -2.48}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 0
+    respawnSeconds: 0
+  - spawnId: test_field_spawn_004
+    encounterId: encounter_slime_3
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: -5.6899996, y: 0.5, z: 9.46}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 0
+    respawnSeconds: 0
+  - spawnId: test_field_spawn_005
+    encounterId: encounter_Test_001
+    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
+    position: {x: -3.23, y: 0.5, z: 9.46}
+    rotationEuler: {x: 0, y: 0, z: 0}
+    wanderRadius: 3
+    enemyId: 
+    respawnType: 0
+    respawnSeconds: 0
+  - spawnId: test_field_spawn_006
     encounterId: encounter_boss_001
     fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
-    position: {x: 0, y: 0.5, z: 9}
+    position: {x: 13.8, y: 0.5, z: 15.8}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
     enemyId: 
