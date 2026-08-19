@@ -8,6 +8,7 @@ public class SceneTransitionController : MonoBehaviour
     [SerializeField] private CanvasGroup fadeCanvasGroup;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float waitBeforLoad = 0.2f;
+    [SerializeField] private bool pauseFieldDuringTransition = true;
 
     private bool isTransitioning;
 
@@ -28,6 +29,11 @@ public class SceneTransitionController : MonoBehaviour
     {
         isTransitioning = true;
 
+        // 进入战斗的 fade 期间 Field 场景还没有切走。
+        // 这里先暂停 Field，避免敌人继续追击、玩家继续移动，导致画面上还在碰撞/推进。
+        if (pauseFieldDuringTransition)
+            FieldPauseState.SetPaused(true);
+
         if (fadeCanvasGroup != null)
         {
             fadeCanvasGroup.blocksRaycasts = true;
@@ -42,6 +48,6 @@ public class SceneTransitionController : MonoBehaviour
         }
         yield return new WaitForSeconds(waitBeforLoad);
 
-        SceneManager.LoadScene("BattleScene");
+        SceneManager.LoadScene(sceneName);
     }
 }
