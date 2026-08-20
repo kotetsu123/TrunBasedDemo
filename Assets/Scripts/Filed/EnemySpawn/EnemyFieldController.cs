@@ -11,6 +11,9 @@ public class EnemyFieldController : MonoBehaviour
     [Header("Wander")]
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float waitTime = 1f;
+    [SerializeField] private float stuckRepathSeconds = 2f;
+    [SerializeField] private float stuckCheckInterval = 0.5f;
+    [SerializeField] private float stuckMinProgress = 0.1f;
 
     [Header("Chase")]
     [SerializeField] private bool canChasePlayer = true;
@@ -23,6 +26,9 @@ public class EnemyFieldController : MonoBehaviour
     private Vector3 wanderTarget;
     private float wanderRadius = 3f;
     private float waitTimer;
+    private float stuckTimer;
+    private float stuckCheckTimer;
+    private float lastDistanceToWanderTarget = -1f;
     private string spawnId;
     private string encounterId;
     private Transform playerTarget;
@@ -86,6 +92,12 @@ public class EnemyFieldController : MonoBehaviour
             return;
         }
 
+        if (IsWanderTargetStuck())
+        {
+            PickNewWanderTarget();
+            return;
+        }
+
         MoveTowards(wanderTarget, moveSpeed);
     }
 
@@ -130,6 +142,49 @@ public class EnemyFieldController : MonoBehaviour
             wanderCenter.x + random.x,
             transform.position.y,
             wanderCenter.z + random.y);
+
+        ResetWanderStuckCheck();
+    }
+
+    private bool IsWanderTargetStuck()
+    {
+        if (stuckRepathSeconds <= 0f)
+            return false;
+
+        stuckCheckTimer += Time.deltaTime;
+        if (stuckCheckTimer < Mathf.Max(0.02f, stuckCheckInterval))
+            return false;
+
+        float currentDistance = FlatDistance(transform.position, wanderTarget);
+        if (lastDistanceToWanderTarget < 0f)
+        {
+            lastDistanceToWanderTarget = currentDistance;
+            stuckCheckTimer = 0f;
+            return false;
+        }
+
+        // 如果距离没有明显变短，就认为这段时间可能被墙或障碍挡住了。
+        float progress = lastDistanceToWanderTarget - currentDistance;
+        if (progress < stuckMinProgress)
+        {
+            stuckTimer += stuckCheckTimer;
+        }
+        else
+        {
+            stuckTimer = 0f;
+        }
+
+        lastDistanceToWanderTarget = currentDistance;
+        stuckCheckTimer = 0f;
+
+        return stuckTimer >= stuckRepathSeconds;
+    }
+
+    private void ResetWanderStuckCheck()
+    {
+        stuckTimer = 0f;
+        stuckCheckTimer = 0f;
+        lastDistanceToWanderTarget = -1f;
     }
 
     private bool ShouldStartChase()
