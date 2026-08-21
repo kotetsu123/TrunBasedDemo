@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using DG.Tweening;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class FieldChestController : MonoBehaviour
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string interactPrompt = "Press E";
     [SerializeField] private FieldInteractionPromptController promptController;
+    [SerializeField] private FieldToastController toastController;
     [SerializeField] private List<InitialItemStack> rewards = new List<InitialItemStack>();
     [SerializeField] private GameObject closedVisual;
     [SerializeField] private GameObject openedVisual;
@@ -41,6 +43,9 @@ public class FieldChestController : MonoBehaviour
     {
         if (promptController == null)
             promptController = FieldInteractionPromptController.Current;
+
+        if (toastController == null)
+            toastController = FieldToastController.Current;
 
         if (string.IsNullOrWhiteSpace(chestId))
         {
@@ -96,14 +101,28 @@ public class FieldChestController : MonoBehaviour
 
     private void GiveRewards()
     {
+        StringBuilder rewardMessage = new StringBuilder();
+
         foreach (InitialItemStack reward in rewards)
         {
             if (reward == null || reward.item == null || reward.count <= 0)
                 continue;
 
             InventoryRuntimeState.AddItem(reward.item, reward.count);
+            AppendRewardMessage(rewardMessage, reward);
             Debug.Log($"[FieldChest] Reward added. chestId={chestId}, item={reward.item.itemName}, count={reward.count}");
         }
+
+        if (rewardMessage.Length > 0)
+            ShowToast($"Obtained\n{rewardMessage}");
+    }
+
+    private void AppendRewardMessage(StringBuilder rewardMessage, InitialItemStack reward)
+    {
+        if (rewardMessage.Length > 0)
+            rewardMessage.AppendLine();
+
+        rewardMessage.Append($"{reward.item.itemName} x{reward.count}");
     }
 
     private void ApplyOpenedState(bool opened)
@@ -202,5 +221,13 @@ public class FieldChestController : MonoBehaviour
     private void HidePrompt()
     {
         promptController?.Hide(this);
+    }
+
+    private void ShowToast(string message)
+    {
+        if (toastController == null)
+            toastController = FieldToastController.Current;
+
+        toastController?.ShowMessage(message);
     }
 }

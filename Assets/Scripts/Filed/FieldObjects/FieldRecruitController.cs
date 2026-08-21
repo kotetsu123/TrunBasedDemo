@@ -8,6 +8,7 @@ public class FieldRecruitController : MonoBehaviour
     [SerializeField] private string interactPrompt = "Recruit";
     [SerializeField] private CharacterDataBase characterDataBase;
     [SerializeField] private FieldInteractionPromptController promptController;
+    [SerializeField] private FieldToastController toastController;
     [SerializeField] private DialoguePanelController dialoguePanel;
     [SerializeField] private DialogueData preRecruitDialogue;
     [SerializeField] private FieldPartyHudController partyHudController;
@@ -70,6 +71,9 @@ public class FieldRecruitController : MonoBehaviour
 
         if (partyHudController == null)
             partyHudController = FindObjectOfType<FieldPartyHudController>();
+
+        if (toastController == null)
+            toastController = FieldToastController.Current;
 
         if (dialoguePanel == null)
             dialoguePanel = DialoguePanelController.Current;
@@ -169,6 +173,7 @@ public class FieldRecruitController : MonoBehaviour
         }
 
         Debug.Log($"[FieldRecruit] {recruitedMember.Name} joined the party. recruitId={recruitId}, characterId={characterId}");
+        ShowToast($"{recruitedMember.Name} joined the party");
 
         partyHudController?.Refresh();
         HidePrompt();
@@ -256,5 +261,13 @@ public class FieldRecruitController : MonoBehaviour
     private void HidePrompt()
     {
         promptController?.Hide(this);
+    }
+
+    private void ShowToast(string message)
+    {
+        if (toastController == null)
+            toastController = FieldToastController.Current;
+
+        toastController?.ShowMessage(message);
     }
 }
