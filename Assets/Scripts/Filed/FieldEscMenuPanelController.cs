@@ -18,6 +18,7 @@ public class FieldEscMenuPanelController : BasePanel
     [Header("Field UI")]
     [SerializeField] private FieldInventoryPanelController inventoryPanel;
     [SerializeField] private FieldPartyHudController partyHudController;
+    [SerializeField] private FieldToastController toastController;
 
     [Header("Message")]
     [SerializeField] private TMP_Text messageText;
@@ -56,7 +57,9 @@ public class FieldEscMenuPanelController : BasePanel
     public void OnClickSave()
     {
         bool saved = SaveSystem.Save();
-        SetMessage(saved ? "Saved" : "Save failed");
+        string message = saved ? "Saved" : "Save failed";
+        SetMessage(message);
+        ShowToast(message);
         RefreshLoadButtonState();
     }
 
@@ -64,14 +67,18 @@ public class FieldEscMenuPanelController : BasePanel
     {
         if (!SaveSystem.HasSaveFile())
         {
-            SetMessage("No save file");
+            const string message = "No save file";
+            SetMessage(message);
+            ShowToast(message);
             RefreshLoadButtonState();
             return;
         }
 
         if (!SaveSystem.Load(itemDataBase, characterDataBase))
         {
-            SetMessage("Load failed");
+            const string message = "Load failed";
+            SetMessage(message);
+            ShowToast(message);
             return;
         }
 
@@ -86,7 +93,9 @@ public class FieldEscMenuPanelController : BasePanel
         // Loading in the same Field scene already applies position through FieldSaveContext.
         inventoryPanel?.Refresh();
         partyHudController?.Refresh();
-        SetMessage("Loaded");
+        const string loadedMessage = "Loaded";
+        SetMessage(loadedMessage);
+        ShowToast(loadedMessage);
     }
 
     public void OnClickClose()
@@ -110,5 +119,13 @@ public class FieldEscMenuPanelController : BasePanel
     {
         if (messageText != null)
             messageText.text = message;
+    }
+
+    private void ShowToast(string message)
+    {
+        if (toastController == null)
+            toastController = FieldToastController.Current;
+
+        toastController?.ShowMessage(message);
     }
 }
