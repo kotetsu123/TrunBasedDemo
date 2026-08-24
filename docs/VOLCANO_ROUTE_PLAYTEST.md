@@ -1,0 +1,192 @@
+# Volcano Route Playtest Checklist / 火山路线测试清单
+
+## Purpose / 目的
+
+This checklist is for validating the first playable volcano blockout route before adding more systems or visual polish.
+
+这份清单用于在继续添加系统或美术 polish 之前，验证火山灰盒路线是否已经可以作为第一版可玩流程跑通。
+
+Test goal / 测试目标:
+
+```text
+Start
+ -> Chest
+ -> Slime Encounter
+ -> Recruit Argo
+ -> Group Encounter
+ -> Boss Encounter
+ -> Ending
+```
+
+## Test Build Notes / 测试版本说明
+
+- Scene: `FildScene`
+- Data: `FieldData_Test`
+- Main focus: route flow, trigger correctness, runtime state writeback, and Save / Load safety.
+- This checklist can be updated after each playtest pass with results and bugs.
+
+- 场景：`FildScene`
+- 数据：`FieldData_Test`
+- 主要关注：路线流程、触发器正确性、运行时状态回写、Save / Load 安全性。
+- 每次 playtest 之后，可以把通过结果、发现的问题和总结补进这份文档。
+
+## 1. New Game / Field Start / 新游戏与 Field 起点
+
+- [ ] Player spawns at the volcano route start point. / 玩家出生在火山路线起点。
+- [ ] Camera starts in a usable angle for the route. / 相机初始角度适合观察路线。
+- [ ] Player can move without getting stuck on the first platform. / 玩家在起始平台移动时不会卡住。
+- [ ] ESC menu opens and closes correctly. / ESC 菜单可以正常打开和关闭。
+- [ ] Save button shows a Field Toast result. / Save 按钮会显示 Field Toast 结果提示。
+- [ ] Load button state matches whether a save file exists. / Load 按钮状态和是否存在存档文件一致。
+- [ ] Tutorial does not unexpectedly pause the Field when returning from Battle. / 从 Battle 返回 Field 时，Tutorial 不会意外让 Field 进入暂停状态。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 2. Chest Flow / 宝箱流程
+
+- [ ] First chest is visible in the expected route position. / 第一个宝箱出现在预期路线位置。
+- [ ] Player cannot walk through the closed chest if collision is enabled. / 如果开启碰撞，玩家不能穿过关闭状态的宝箱。
+- [ ] E prompt appears when the player approaches the chest. / 玩家靠近宝箱时出现 E 互动提示。
+- [ ] Pressing E opens the chest. / 按 E 可以打开宝箱。
+- [ ] Chest reward is added to `InventoryRuntimeState`. / 宝箱奖励会加入 `InventoryRuntimeState`。
+- [ ] Field Toast displays the obtained item message. / Field Toast 会显示获得道具提示。
+- [ ] Opened chest visual/state remains correct after leaving and re-entering the area. / 离开并重新进入区域后，已打开宝箱的视觉和状态保持正确。
+- [ ] Save / Load preserves opened chest state. / Save / Load 后仍然保存宝箱已打开状态。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 3. Slime Encounter / Slime 遭遇战
+
+- [ ] Slime field enemy spawns from `FieldData_Test`. / Slime 场景敌人由 `FieldData_Test` 正常生成。
+- [ ] Slime appears in the correct route position. / Slime 出现在正确路线位置。
+- [ ] Slime starts wandering correctly. / Slime 可以正常游荡。
+- [ ] Slime does not stay stuck against maze walls for too long. / Slime 不会长时间卡在迷宫墙上。
+- [ ] Slime can chase the player. / Slime 可以追踪玩家。
+- [ ] Collision with Slime starts the expected Battle encounter. / 与 Slime 碰撞后进入预期 Battle encounter。
+- [ ] Battle transition fade pauses Field movement. / 战斗转场 fade 期间 Field 移动会暂停。
+- [ ] Run / Escape returns the player to the Field position before battle. / Run / Escape 后玩家回到进入战斗前的 Field 位置。
+- [ ] Encounter cooldown prevents immediate re-entry into battle. / 遭遇冷却可以防止刚返回 Field 就立刻重新进战斗。
+- [ ] Winning the battle clears the correct `spawnId`. / 战斗胜利后会清除正确的 `spawnId`。
+- [ ] Cleared Slime does not respawn when configured as Permanent. / 如果配置为 Permanent，已清除的 Slime 不会重新生成。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 4. Recruit Argo / Argo 入队
+
+- [ ] Argo RecruitPoint is generated from `FieldData_Test`. / Argo RecruitPoint 由 `FieldData_Test` 正常生成。
+- [ ] Argo visual appears in the expected route position. / Argo 视觉模型出现在预期路线位置。
+- [ ] Recruit interaction collider is active. / 入队交互 collider 处于启用状态。
+- [ ] E prompt appears near Argo. / 靠近 Argo 时出现 E 互动提示。
+- [ ] Pressing E plays pre-recruit dialogue if configured. / 如果配置了入队前对话，按 E 后会播放对话。
+- [ ] Dialogue completion recruits Argo. / 对话结束后 Argo 入队。
+- [ ] Argo is added to `PartyRuntimeState`. / Argo 被加入 `PartyRuntimeState`。
+- [ ] Field party HUD refreshes after recruitment. / 入队后 Field party HUD 会刷新。
+- [ ] Field Toast displays the party join message. / Field Toast 会显示入队提示。
+- [ ] Argo visual hides after recruitment when `disableAfterRecruit` is enabled. / 如果 `disableAfterRecruit` 启用，入队后 Argo 视觉模型会隐藏。
+- [ ] Save / Load preserves Argo recruitment state. / Save / Load 后仍然保存 Argo 入队状态。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 5. Group Encounter / 联合遇敌
+
+- [ ] Multiple field enemies spawn in the group encounter zone. / 联合遇敌区域内会生成多个场景敌人。
+- [ ] Group enemies are close enough for group encounter detection. / 多个敌人的距离足够触发联合遇敌检测。
+- [ ] Runtime group link line appears when enemies are chasing, if enabled. / 如果启用，敌人追踪时会显示运行时联合线条。
+- [ ] Colliding with one enemy collects nearby group enemies. / 与其中一只敌人碰撞时，会收集附近的联合敌人。
+- [ ] Battle starts with the expected combined enemy group. / Battle 中会生成预期的联合敌人组。
+- [ ] Group encounter popup/message appears if configured. / 如果配置了提示，会显示联合遇敌 popup/message。
+- [ ] Winning the battle clears all involved `spawnId` values. / 战斗胜利后会清除所有参与战斗的 `spawnId`。
+- [ ] Cleared group enemies do not immediately respawn when configured as Permanent. / 如果配置为 Permanent，已清除的联合敌人不会立刻重新生成。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 6. Boss Encounter / Boss 遭遇战
+
+- [ ] Boss field enemy spawns in the boss arena. / Boss 场景敌人生成在 Boss arena。
+- [ ] Boss uses the expected `encounterId`. / Boss 使用预期的 `encounterId`。
+- [ ] Boss encounter type is configured as Boss. / Boss encounter type 配置为 Boss。
+- [ ] Battle starts successfully from the Boss field enemy. / 通过 Boss 场景敌人可以正常进入 Battle。
+- [ ] Boss camera performance uses the Boss flow. / Boss camera 表现使用 Boss 流程。
+- [ ] Reward / result UI appears after victory. / 胜利后会显示 reward / result UI。
+- [ ] Returning to Field after Boss victory keeps Field state stable. / Boss 胜利后返回 Field，Field 状态保持稳定。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 7. Ending Trigger / 结尾触发器
+
+- [ ] Ending trigger exists after the Boss route. / Boss 路线之后存在 Ending trigger。
+- [ ] Player can reach the ending trigger after clearing the route. / 玩家清理路线后可以到达 Ending trigger。
+- [ ] Ending interaction / trigger condition works. / Ending 交互或触发条件可以正常工作。
+- [ ] Ending dialogue or ending text displays if configured. / 如果配置了 Ending dialogue 或文字，会正常显示。
+- [ ] Ending trigger does not fire before intended route completion. / Ending trigger 不会在预期路线完成前提前触发。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 8. Save / Load Regression / Save 与 Load 回归测试
+
+- [ ] Save records player position in the Field scene. / Save 会记录 Field 场景中的玩家位置。
+- [ ] Load restores player position in the Field scene. / Load 会恢复 Field 场景中的玩家位置。
+- [ ] Load restores inventory item counts. / Load 会恢复背包道具数量。
+- [ ] Load restores party member HP / MP state. / Load 会恢复队伍成员 HP / MP 状态。
+- [ ] Load preserves opened chest IDs. / Load 会保存已打开宝箱 ID。
+- [ ] Load preserves recruited party members. / Load 会保存已入队角色。
+- [ ] Load preserves cleared permanent enemy spawn IDs. / Load 会保存已清除的 Permanent 敌人 spawn ID。
+- [ ] Load does not duplicate generated field objects. / Load 不会重复生成 Field 对象。
+- [ ] Load does not leave Field in a hidden paused state. / Load 后 Field 不会停留在隐藏暂停状态。
+
+Notes / 备注:
+
+```text
+
+```
+
+## 9. Issues Found / 发现的问题
+
+Use this section after testing.
+
+测试后在这里记录发现的问题。
+
+```text
+- 
+```
+
+## 10. Pass Summary / 测试总结
+
+Use this section after testing.
+
+测试后在这里记录本次结果。
+
+```text
+Date / 日期:
+Tester / 测试者:
+Result / 结果: Not tested / Partial pass / Pass / Blocked
+Summary / 总结:
+```
