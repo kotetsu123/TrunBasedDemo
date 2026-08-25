@@ -30,6 +30,7 @@ Start
 - 主要关注：路线流程、触发器正确性、运行时状态回写、Save / Load 安全性。
 - 每次 playtest 之后，可以把通过结果、发现的问题和总结补进这份文档。
 
+
 ## 1. New Game / Field Start / 新游戏与 Field 起点
 
 - [ ] Player spawns at the volcano route start point. / 玩家出生在火山路线起点。
@@ -46,42 +47,45 @@ Notes / 备注:
 
 ```
 
+
+
+
 ## 2. Chest Flow / 宝箱流程
 
-- [ ] First chest is visible in the expected route position. / 第一个宝箱出现在预期路线位置。
-- [ ] Player cannot walk through the closed chest if collision is enabled. / 如果开启碰撞，玩家不能穿过关闭状态的宝箱。
-- [ ] E prompt appears when the player approaches the chest. / 玩家靠近宝箱时出现 E 互动提示。
-- [ ] Pressing E opens the chest. / 按 E 可以打开宝箱。
-- [ ] Chest reward is added to `InventoryRuntimeState`. / 宝箱奖励会加入 `InventoryRuntimeState`。
-- [ ] Field Toast displays the obtained item message. / Field Toast 会显示获得道具提示。
-- [ ] Opened chest visual/state remains correct after leaving and re-entering the area. / 离开并重新进入区域后，已打开宝箱的视觉和状态保持正确。
-- [ ] Save / Load preserves opened chest state. / Save / Load 后仍然保存宝箱已打开状态。
+- [√] First chest is visible in the expected route position. / 第一个宝箱出现在预期路线位置。
+- [√] Player cannot walk through the closed chest if collision is enabled. / 如果开启碰撞，玩家不能穿过关闭状态的宝箱。
+- [√] E prompt appears when the player approaches the chest. / 玩家靠近宝箱时出现 E 互动提示。
+- [√] Pressing E opens the chest. / 按 E 可以打开宝箱。
+- [√] Chest reward is added to `InventoryRuntimeState`. / 宝箱奖励会加入 `InventoryRuntimeState`。
+- [√] Field Toast displays the obtained item message. / Field Toast 会显示获得道具提示。
+- [√] Opened chest visual/state remains correct after leaving and re-entering the area. / 离开并重新进入区域后，已打开宝箱的视觉和状态保持正确。
+- [√] Save / Load preserves opened chest state. / Save / Load 后仍然保存宝箱已打开状态。
 
 Notes / 备注:
 
 ```text
 
 ```
+
+
 
 ## 3. Slime Encounter / Slime 遭遇战
 
-- [ ] Slime field enemy spawns from `FieldData_Test`. / Slime 场景敌人由 `FieldData_Test` 正常生成。
-- [ ] Slime appears in the correct route position. / Slime 出现在正确路线位置。
-- [ ] Slime starts wandering correctly. / Slime 可以正常游荡。
-- [ ] Slime does not stay stuck against maze walls for too long. / Slime 不会长时间卡在迷宫墙上。
-- [ ] Slime can chase the player. / Slime 可以追踪玩家。
-- [ ] Collision with Slime starts the expected Battle encounter. / 与 Slime 碰撞后进入预期 Battle encounter。
+- [√] Slime field enemy spawns from `FieldData_Test`. / Slime 场景敌人由 `FieldData_Test` 正常生成。
+- [√] Slime appears in the correct route position. / Slime 出现在正确路线位置。
+- [√] Slime starts wandering correctly. / Slime 可以正常游荡。
+- [√] Slime does not stay stuck against maze walls for too long. / Slime 不会长时间卡在迷宫墙上。
+- [√] Slime can chase the player. / Slime 可以追踪玩家。
+- [√] Collision with Slime starts the expected Battle encounter. / 与 Slime 碰撞后进入预期 Battle encounter。
 - [ ] Battle transition fade pauses Field movement. / 战斗转场 fade 期间 Field 移动会暂停。
-- [ ] Run / Escape returns the player to the Field position before battle. / Run / Escape 后玩家回到进入战斗前的 Field 位置。
-- [ ] Encounter cooldown prevents immediate re-entry into battle. / 遭遇冷却可以防止刚返回 Field 就立刻重新进战斗。
-- [ ] Winning the battle clears the correct `spawnId`. / 战斗胜利后会清除正确的 `spawnId`。
-- [ ] Cleared Slime does not respawn when configured as Permanent. / 如果配置为 Permanent，已清除的 Slime 不会重新生成。
+- [√] Run / Escape returns the player to the Field position before battle. / Run / Escape 后玩家回到进入战斗前的 Field 位置。
+- [√] Encounter cooldown prevents immediate re-entry into battle. / 遭遇冷却可以防止刚返回 Field 就立刻重新进战斗。
+- [√] Winning the battle clears the correct `spawnId`. / 战斗胜利后会清除正确的 `spawnId`。
+- [√] Cleared Slime does not respawn when configured as Permanent. / 如果配置为 Permanent，已清除的 Slime 不会重新生成。
 
 Notes / 备注:
+感觉追击有点太极端了。 现在的情况是，刚从场景转换回来，虽然怪物的位置会重新刷新回他们的生成点，但是如果人物距离生成点近的情况下， 人物回到场景当中需要时间但是怪物不需要。所以会在人物能操作之前就开始追击了，很容易造成追上在cooltime 当中无法触发战斗，但是怼着不让动、移动后又进入战斗的情况
 
-```text
-
-```
 
 ## 4. Recruit Argo / Argo 入队
 
@@ -103,6 +107,8 @@ Notes / 备注:
 
 ```
 
+
+
 ## 5. Group Encounter / 联合遇敌
 
 - [ ] Multiple field enemies spawn in the group encounter zone. / 联合遇敌区域内会生成多个场景敌人。
@@ -120,6 +126,8 @@ Notes / 备注:
 
 ```
 
+
+
 ## 6. Boss Encounter / Boss 遭遇战
 
 - [ ] Boss field enemy spawns in the boss arena. / Boss 场景敌人生成在 Boss arena。
@@ -136,6 +144,8 @@ Notes / 备注:
 
 ```
 
+
+
 ## 7. Ending Trigger / 结尾触发器
 
 - [ ] Ending trigger exists after the Boss route. / Boss 路线之后存在 Ending trigger。
@@ -149,6 +159,8 @@ Notes / 备注:
 ```text
 
 ```
+
+
 
 ## 8. Save / Load Regression / Save 与 Load 回归测试
 
@@ -168,6 +180,8 @@ Notes / 备注:
 
 ```
 
+
+
 ## 9. Issues Found / 发现的问题
 
 Use this section after testing.
@@ -175,9 +189,16 @@ Use this section after testing.
 测试后在这里记录发现的问题。
 
 ```text
-- 
-```
+- Field enemy chase after battle return still feels too aggressive.
+  After returning from Battle, enemies respawn/reset at their spawn point faster than the player regains control.
+  If the player returns near an enemy spawn point, the enemy can chase during cooldown, body-block the player,
+  and then trigger another battle after cooldown ends.
 
+- Field 敌人在战斗返回后的追击体验仍然偏激进。
+  从 Battle 回到 Field 后，敌人会比玩家更早从生成点开始行动。
+  如果玩家返回位置离敌人生成点太近，敌人会在 cooldown 期间贴住玩家，造成卡位，
+  cooldown 结束后又容易立刻重新进入战斗。
+```
 ## 10. Pass Summary / 测试总结
 
 Use this section after testing.
@@ -185,8 +206,18 @@ Use this section after testing.
 测试后在这里记录本次结果。
 
 ```text
-Date / 日期:
-Tester / 测试者:
-Result / 结果: Not tested / Partial pass / Pass / Blocked
+Date / 日期: 2026-08-25
+Tester / 测试者: Kotetsu
+Result / 结果: Partial pass
 Summary / 总结:
+- Chest Flow passed. Chest visibility, collision, E prompt, reward writeback, Field Toast, opened visual state, and Save / Load chest state were verified.
+- Slime Encounter mostly passed. FieldData spawn, position, wander, chase, battle entry, Run / Escape return, encounter cooldown, spawnId clear, and Permanent no-respawn were verified.
+- Remaining issue: enemy chase after battle return/cooldown can feel too aggressive and may body-block the player near spawn points.
+- Recruit Argo, Group Encounter, Boss Encounter, Ending Trigger, and full Save / Load regression remain untested.
+
+- 宝箱流程已通过。已验证宝箱显示、碰撞、E 提示、奖励写入、Field Toast、开启后视觉状态，以及 Save / Load 后宝箱状态。
+- Slime 遭遇战大部分通过。已验证 FieldData 生成、位置、游荡、追击、进入战斗、Run / Escape 返回、遭遇冷却、spawnId 清除，以及 Permanent 不刷新。
+- 剩余问题：战斗返回/cooldown 后敌人追击仍然偏激进，在靠近生成点时可能会贴住玩家造成卡位。
+- Argo 入队、联合遇敌、Boss 遭遇战、Ending Trigger，以及完整 Save / Load 回归测试尚未测试。
 ```
+
