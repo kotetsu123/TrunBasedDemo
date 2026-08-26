@@ -31,15 +31,18 @@ Start
 - 每次 playtest 之后，可以把通过结果、发现的问题和总结补进这份文档。
 
 
+
+<!-- pagebreak -->
+
 ## 1. New Game / Field Start / 新游戏与 Field 起点
 
-- [ ] Player spawns at the volcano route start point. / 玩家出生在火山路线起点。
-- [ ] Camera starts in a usable angle for the route. / 相机初始角度适合观察路线。
-- [ ] Player can move without getting stuck on the first platform. / 玩家在起始平台移动时不会卡住。
-- [ ] ESC menu opens and closes correctly. / ESC 菜单可以正常打开和关闭。
-- [ ] Save button shows a Field Toast result. / Save 按钮会显示 Field Toast 结果提示。
-- [ ] Load button state matches whether a save file exists. / Load 按钮状态和是否存在存档文件一致。
-- [ ] Tutorial does not unexpectedly pause the Field when returning from Battle. / 从 Battle 返回 Field 时，Tutorial 不会意外让 Field 进入暂停状态。
+- [√] Player spawns at the volcano route start point. / 玩家出生在火山路线起点。
+- [√] Camera starts in a usable angle for the route. / 相机初始角度适合观察路线。
+- [√] Player can move without getting stuck on the first platform. / 玩家在起始平台移动时不会卡住。
+- [√] ESC menu opens and closes correctly. / ESC 菜单可以正常打开和关闭。
+- [√] Save button shows a Field Toast result. / Save 按钮会显示 Field Toast 结果提示。
+- [√] Load button state matches whether a save file exists. / Load 按钮状态和是否存在存档文件一致。
+- [√] Tutorial does not unexpectedly pause the Field when returning from Battle. / 从 Battle 返回 Field 时，Tutorial 不会意外让 Field 进入暂停状态。
 
 Notes / 备注:
 
@@ -49,6 +52,9 @@ Notes / 备注:
 
 
 
+
+
+<!-- pagebreak -->
 
 ## 2. Chest Flow / 宝箱流程
 
@@ -69,6 +75,9 @@ Notes / 备注:
 
 
 
+
+<!-- pagebreak -->
+
 ## 3. Slime Encounter / Slime 遭遇战
 
 - [√] Slime field enemy spawns from `FieldData_Test`. / Slime 场景敌人由 `FieldData_Test` 正常生成。
@@ -77,7 +86,7 @@ Notes / 备注:
 - [√] Slime does not stay stuck against maze walls for too long. / Slime 不会长时间卡在迷宫墙上。
 - [√] Slime can chase the player. / Slime 可以追踪玩家。
 - [√] Collision with Slime starts the expected Battle encounter. / 与 Slime 碰撞后进入预期 Battle encounter。
-- [ ] Battle transition fade pauses Field movement. / 战斗转场 fade 期间 Field 移动会暂停。
+- [√] Battle transition fade pauses Field movement. / 战斗转场 fade 期间 Field 移动会暂停。
 - [√] Run / Escape returns the player to the Field position before battle. / Run / Escape 后玩家回到进入战斗前的 Field 位置。
 - [√] Encounter cooldown prevents immediate re-entry into battle. / 遭遇冷却可以防止刚返回 Field 就立刻重新进战斗。
 - [√] Winning the battle clears the correct `spawnId`. / 战斗胜利后会清除正确的 `spawnId`。
@@ -87,19 +96,22 @@ Notes / 备注:
 感觉追击有点太极端了。 现在的情况是，刚从场景转换回来，虽然怪物的位置会重新刷新回他们的生成点，但是如果人物距离生成点近的情况下， 人物回到场景当中需要时间但是怪物不需要。所以会在人物能操作之前就开始追击了，很容易造成追上在cooltime 当中无法触发战斗，但是怼着不让动、移动后又进入战斗的情况
 
 
+
+<!-- pagebreak -->
+
 ## 4. Recruit Argo / Argo 入队
 
-- [ ] Argo RecruitPoint is generated from `FieldData_Test`. / Argo RecruitPoint 由 `FieldData_Test` 正常生成。
-- [ ] Argo visual appears in the expected route position. / Argo 视觉模型出现在预期路线位置。
-- [ ] Recruit interaction collider is active. / 入队交互 collider 处于启用状态。
-- [ ] E prompt appears near Argo. / 靠近 Argo 时出现 E 互动提示。
-- [ ] Pressing E plays pre-recruit dialogue if configured. / 如果配置了入队前对话，按 E 后会播放对话。
-- [ ] Dialogue completion recruits Argo. / 对话结束后 Argo 入队。
-- [ ] Argo is added to `PartyRuntimeState`. / Argo 被加入 `PartyRuntimeState`。
-- [ ] Field party HUD refreshes after recruitment. / 入队后 Field party HUD 会刷新。
-- [ ] Field Toast displays the party join message. / Field Toast 会显示入队提示。
-- [ ] Argo visual hides after recruitment when `disableAfterRecruit` is enabled. / 如果 `disableAfterRecruit` 启用，入队后 Argo 视觉模型会隐藏。
-- [ ] Save / Load preserves Argo recruitment state. / Save / Load 后仍然保存 Argo 入队状态。
+- [√] Argo RecruitPoint is generated from `FieldData_Test`. / Argo RecruitPoint 由 `FieldData_Test` 正常生成。
+- [√] Argo visual appears in the expected route position. / Argo 视觉模型出现在预期路线位置。
+- [√] Recruit interaction collider is active. / 入队交互 collider 处于启用状态。
+- [√] E prompt appears near Argo. / 靠近 Argo 时出现 E 互动提示。
+- [√] Pressing E plays pre-recruit dialogue if configured. / 如果配置了入队前对话，按 E 后会播放对话。
+- [√] Dialogue completion recruits Argo. / 对话结束后 Argo 入队。
+- [√] Argo is added to `PartyRuntimeState`. / Argo 被加入 `PartyRuntimeState`。
+- [√] Field party HUD refreshes after recruitment. / 入队后 Field party HUD 会刷新。
+- [√] Field Toast displays the party join message. / Field Toast 会显示入队提示。
+- [√] Argo visual hides after recruitment when `disableAfterRecruit` is enabled. / 如果 `disableAfterRecruit` 启用，入队后 Argo 视觉模型会隐藏。
+- [√] Save / Load preserves Argo recruitment state. / Save / Load 后仍然保存 Argo 入队状态。
 
 Notes / 备注:
 
@@ -108,6 +120,9 @@ Notes / 备注:
 ```
 
 
+
+
+<!-- pagebreak -->
 
 ## 5. Group Encounter / 联合遇敌
 
@@ -121,12 +136,11 @@ Notes / 备注:
 - [ ] Cleared group enemies do not immediately respawn when configured as Permanent. / 如果配置为 Permanent，已清除的联合敌人不会立刻重新生成。
 
 Notes / 备注:
-
-```text
-
-```
+联合战斗的部分，现在隔着墙也能进入战斗，我觉得可能需要修改一下索敌逻辑？还有联合逻辑，但其实也可以用就是。
 
 
+
+<!-- pagebreak -->
 
 ## 6. Boss Encounter / Boss 遭遇战
 
@@ -146,6 +160,9 @@ Notes / 备注:
 
 
 
+
+<!-- pagebreak -->
+
 ## 7. Ending Trigger / 结尾触发器
 
 - [ ] Ending trigger exists after the Boss route. / Boss 路线之后存在 Ending trigger。
@@ -161,6 +178,9 @@ Notes / 备注:
 ```
 
 
+
+
+<!-- pagebreak -->
 
 ## 8. Save / Load Regression / Save 与 Load 回归测试
 
@@ -182,6 +202,9 @@ Notes / 备注:
 
 
 
+
+<!-- pagebreak -->
+
 ## 9. Issues Found / 发现的问题
 
 Use this section after testing.
@@ -199,6 +222,9 @@ Use this section after testing.
   如果玩家返回位置离敌人生成点太近，敌人会在 cooldown 期间贴住玩家，造成卡位，
   cooldown 结束后又容易立刻重新进入战斗。
 ```
+
+<!-- pagebreak -->
+
 ## 10. Pass Summary / 测试总结
 
 Use this section after testing.
@@ -220,4 +246,7 @@ Summary / 总结:
 - 剩余问题：战斗返回/cooldown 后敌人追击仍然偏激进，在靠近生成点时可能会贴住玩家造成卡位。
 - Argo 入队、联合遇敌、Boss 遭遇战、Ending Trigger，以及完整 Save / Load 回归测试尚未测试。
 ```
+
+
+
 
