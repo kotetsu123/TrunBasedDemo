@@ -144,6 +144,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleSceneName: BattleScene
   transitionController: {fileID: 0}
+  groupEncounterRadius: 4
+  requireLineOfSightForGroup: 1
+  groupObstacleMask:
+    serializedVersion: 2
+    m_Bits: 128
+  groupLineOfSightHeight: 0.8
+  groupRadiusGizmoColor: {r: 1, g: 0.85, b: 0.2, a: 0.35}
+  groupLinkGizmoColor: {r: 1, g: 0.45, b: 0.1, a: 0.9}
+  showGroupLinksInGame: 1
+  showGroupLinksOnlyWhileChasing: 1
+  groupLinkRefreshInterval: 0.1
+  groupLinkHeight: 1.2
+  groupLinkWidth: 0.04
+  groupRuntimeLinkColor: {r: 1, g: 0.45, b: 0.1, a: 0.9}
+  groupLinkMaterial: {fileID: 0}
 --- !u!114 &-2391111053808436137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,11 +173,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   waitTime: 1
+  stuckRepathSeconds: 2
+  stuckCheckInterval: 0.5
+  stuckMinProgress: 0.1
   canChasePlayer: 1
   chaseSpeed: 3.5
   detectRadius: 5
   loseRadius: 7
   playerTag: Player
+  requireLineOfSightForChase: 1
+  chaseObstacleMask:
+    serializedVersion: 2
+    m_Bits: 128
+  chaseLineOfSightHeight: 0.8
 --- !u!54 &5786426579013256382
 Rigidbody:
   m_ObjectHideFlags: 0

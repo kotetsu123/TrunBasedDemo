@@ -22,6 +22,11 @@ public class EnemyFieldController : MonoBehaviour
     [SerializeField] private float loseRadius = 7f;
     [SerializeField] private string playerTag = "Player";
 
+    [Header("Chase Sight")]
+    [SerializeField] private bool requireLineOfSightForChase = true;
+    [SerializeField] private LayerMask chaseObstacleMask = 0;
+    [SerializeField] private float chaseLineOfSightHeight = 0.8f;
+
     private Vector3 wanderCenter;
     private Vector3 wanderTarget;
     private float wanderRadius = 3f;
@@ -196,7 +201,8 @@ public class EnemyFieldController : MonoBehaviour
         if (player == null)
             return false;
 
-        return FlatDistance(transform.position, player.position) <= detectRadius;
+        return FlatDistance(transform.position, player.position) <= detectRadius
+               && HasLineOfSightToPlayer(player);
     }
 
     private bool CanKeepChasing()
@@ -208,7 +214,8 @@ public class EnemyFieldController : MonoBehaviour
         if (player == null)
             return false;
 
-        return FlatDistance(transform.position, player.position) <= Mathf.Max(detectRadius, loseRadius);
+        return FlatDistance(transform.position, player.position) <= Mathf.Max(detectRadius, loseRadius)
+               && HasLineOfSightToPlayer(player);
     }
 
     private Transform GetPlayerTarget()
@@ -219,6 +226,25 @@ public class EnemyFieldController : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag(playerTag);
         playerTarget = player != null ? player.transform : null;
         return playerTarget;
+    }
+
+    private bool HasLineOfSightToPlayer(Transform player)
+    {
+        if (!requireLineOfSightForChase)
+            return true;
+
+        if (player == null)
+            return false;
+
+        // 没有配置遮挡层时保持旧逻辑，避免敌人/玩家自己的 Collider 误挡索敌。
+        if (chaseObstacleMask.value == 0)
+            return true;
+
+        Vector3 from = transform.position + Vector3.up * chaseLineOfSightHeight;
+        Vector3 to = player.position + Vector3.up * chaseLineOfSightHeight;
+
+        // 只检测墙体/环境层。中间有障碍时，敌人不会开始或继续追击玩家。
+        return !Physics.Linecast(from, to, chaseObstacleMask, QueryTriggerInteraction.Ignore);
     }
 
     private void MoveTowards(Vector3 target, float speed)

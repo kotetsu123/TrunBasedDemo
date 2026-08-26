@@ -9,6 +9,9 @@ public class EncounterTrigger : MonoBehaviour
     [SerializeField] private SceneTransitionController transitionController;
     [Header("Group Encounter")]
     [SerializeField] private float groupEncounterRadius = 4f;
+    [SerializeField] private bool requireLineOfSightForGroup = true;
+    [SerializeField] private LayerMask groupObstacleMask = 0;
+    [SerializeField] private float groupLineOfSightHeight = 0.8f;
     [SerializeField] private Color groupRadiusGizmoColor = new Color(1f, 0.85f, 0.2f, 0.35f);
     [SerializeField] private Color groupLinkGizmoColor = new Color(1f, 0.45f, 0.1f, 0.9f);
 
@@ -86,10 +89,7 @@ public class EncounterTrigger : MonoBehaviour
             if (enemy == null || enemy == cachedFieldEnemy || !enemy.gameObject.activeInHierarchy)
                 continue;
 
-            Vector3 offset = enemy.transform.position - cachedFieldEnemy.transform.position;
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude > sqrRadius)
+            if (!CanJoinGroupEncounter(cachedFieldEnemy, enemy, sqrRadius))
                 continue;
 
             groupLinkTargets.Add(enemy);
@@ -268,23 +268,52 @@ public class EncounterTrigger : MonoBehaviour
 
         EnemyFieldController[] fieldEnemies = FindObjectsOfType<EnemyFieldController>();
         float sqrRadius = groupEncounterRadius * groupEncounterRadius;
-        Vector3 center = triggerEnemy.transform.position;
 
         foreach (EnemyFieldController enemy in fieldEnemies)
         {
             if (enemy == null || enemy == triggerEnemy || !enemy.gameObject.activeInHierarchy)
                 continue;
 
-            Vector3 offset = enemy.transform.position - center;
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude > sqrRadius)
+            if (!CanJoinGroupEncounter(triggerEnemy, enemy, sqrRadius))
                 continue;
 
             AddEncounterEnemy(enemy, spawnIds, encounterIds);
         }
 
         Debug.Log($"[EncounterTrigger] Group encounter collected. spawnCount={spawnIds.Count}, encounterCount={encounterIds.Count}");
+    }
+
+    private bool CanJoinGroupEncounter(EnemyFieldController sourceEnemy, EnemyFieldController targetEnemy, float sqrRadius)
+    {
+        if (sourceEnemy == null || targetEnemy == null)
+            return false;
+
+        Vector3 offset = targetEnemy.transform.position - sourceEnemy.transform.position;
+        offset.y = 0f;
+
+        if (offset.sqrMagnitude > sqrRadius)
+            return false;
+
+        if (!requireLineOfSightForGroup)
+            return true;
+
+        return HasGroupLineOfSight(sourceEnemy.transform, targetEnemy.transform);
+    }
+
+    private bool HasGroupLineOfSight(Transform source, Transform target)
+    {
+        if (source == null || target == null)
+            return false;
+
+        // 没有配置遮挡层时保持旧逻辑，避免误把敌人/玩家 Collider 当成墙挡住。
+        if (groupObstacleMask.value == 0)
+            return true;
+
+        Vector3 from = source.position + Vector3.up * groupLineOfSightHeight;
+        Vector3 to = target.position + Vector3.up * groupLineOfSightHeight;
+
+        // 只检测墙体/环境层。中间有障碍物时，这个敌人不会加入联合遇敌。
+        return !Physics.Linecast(from, to, groupObstacleMask, QueryTriggerInteraction.Ignore);
     }
 
     private void AddEncounterEnemy(
@@ -326,10 +355,7 @@ public class EncounterTrigger : MonoBehaviour
             if (enemy == null || enemy == triggerEnemy || !enemy.gameObject.activeInHierarchy)
                 continue;
 
-            Vector3 offset = enemy.transform.position - center;
-            offset.y = 0f;
-
-            if (offset.sqrMagnitude > sqrRadius)
+            if (!CanJoinGroupEncounter(triggerEnemy, enemy, sqrRadius))
                 continue;
 
             Gizmos.DrawLine(center, enemy.transform.position);
