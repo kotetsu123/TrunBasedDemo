@@ -2408,6 +2408,7 @@ MonoBehaviour:
   fallbackFieldSceneName: FildScene
   inventoryPanel: {fileID: 755044484}
   partyHudController: {fileID: 1294726527}
+  toastController: {fileID: 0}
   messageText: {fileID: 0}
 --- !u!1001 &463742223
 PrefabInstance:
