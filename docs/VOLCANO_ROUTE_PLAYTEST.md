@@ -80,21 +80,21 @@ Notes / 备注:
 
 ## 2.5 Inventory Flow / 背包流程
 
-- [ ] Pressing B opens and closes the Field inventory panel. / 按 B 可以打开和关闭 Field 背包面板。
-- [ ] Pressing ESC closes the inventory panel when it is open. / 背包打开时按 ESC 可以关闭背包。
-- [ ] Inventory slots are generated in the expected order. / 背包格子会按预期顺序生成。
-- [ ] Empty inventory slots hide icon and count text. / 空背包格会隐藏 icon 和数量文本。
-- [ ] Clicking an item shows the description panel. / 点击道具后会显示说明面板。
-- [ ] Use button appears only after a usable item is selected. / 选择可使用道具后才会显示 Use 按钮。
-- [ ] Field item usage opens the party target panel. / 在 Field 使用道具时会打开队伍目标选择面板。
-- [ ] HP recovery item restores the selected party member HP. / HP 恢复道具会恢复被选中队员的 HP。
-- [ ] MP recovery item restores the selected party member MP. / MP 恢复道具会恢复被选中队员的 MP。
+- [√] Pressing B opens and closes the Field inventory panel. / 按 B 可以打开和关闭 Field 背包面板。
+- [?] Pressing ESC closes the inventory panel when it is open. / 背包打开时按 ESC 可以关闭背包。
+- [√] Inventory slots are generated in the expected order. / 背包格子会按预期顺序生成。
+- [√] Empty inventory slots hide icon and count text. / 空背包格会隐藏 icon 和数量文本。
+- [√] Clicking an item shows the description panel. / 点击道具后会显示说明面板。
+- [?] Use button appears only after a usable item is selected. / 选择可使用道具后才会显示 Use 按钮。
+- [√] Field item usage opens the party target panel. / 在 Field 使用道具时会打开队伍目标选择面板。
+- [√] HP recovery item restores the selected party member HP. / HP 恢复道具会恢复被选中队员的 HP。
+- [√] MP recovery item restores the selected party member MP. / MP 恢复道具会恢复被选中队员的 MP。
 - [ ] Revive item can target a dead party member in Field. / 复活道具可以在 Field 中选择死亡队员。
-- [ ] Item count decreases after successful use. / 道具成功使用后数量会减少。
-- [ ] Dragging an item swaps or moves it to the expected slot. / 拖拽道具后会交换或移动到预期格子。
-- [ ] Drag preview shows both item icon and count text. / 拖拽预览会同时显示道具 icon 和数量文本。
-- [ ] Save / Load restores inventory item counts. / Save / Load 后会恢复背包道具数量。
-- [ ] Save / Load restores inventory slot order. / Save / Load 后会恢复背包格子顺序。
+- [√] Item count decreases after successful use. / 道具成功使用后数量会减少。
+- [√] Dragging an item swaps or moves it to the expected slot. / 拖拽道具后会交换或移动到预期格子。
+- [√] Drag preview shows both item icon and count text. / 拖拽预览会同时显示道具 icon 和数量文本。
+- [√] Save / Load restores inventory item counts. / Save / Load 后会恢复背包道具数量。
+- [√] Save / Load restores inventory slot order. / Save / Load 后会恢复背包格子顺序。
 
 Notes / 备注:
 

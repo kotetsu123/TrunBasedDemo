@@ -13,10 +13,10 @@ public abstract class BaseController : MonoBehaviour
 
 
     /// <summary>
-    /// TODO:Öğ½¥È¡ÏûÕâ¸ö£¬¸Ä³É´¿Êı¾İÇı¶¯£¬ControllerÖ»¸ºÔğ±íÏÖºÍµ÷ÓÃ¼¼ÄÜÂß¼­£¬Êı¾İ¶¼·ÅÔÚCharacterÀï£¬·½±ãºóĞøÍÑÀëUnity×ö´¿Âß¼­²âÊÔ
+    /// TODO:ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³É´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ControllerÖ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖºÍµï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ¶ï¿½ï¿½ï¿½ï¿½ï¿½Characterï¿½ï£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Unityï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [Header("Visual")]
-    public Sprite portrait;//½ÇÉ«Ğ¤Ïñ
+    public Sprite portrait;//ï¿½ï¿½É«Ğ¤ï¿½ï¿½
 
     private float _nextDmgLogTime = 0f;
 
@@ -35,7 +35,7 @@ public abstract class BaseController : MonoBehaviour
     {
         EnsureRunTimeDefaults();
     }
-    //Í³Ò»µÄÊÜÉËÂß¼­
+    //Í³Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
     public virtual void TakeDamage(int damage)
     {
         if (Time.unscaledTime >= _nextDmgLogTime)
@@ -110,7 +110,7 @@ public abstract class BaseController : MonoBehaviour
         OnRevied?.Invoke(this);
 
     }
-    //¸ø×ÓÀà"ÍØÕ¹"µÄ¹³×Ó
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"ï¿½ï¿½Õ¹"ï¿½Ä¹ï¿½ï¿½ï¿½
     protected virtual void OnDeath()
     {
         BattleManager.Instance.NotifyDeath(this);
@@ -120,19 +120,9 @@ public abstract class BaseController : MonoBehaviour
         //Debug.LogError($"[Init CALLED]{gameObject.name}");
 
         this.data = data;
-        //»ù´¡Õ½¶·×´Ì¬
-        this.data.isDead = false;
+        //ï¿½ï¿½ï¿½ï¿½Õ½ï¿½ï¿½×´Ì¬
         this.data.ActionValue = this.data.MaxActionValue;
-
-        //hp/MaxHp³õÊ¼»¯¶µµ×£¨·ÀÖ¹MaxHp=0£©
-        if(this.data.MaxHp<=0&&this.data.Hp>0)
-            this.data.MaxHp= this.data.Hp;
-
-        //×îºó¶µµ×£ºÁ½¸ö¶¼<=0 ¾Í¸ø¸öÄ¬ÈÏÖµ£¬±ÜÃâ³ı0ºÍUIÈ«0
-        if (this.data.MaxHp <= 0)
-            this.data.MaxHp = 100;
-        if(this.data.Hp<=0)
-            this.data.Hp=this.data.MaxHp;
+        NormalizeRuntimeHpState();
         if (this.data.Portrait == null && portrait != null)
         {
             this.data.Portrait = portrait;
@@ -147,17 +137,50 @@ public abstract class BaseController : MonoBehaviour
     private void EnsureRunTimeDefaults()
     {
         if (data == null) return;
-         
-        data.isDead = false;
 
-        if(data.MaxHp<=0&&data.Hp>0)data.MaxHp= data.Hp;
-        if(data.Hp<=0&&data.MaxHp>0)data.Hp= data.MaxHp;
-        if (data.MaxHp <= 0) data.MaxHp = 100;
-        if (data.Hp <= 0) data.Hp = data.MaxHp;
+        NormalizeRuntimeHpState();
 
         if(data.MaxActionValue>0)data.ActionValue= data.MaxActionValue;
     }
-    //Ê¹ÓÃ¼¼ÄÜ
+
+    private void NormalizeRuntimeHpState()
+    {
+        if (data == null) return;
+
+        // MaxHp æ²¡å¡«ä½† Hp æœ‰å€¼æ—¶ï¼Œç”¨å½“å‰ Hp åæ¨ MaxHpï¼Œå…¼å®¹æ—§é…ç½®ã€‚
+        if (data.MaxHp <= 0 && data.Hp > 0)
+            data.MaxHp = data.Hp;
+
+        // MaxHp å’Œ Hp éƒ½æ— æ•ˆæ—¶ï¼Œè¯´æ˜è¿™æ›´åƒæ˜¯æ•°æ®æ²¡é…ç½®ï¼Œä¸æ˜¯åˆæ³•æ­»äº¡çŠ¶æ€ã€‚
+        if (data.MaxHp <= 0)
+        {
+            data.MaxHp = 100;
+            data.Hp = data.MaxHp;
+            data.isDead = false;
+            return;
+        }
+
+        // ç©å®¶ Hp=0 æ˜¯åˆæ³•çš„æ­»äº¡çŠ¶æ€ï¼Œä¸èƒ½åœ¨è¿›å…¥ä¸‹ä¸€åœºæˆ˜æ–—æ—¶è¢« Init è‡ªåŠ¨è¡¥æ»¡ã€‚
+        if (data.Hp <= 0)
+        {
+            if (data.isDead || data.Team == Team.Player || isPlayer)
+            {
+                data.Hp = 0;
+                data.isDead = true;
+            }
+            else
+            {
+                data.Hp = data.MaxHp;
+                data.isDead = false;
+            }
+
+            return;
+        }
+
+        data.Hp = Mathf.Min(data.Hp, data.MaxHp);
+        data.isDead = false;
+    }
+    //Ê¹ï¿½Ã¼ï¿½ï¿½ï¿½
     public void UseSkill(SkillData skill, BaseController target)
     {
         Debug.Log($"[UseSkill] actor={data.Name}, target={target?.data.Name}, skill={skill.skillName}, type={skill.skillType}, targetType={skill.targetType}");
