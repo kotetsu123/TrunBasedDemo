@@ -240,10 +240,14 @@ public class BattleManager : MonoBehaviour
          {
              InitializeBattle();
          }*/
-        //var iconobj = Instantiate(timeLineIconPrefab, actionBarPanel);
-        var iconobj = Instantiate(timeLineIconPrefab, iconVisualRoot);
-        var icon = iconobj.GetComponent<TimeLineIcon>();
-        icon.Bind(character);
+        if (ShouldShowInTimeline(character))
+        {
+            // Dead characters stay in controllers for revive targeting, but should not appear on the timeline.
+            var iconobj = Instantiate(timeLineIconPrefab, iconVisualRoot);
+            var icon = iconobj.GetComponent<TimeLineIcon>();
+            icon.Bind(character);
+            timeLineIcons.Add(character, icon);
+        }
         if (isBattleReady)
         {
             TryPlaceIntoFormation(character);
@@ -252,14 +256,23 @@ public class BattleManager : MonoBehaviour
             InitializeBattle();
         }
 
-        timeLineIcons.Add(character, icon);
 
         //character.data.ActionValue = character.data.MaxActionValue; //初始行动值设为最大值
         FindObjectOfType<TimeLineUI>()?.BuildCache();
 
+        character.OnRevied -= HandleCharacterRevived;
         character.OnRevied += HandleCharacterRevived;
         _timelineDirty= true;//注册角色后需要刷新时间轴
         //RequestReorder();//最后一帧搞一下
+    }
+
+    private bool ShouldShowInTimeline(BaseController controller)
+    {
+        if (controller == null || controller.data == null)
+            return false;
+
+        // Dead characters can be revive targets, but they should not take timeline slots.
+        return controller.data.isOnField && !controller.isDead && !controller.data.isDead && controller.data.Hp > 0;
     }
 
     void InitializeBattle()
