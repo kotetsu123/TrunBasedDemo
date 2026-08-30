@@ -14,8 +14,8 @@ public class FieldEscMenuInputController : MonoBehaviour
         if (escPanel == null)
             return;
 
-        // Inventory owns Esc while it is open, so the system menu does not open on the same key press.
-        if (inventoryInputController != null && inventoryInputController.IsOpen)
+        // Inventory gets the first chance to consume ESC, including the frame where it just closed itself.
+        if (inventoryInputController != null && inventoryInputController.TryCloseByEsc())
             return;
 
         if (escPanel.IsOpen)

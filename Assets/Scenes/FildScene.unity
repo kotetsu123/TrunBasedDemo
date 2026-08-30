@@ -1661,7 +1661,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 316109990}
-  - component: {fileID: 316109991}
   - component: {fileID: 316109992}
   m_Layer: 0
   m_Name: FieldSystems
@@ -1685,21 +1684,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &316109991
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 316109989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bedb33f743c00e40a0b32308fe42a1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventorypanel: {fileID: 755044484}
-  toggleKey: 98
-  closeKey: 27
 --- !u!114 &316109992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1713,7 +1697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   escPanel: {fileID: 451724008}
-  inventoryInputController: {fileID: 316109991}
+  inventoryInputController: {fileID: 755044485}
   toggleKey: 27
 --- !u!1 &339426443
 GameObject:
@@ -3996,6 +3980,7 @@ GameObject:
   - component: {fileID: 755044480}
   - component: {fileID: 755044484}
   - component: {fileID: 755044483}
+  - component: {fileID: 755044485}
   m_Layer: 5
   m_Name: ItemInventoryPanel
   m_TagString: Untagged
@@ -4128,6 +4113,21 @@ MonoBehaviour:
   useItemButton: {fileID: 1507346655}
   partyHudController: {fileID: 1294726527}
   partyTargetPanel: {fileID: 1844296595}
+--- !u!114 &755044485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755044478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bedb33f743c00e40a0b32308fe42a1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventorypanel: {fileID: 755044484}
+  toggleKey: 98
+  closeKey: 27
 --- !u!1 &755253181
 GameObject:
   m_ObjectHideFlags: 0

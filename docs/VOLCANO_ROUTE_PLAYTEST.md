@@ -89,7 +89,7 @@ Notes / 备注:
 - [√] Field item usage opens the party target panel. / 在 Field 使用道具时会打开队伍目标选择面板。
 - [√] HP recovery item restores the selected party member HP. / HP 恢复道具会恢复被选中队员的 HP。
 - [√] MP recovery item restores the selected party member MP. / MP 恢复道具会恢复被选中队员的 MP。
-- [ ] Revive item can target a dead party member in Field. / 复活道具可以在 Field 中选择死亡队员。
+- [√] Revive item can target a dead party member in Field. / 复活道具可以在 Field 中选择死亡队员。
 - [√] Item count decreases after successful use. / 道具成功使用后数量会减少。
 - [√] Dragging an item swaps or moves it to the expected slot. / 拖拽道具后会交换或移动到预期格子。
 - [√] Drag preview shows both item icon and count text. / 拖拽预览会同时显示道具 icon 和数量文本。
@@ -101,7 +101,7 @@ Notes / 备注:
 ```text
 
 ``` -在打开背包的时候，按esc关闭背包的情况下，会直接弹出ESC菜单，而不是关闭背包。 这个可能需要修改一下逻辑，按esc关闭背包的时候，应该是先关闭背包，再按一次esc才会弹出菜单。
-```
+```在打开背包的状态下，如果不小心右键到panel 以外的part 可以旋转视角。 这个敌方我想限制一下。类似gametime set 0 的那种冻结状态，更应该说是。 打开背包的时候，disable 右键操控视角这个部分？
 
 
 
@@ -157,14 +157,14 @@ Notes / 备注:
 
 ## 5. Group Encounter / 联合遇敌
 
-- [ ] Multiple field enemies spawn in the group encounter zone. / 联合遇敌区域内会生成多个场景敌人。
-- [ ] Group enemies are close enough for group encounter detection. / 多个敌人的距离足够触发联合遇敌检测。
-- [ ] Runtime group link line appears when enemies are chasing, if enabled. / 如果启用，敌人追踪时会显示运行时联合线条。
-- [ ] Colliding with one enemy collects nearby group enemies. / 与其中一只敌人碰撞时，会收集附近的联合敌人。
-- [ ] Battle starts with the expected combined enemy group. / Battle 中会生成预期的联合敌人组。
-- [ ] Group encounter popup/message appears if configured. / 如果配置了提示，会显示联合遇敌 popup/message。
-- [ ] Winning the battle clears all involved `spawnId` values. / 战斗胜利后会清除所有参与战斗的 `spawnId`。
-- [ ] Cleared group enemies do not immediately respawn when configured as Permanent. / 如果配置为 Permanent，已清除的联合敌人不会立刻重新生成。
+- [√] Multiple field enemies spawn in the group encounter zone. / 联合遇敌区域内会生成多个场景敌人。
+- [√] Group enemies are close enough for group encounter detection. / 多个敌人的距离足够触发联合遇敌检测。
+- [√] Runtime group link line appears when enemies are chasing, if enabled. / 如果启用，敌人追踪时会显示运行时联合线条。
+- [√] Colliding with one enemy collects nearby group enemies. / 与其中一只敌人碰撞时，会收集附近的联合敌人。
+- [√] Battle starts with the expected combined enemy group. / Battle 中会生成预期的联合敌人组。
+- [√] Group encounter popup/message appears if configured. / 如果配置了提示，会显示联合遇敌 popup/message。
+- [√] Winning the battle clears all involved `spawnId` values. / 战斗胜利后会清除所有参与战斗的 `spawnId`。
+- [√] Cleared group enemies do not immediately respawn when configured as Permanent. / 如果配置为 Permanent，已清除的联合敌人不会立刻重新生成。
 
 Notes / 备注:
 联合战斗的部分，现在隔着墙也能进入战斗，我觉得可能需要修改一下索敌逻辑？还有联合逻辑，但其实也可以用就是。
@@ -215,15 +215,15 @@ Notes / 备注:
 
 ## 8. Save / Load Regression / Save 与 Load 回归测试
 
-- [ ] Save records player position in the Field scene. / Save 会记录 Field 场景中的玩家位置。
-- [ ] Load restores player position in the Field scene. / Load 会恢复 Field 场景中的玩家位置。
-- [ ] Load restores inventory item counts. / Load 会恢复背包道具数量。
-- [ ] Load restores party member HP / MP state. / Load 会恢复队伍成员 HP / MP 状态。
-- [ ] Load preserves opened chest IDs. / Load 会保存已打开宝箱 ID。
-- [ ] Load preserves recruited party members. / Load 会保存已入队角色。
-- [ ] Load preserves cleared permanent enemy spawn IDs. / Load 会保存已清除的 Permanent 敌人 spawn ID。
-- [ ] Load does not duplicate generated field objects. / Load 不会重复生成 Field 对象。
-- [ ] Load does not leave Field in a hidden paused state. / Load 后 Field 不会停留在隐藏暂停状态。
+- [√] Save records player position in the Field scene. / Save 会记录 Field 场景中的玩家位置。
+- [√] Load restores player position in the Field scene. / Load 会恢复 Field 场景中的玩家位置。
+- [√] Load restores inventory item counts. / Load 会恢复背包道具数量。
+- [√] Load restores party member HP / MP state. / Load 会恢复队伍成员 HP / MP 状态。
+- [√] Load preserves opened chest IDs. / Load 会保存已打开宝箱 ID。
+- [√] Load preserves recruited party members. / Load 会保存已入队角色。
+- [√] Load preserves cleared permanent enemy spawn IDs. / Load 会保存已清除的 Permanent 敌人 spawn ID。
+- [√] Load does not duplicate generated field objects. / Load 不会重复生成 Field 对象。
+- [√] Load does not leave Field in a hidden paused state. / Load 后 Field 不会停留在隐藏暂停状态。
 
 Notes / 备注:
 
