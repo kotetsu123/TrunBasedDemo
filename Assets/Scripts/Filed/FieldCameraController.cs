@@ -29,6 +29,10 @@ public class FieldCameraController : MonoBehaviour
     }
     private void HandleCameraRotation()
     {
+        // 如果游戏暂停，停止旋转
+        if (FieldPauseState.IsPaused)
+            return;
+
         if (!Input.GetMouseButton(1)) return;// 右键旋转
 
         float mouseX = Input.GetAxis("Mouse X");
