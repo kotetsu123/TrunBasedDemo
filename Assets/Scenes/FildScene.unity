@@ -4113,6 +4113,7 @@ MonoBehaviour:
   useItemButton: {fileID: 1507346655}
   partyHudController: {fileID: 1294726527}
   partyTargetPanel: {fileID: 1844296595}
+  toastController: {fileID: 697337633}
 --- !u!114 &755044485
 MonoBehaviour:
   m_ObjectHideFlags: 0

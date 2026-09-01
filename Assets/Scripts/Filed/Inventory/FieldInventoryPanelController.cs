@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -20,6 +21,9 @@ public class FieldInventoryPanelController : BasePanel
     [Header("Party")]
     [SerializeField] private FieldPartyHudController partyHudController;
     [SerializeField] private FieldInventoryPartyTargetPanelController partyTargetPanel;
+
+    [Header("Feedback")]
+    [SerializeField] private FieldToastController toastController;
 
     private readonly List<FieldInventoryItemView> spawnedItems = new();
     private ItemData selectedItem;
@@ -168,6 +172,9 @@ public class FieldInventoryPanelController : BasePanel
 
         if (!TryApplyFieldItemEffect(item, target))
         {
+            string message = GetItemUseFialMeassage(item, target);
+            SHowToast(message);
+
             Debug.Log("[FieldInventory] Selected party member cannot use this item.");
             return;
         }
@@ -193,6 +200,8 @@ public class FieldInventoryPanelController : BasePanel
             HideDescription();
         }
     }
+
+ 
     private bool TryApplyFieldItemEffect(ItemData item, Character target)
     {
         // Field item effects operate directly on PartyRuntimeState because there is no battle controller here.
@@ -210,6 +219,42 @@ public class FieldInventoryPanelController : BasePanel
             default:
                 return false;
         }
+    }
+  
+
+    private string GetItemUseFialMeassage(ItemData item, Character target)
+    {
+        if (item == null)
+            return "No item selected.";
+        if (target == null)
+            return "No target selected.";
+        switch (item.itemtype)
+        {
+            case ItemType.Heal:
+                if (target.isDead || target.Hp <= 0)
+                    return $"{target.Name} cannot be healed while down";
+                if (target.Hp >= target.MaxHp)
+                    return $"{target.Name} is already at full HP.";
+                return $"{target.Name} cannot use this item.";
+            case ItemType.RestoreMp:
+                if (target.isDead || target.Hp <= 0)
+                    return $"{target.Name} cannot restore MP while down";
+                if (target.Mp >= target.MaxMp)
+                    return $"{target.Name} is already at full MP.";
+                return $"{target.Name} cannot use this item.";
+            case ItemType.Revive:
+                if (!target.isDead && target.Hp > 0)
+                    return $"{target.Name} does not need revival";
+                return $"{target.Name} cannot be revived.";
+            default:
+                return $"Cannot use {item.itemName} on {target.Name}.";
+        }
+    }
+    private void SHowToast(string message)
+    {
+        if(toastController==null)
+            toastController=FieldToastController.Current;
+        toastController?.ShowMessage(message);
     }
     private bool CanUseSelectedItem()
     {
