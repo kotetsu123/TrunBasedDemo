@@ -7683,7 +7683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f5afcc82e81bf43966bf50bc21ba07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldData: {fileID: 11400000, guid: 323c35cbb76fd834c9934723dacdcfe8, type: 2}
+  fieldData: {fileID: 11400000, guid: 43114838ec5d4ef9927ab8efa35c2781, type: 2}
   generatedSpawnPointRoot: {fileID: 1818626006}
   generatedInteractableRoot: {fileID: 839029127}
   generatedEnvironmentRoot: {fileID: 0}
