@@ -22,6 +22,11 @@ public class SceneTransitionController : MonoBehaviour
     }
     public void StartBattleTransition(string sceneName)
     {
+        StartSceneTransition(sceneName);
+    }
+
+    public void StartSceneTransition(string sceneName)
+    {
         if (isTransitioning) return;
         StartCoroutine(TransitionCoroutine(sceneName));
     }

@@ -60,6 +60,13 @@ public class FieldCreator : MonoBehaviour
                 FieldBattleContext.PlayerRotationBeforeBattle);
             return;
         }
+        // Scene transition spawn has priority over the default start point.
+        if (FieldSceneTransitionContext.TryConsumePendingSpawnPoint(out string spawnPointId))
+        {
+            if (TryTeleportPlayerToSceneSpawnPoint(spawnPointId))
+                return;
+        }
+
         // Saved player transform is used when entering Field from Load.
         if (FieldBattleContext.HasSavedPlayerTransform)
         {
@@ -78,6 +85,24 @@ public class FieldCreator : MonoBehaviour
                 playerStartPoint.position,
                 playerStartPoint.rotation);
         }
+    }
+
+    private bool TryTeleportPlayerToSceneSpawnPoint(string spawnPointId)
+    {
+        FieldSceneSpawnPoint[] spawnPoints = FindObjectsOfType<FieldSceneSpawnPoint>(true);
+
+        foreach (FieldSceneSpawnPoint spawnPoint in spawnPoints)
+        {
+            if (spawnPoint == null || spawnPoint.SpawnPointId != spawnPointId)
+                continue;
+
+            Transform spawnTransform = spawnPoint.transform;
+            FieldPlayerTransformUtility.Teleport(player, spawnTransform.position, spawnTransform.rotation);
+            return true;
+        }
+
+        Debug.LogWarning($"[FieldCreator] Scene spawn point not found. spawnPointId={spawnPointId}");
+        return false;
     }
 
     private void SpwanEnemies()

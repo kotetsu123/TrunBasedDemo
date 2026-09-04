@@ -59,15 +59,6 @@ MonoBehaviour:
     enemyId: 
     respawnType: 0
     respawnSeconds: 0
-  - spawnId: test_field_spawn_006
-    encounterId: encounter_boss_001
-    fieldPrefab: {fileID: 5530866489079673050, guid: 06a3c58cb3717ee4c8aebd5e256d6350, type: 3}
-    position: {x: 13.8, y: 0.5, z: 15.8}
-    rotationEuler: {x: 0, y: 0, z: 0}
-    wanderRadius: 3
-    enemyId: 
-    respawnType: 0
-    respawnSeconds: 0
   fieldObjects:
   - objectId: Chest_001
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
