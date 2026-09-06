@@ -1110,7 +1110,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: Boss_FieldScene
-  targetSpawnPointId: MazeEntrance
+  targetSpawnPointId: BossFieldEntry
   transitionController: {fileID: 749454896}
   triggerOnce: 1
 --- !u!1 &163447632
