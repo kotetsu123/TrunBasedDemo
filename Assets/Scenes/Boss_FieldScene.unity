@@ -10246,6 +10246,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1956867575}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &2081870837
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2081870839}
+  - component: {fileID: 2081870838}
+  m_Layer: 0
+  m_Name: BossEndingAutoEvent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2081870838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2081870837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0826a4752e4e4253b0e46b003d19ed7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventId: boss_ending_001
+  requiredClearedSpawnId: boss_spawn_001
+  playOnce: 1
+  playDelaySeconds: 0.5
+  dialogueData: {fileID: 0}
+  dialoguePanel: {fileID: 0}
+--- !u!4 &2081870839
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2081870837}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2116735797
 GameObject:
   m_ObjectHideFlags: 0
@@ -10686,6 +10736,7 @@ SceneRoots:
   - {fileID: 1164361664}
   - {fileID: 749454895}
   - {fileID: 316109990}
+  - {fileID: 2081870839}
   - {fileID: 1126555608}
   - {fileID: 1172996146}
   - {fileID: 1603700510}

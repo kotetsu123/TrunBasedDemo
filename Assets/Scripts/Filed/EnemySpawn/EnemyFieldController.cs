@@ -37,12 +37,14 @@ public class EnemyFieldController : MonoBehaviour
     private string spawnId;
     private string encounterId;
     private Transform playerTarget;
+    private bool isStationary;
     private EnemyFieldState currentState = EnemyFieldState.Wander;
 
     public string SpawnId => spawnId;
     public string EncounterId => encounterId;
     public EnemyFieldState CurrentState => currentState;
     public bool IsChasing => currentState == EnemyFieldState.Chase;
+    public bool IsStationary => isStationary;
 
     public void SetWanderCenter(Vector3 center, float radius)
     {
@@ -53,16 +55,26 @@ public class EnemyFieldController : MonoBehaviour
 
     public void Init(string id, string encounter, Vector3 center, float radius)
     {
+        Init(id, encounter, center, radius, false);
+    }
+
+    public void Init(string id, string encounter, Vector3 center, float radius, bool stationary)
+    {
         spawnId = id;
         encounterId = encounter;
         wanderCenter = center;
         wanderRadius = radius;
+        isStationary = stationary;
         ResetWander();
     }
 
     private void Update()
     {
         if (FieldPauseState.IsPaused)
+            return;
+
+        // Stationary enemies, such as boss field enemies, keep collision/encounter behavior but skip field movement AI.
+        if (isStationary)
             return;
 
         switch (currentState)

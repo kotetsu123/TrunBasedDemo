@@ -14,6 +14,7 @@ public class EnemySpawnPoint : MonoBehaviour
     [SerializeField] private string encounterId; // Table-driven battle id used by EncounterDataBase.
     [SerializeField] private GameObject fieldPrefab; // Field-side enemy prefab used for collision and wandering.
     [SerializeField] private float wanderRadius = 3f;
+    [SerializeField] private bool isStationary; // Stationary enemies keep their spawn position and do not wander or chase.
     [SerializeField] private string enemyId; // Compatibility fallback for older EnemyDataBase driven spawn points.
     [SerializeField] private EnemySpawnRespawnType respawnType = EnemySpawnRespawnType.Permanent;
     [SerializeField] private float respawnSeconds = 60f;
@@ -22,6 +23,7 @@ public class EnemySpawnPoint : MonoBehaviour
     public string EncounterId => encounterId;
     public GameObject FieldPrefab => fieldPrefab;
     public float WanderRadius => wanderRadius;
+    public bool IsStationary => isStationary;
     public string EnemyId => enemyId;
 
     // Boss-like spawn points stay cleared forever. Timed spawn points can come back after RespawnSeconds.
@@ -37,6 +39,7 @@ public class EnemySpawnPoint : MonoBehaviour
         encounterId = entry.EncounterId;
         fieldPrefab = entry.FieldPrefab;
         wanderRadius = entry.WanderRadius;
+        isStationary = entry.IsStationary;
         enemyId = entry.EnemyId;
         respawnType = entry.RespawnType;
         respawnSeconds = entry.RespawnSeconds;

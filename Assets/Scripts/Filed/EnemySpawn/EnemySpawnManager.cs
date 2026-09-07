@@ -127,7 +127,8 @@ public class EnemySpawnManager : MonoBehaviour
                 point.SpawnId,
                 encounterId,
                 point.transform.position,
-                wanderRadius);
+                wanderRadius,
+                point.IsStationary);
         }
 
         RegisterActiveEnemy(point.SpawnId, fieldEnemy);

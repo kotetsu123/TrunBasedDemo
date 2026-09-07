@@ -10,6 +10,7 @@ public class FieldSpawnPointEntry
     [SerializeField] private Vector3 position;
     [SerializeField] private Vector3 rotationEuler;
     [SerializeField] private float wanderRadius = 3f;
+    [SerializeField] private bool isStationary;
     [SerializeField] private string enemyId;
     [SerializeField] private EnemySpawnRespawnType respawnType = EnemySpawnRespawnType.Permanent;
     [SerializeField] private float respawnSeconds = 60f;
@@ -20,6 +21,7 @@ public class FieldSpawnPointEntry
     public Vector3 Position => position;
     public Quaternion Rotation => Quaternion.Euler(rotationEuler);
     public float WanderRadius => wanderRadius;
+    public bool IsStationary => isStationary;
     public string EnemyId => enemyId;
     public EnemySpawnRespawnType RespawnType => respawnType;
     public float RespawnSeconds => respawnSeconds;
