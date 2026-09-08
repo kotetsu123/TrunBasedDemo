@@ -10279,8 +10279,8 @@ MonoBehaviour:
   requiredClearedSpawnId: boss_spawn_001
   playOnce: 1
   playDelaySeconds: 0.5
-  dialogueData: {fileID: 0}
-  dialoguePanel: {fileID: 0}
+  dialogueData: {fileID: 11400000, guid: bbfde43229877974192f31f1e194f1aa, type: 2}
+  dialoguePanel: {fileID: 587356434}
 --- !u!4 &2081870839
 Transform:
   m_ObjectHideFlags: 0
