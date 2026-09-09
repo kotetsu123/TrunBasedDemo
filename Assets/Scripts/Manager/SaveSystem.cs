@@ -25,6 +25,7 @@ public static class SaveSystem
             party = PartyRuntimeState.ToSaveData(),
             field=fieldSaveData,
             tutorial = TutorialRuntimeState.ToSaveData(),
+            fieldAutoEvents = FieldAutoEventRuntimeState.ToSaveData(),
         };
     }
 
@@ -90,6 +91,9 @@ public static class SaveSystem
 
         // Tutorial state keeps one-time tutorials from playing again after Load.
         TutorialRuntimeState.LoadFromSaveData(saveData.tutorial);
+
+        // Field auto event state keeps events like boss ending dialogue from replaying after Load.
+        FieldAutoEventRuntimeState.LoadFromSaveData(saveData.fieldAutoEvents);
 
         // If Load is called while already in a Field scene, apply the saved player transform immediately.
         // Title Load has no FieldSaveContext, so FieldCreator will apply it after the Field scene loads.

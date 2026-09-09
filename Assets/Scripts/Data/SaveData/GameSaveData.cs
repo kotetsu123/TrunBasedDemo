@@ -9,5 +9,5 @@ public class GameSaveData
     public PartySaveData party;
     public FieldSaveData field;
     public TutorialSaveData tutorial;
+    public FieldAutoEventSaveData fieldAutoEvents;
 }
-
