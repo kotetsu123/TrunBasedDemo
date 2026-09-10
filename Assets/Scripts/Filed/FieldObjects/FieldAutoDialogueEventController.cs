@@ -23,17 +23,26 @@ public class FieldAutoDialogueEventController : MonoBehaviour
     private void TryStartAutoEvent()
     {
         if (isPlaying)
+        {
+            Debug.Log($"[FieldAutoDialogueEvent] Skip because event is already playing. eventId={eventId}");
             return;
+        }
 
         // eventId 是这个自动剧情的唯一记录 ID，用来避免同一轮运行里重复播放。
         if (playOnce && FieldAutoEventRuntimeState.IsCompleted(eventId))
+        {
+            Debug.Log($"[FieldAutoDialogueEvent] Skip completed event. eventId={eventId}");
             return;
+        }
 
         // Boss 战后会把 boss_spawn_001 记录到 FieldBattleContext 的 cleared spawn 里。
         // 这里用它作为条件，避免玩家没打 Boss 就直接触发结尾剧情。
         if (!string.IsNullOrWhiteSpace(requiredClearedSpawnId) &&
             !FieldBattleContext.IsSpawnCleard(requiredClearedSpawnId))
+        {
+            Debug.Log($"[FieldAutoDialogueEvent] Waiting for cleared spawn. eventId={eventId}, requiredClearedSpawnId={requiredClearedSpawnId}");
             return;
+        }
 
         if (dialogueData == null)
         {
@@ -47,6 +56,7 @@ public class FieldAutoDialogueEventController : MonoBehaviour
     private IEnumerator PlayEventRoutine()
     {
         isPlaying = true;
+        Debug.Log($"[FieldAutoDialogueEvent] Start auto dialogue. eventId={eventId}, dialogueId={dialogueData.DialogueId}");
 
         if (playDelaySeconds > 0f)
             yield return new WaitForSeconds(playDelaySeconds);
@@ -67,6 +77,7 @@ public class FieldAutoDialogueEventController : MonoBehaviour
     private void OnDialogueComplete()
     {
         isPlaying = false;
+        Debug.Log($"[FieldAutoDialogueEvent] Complete auto dialogue. eventId={eventId}");
 
         if (playOnce)
             FieldAutoEventRuntimeState.MarkCompleted(eventId);
