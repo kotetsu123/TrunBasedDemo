@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FieldAutoDialogueEventController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class FieldAutoDialogueEventController : MonoBehaviour
     [Header("Dialogue")]
     [SerializeField] private DialogueData dialogueData;
     [SerializeField] private DialoguePanelController dialoguePanel;
+
+    [Header("Completion")]
+    [SerializeField] private UnityEvent onDialogueFinished;
 
     private bool isPlaying;
 
@@ -81,5 +85,9 @@ public class FieldAutoDialogueEventController : MonoBehaviour
 
         if (playOnce)
             FieldAutoEventRuntimeState.MarkCompleted(eventId);
+
+        // 自动剧情播完后，把后续流程交给 Inspector 配置。
+        // 例如 Boss 结尾剧情可以在这里打开 DemoEndPanel。
+        onDialogueFinished?.Invoke();
     }
 }
