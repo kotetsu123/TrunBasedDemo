@@ -2,9 +2,9 @@
 
 ## 1. Document Purpose
 
-This document summarizes the current technical structure of `Adventure of Paul Demo`.
+This document summarizes the current technical structure of `Adventure of Paul Demo` as of Demo v1.
 
-The project is a Unity turn-based RPG systems demo. The goal is not to ship a full game yet, but to connect common RPG systems into a playable and extensible loop:
+The project is a Unity turn-based RPG systems demo. Demo v1 focuses on proving that the major RPG systems can be connected into a playable and extensible loop:
 
 ```text
 Field exploration
@@ -14,13 +14,42 @@ Field exploration
  -> Runtime state writeback
  -> Save / Load
  -> Return to Field
+ -> Boss Field
+ -> Boss battle
+ -> Ending dialogue
+ -> Demo clear panel
 ```
 
 中文概括：
 
 ```text
 这是一个以作品集为目标的 Unity 回合制 RPG demo。
-当前重点是把 Field、Battle、Inventory、Party、Reward、Save/Load、Dialogue、Tutorial 等系统串成可体验流程。
+Demo v1 已经完成从 Field 探索、普通战斗、Boss 战、Ending Dialogue 到 DemoEndPanel 的基础闭环。
+当前重点从“继续扩系统”转向“打磨体验、补测试、补内容和文档”。
+```
+
+## 1.1 Demo v1 Closed Loop
+
+Current verified high-level play flow:
+
+```text
+Title
+ -> Field maze
+ -> Chest / recruit / regular encounter / group encounter
+ -> Boss Field transition
+ -> Boss encounter
+ -> Battle scene
+ -> Return to Boss Field
+ -> Auto ending dialogue
+ -> DemoEndPanel
+ -> Back to Title
+```
+
+中文：
+
+```text
+目前 Demo v1 的目标不是完整游戏，而是一个能从头走到尾的灰盒流程。
+核心闭环已经可以跑通：Field 迷宫 -> Boss Field -> Boss 战 -> 结尾剧情 -> Demo 通关面板。
 ```
 
 ## 2. High-Level Architecture
@@ -30,12 +59,13 @@ Field exploration
 | Field System | Field scene bootstrapping, player placement, generated spawn/interactable roots | `FieldCreator`, `FieldData`, `FieldSaveContext` |
 | Encounter System | Field enemy spawn, trigger, respawn, group encounter | `EnemySpawnManager`, `EnemySpawnPoint`, `EnemyFieldController`, `EncounterTrigger`, `FieldBattleContext` |
 | Battle System | Turn flow, timeline, target selection, battle camera, result handling | `BattleManager`, `BattleSpawner`, `BattleFormation`, `BattleTargetSelector`, `BattleCameraDirector` |
-| Runtime State | Cross-scene party, inventory, tutorial state | `PartyRuntimeState`, `InventoryRuntimeState`, `TutorialRuntimeState` |
+| Runtime State | Cross-scene party, inventory, tutorial, auto event state | `PartyRuntimeState`, `InventoryRuntimeState`, `TutorialRuntimeState`, `FieldAutoEventRuntimeState` |
 | Data Tables | ScriptableObject gameplay configuration | `FieldData`, `EncounterData`, `EncounterDataBase`, `EnemyCharacterDataBase`, `ItemDataBase`, `CharacterDataBase` |
 | Reward System | EXP, item drops, reward result payload | `EncounterRewardService`, `EncounterRewardResult`, `RewardPopController` |
 | Field Interactables | Chest, recruit point, dialogue trigger, E prompt | `FieldChestController`, `FieldRecruitController`, `FieldDialogueController`, `FieldInteractionPromptController` |
-| Save / Load | JSON save data and runtime restoration | `SaveSystem`, `GameSaveData`, `FieldSaveData`, `InventorySaveData`, `PartyMemberSaveData`, `TutorialSaveData` |
-| UI System | Battle UI, field inventory, result, reward, tutorial, dialogue | `BasePanel`, `DialoguePanelController`, `TutorialPanelController`, `RewardPopController`, `LevelUpPopController` |
+| Save / Load | JSON save data and runtime restoration | `SaveSystem`, `GameSaveData`, `FieldSaveData`, `InventorySaveData`, `PartyMemberSaveData`, `TutorialSaveData`, `FieldAutoEventSaveData` |
+| UI System | Battle UI, field inventory, result, reward, tutorial, dialogue, demo clear | `BasePanel`, `DialoguePanelController`, `TutorialPanelController`, `RewardPopController`, `LevelUpPopController`, `DemoEndController` |
+| Scene Transition | Field-to-field transition and target spawn placement | `FieldSceneTransitionTrigger`, `SceneTransitionController`, `FieldSceneTransitionContext` |
 
 Core runtime data flow:
 
@@ -51,7 +81,13 @@ FieldCreator
  -> PartyRuntimeState / InventoryRuntimeState
  -> SaveSystem
  -> FieldCreator
+ -> FieldAutoDialogueEventController
+ -> DemoEndController
 ```
+
+中文概括：
+
+这一章说明项目的整体分层。当前核心链路是：Field 生成玩法点，玩家触发 Encounter，Battle 根据 EncounterData 生成敌人，战斗结束后奖励和状态回写，再由 SaveSystem 保存或读取。Demo v1 还额外接上了 Boss Ending 和 DemoEndPanel，让流程有明确结束点。
 
 ## 3. Field Scene Structure
 
@@ -85,6 +121,10 @@ Rule of thumb:
 - `Environment/Props`: static decoration, no save id, no gameplay state.
 - `SpawnPoints`: designer-placed gameplay markers.
 - `RuntimeGenerated`: objects created by `FieldCreator` or spawn managers.
+
+中文概括：
+
+Field 场景现在是“手摆场景 + 数据驱动玩法点”的混合结构。墙、地面、装饰物继续放在 Unity 场景里手动摆；敌人生成点、宝箱点、入队点这类需要 ID、需要保存状态的东西，才适合交给 `FieldData` 和 `FieldCreator` 管理。
 
 ## 4. FieldCreator
 
@@ -125,6 +165,47 @@ Generated root behavior:
 - Chests and recruit points are parented under `generatedInteractableRoot`.
 - Non-interactable field objects are parented under `generatedEnvironmentRoot`.
 - If a root is missing, the code falls back to a nearby root or the `FieldCreator` transform.
+
+中文概括：
+
+`FieldCreator` 是 Field 场景启动时的入口。它负责初始化运行时数据、根据 `FieldData` 生成敌人/宝箱/入队点、放置玩家、刷新 HUD，并在从战斗或其他 Field 场景返回时处理玩家落点。
+
+## 4.1 Field Scene Transition
+
+Files:
+
+```text
+Assets/Scripts/Filed/FieldSceneTransitionContext.cs
+Assets/Scripts/Filed/FieldObjects/FieldSceneTransitionTrigger.cs
+Assets/Scripts/Filed/SceneTransitionController.cs
+```
+
+Field-to-field transition flow:
+
+```text
+Player enters FieldSceneTransitionTrigger
+ -> validate targetSceneName
+ -> FieldSceneTransitionContext.SetPendingSpawnPoint(targetSpawnPointId)
+ -> SceneTransitionController.StartSceneTransition(targetSceneName)
+ -> fade canvas blocks raycasts
+ -> FieldPauseState.SetPaused(true)
+ -> SceneManager.LoadScene(targetSceneName)
+ -> FieldCreator consumes pending spawn point
+ -> player is placed at the target spawn point
+```
+
+Purpose:
+
+- Move from the maze Field scene to `Boss_FieldScene`.
+- Move back from Boss Field to the maze if needed.
+- Keep scene transition placement data separate from battle return placement.
+
+中文：
+
+- `targetSceneName` 决定要切到哪个 Field 场景。
+- `targetSpawnPointId` 决定进入新场景后玩家落在哪个点。
+- `FieldSceneTransitionContext` 只保存一次临时传送点，`FieldCreator` 用完后会消费掉。
+- Fade 期间会暂停 Field，避免敌人和玩家在画面变黑时继续移动或追击。
 
 ## 5. FieldData
 
@@ -221,6 +302,10 @@ Recommended setup:
 - The generated visual is placed under the recruit point.
 - Nested `FieldRecruitController` and colliders inside the visual are disabled by `FieldCreator` to avoid duplicate interactions.
 
+中文概括：
+
+`FieldData` 不是完整地图生成器，而是场景玩法配置表。它负责描述敌人生成点、宝箱/物件、入队点等“可交互或会影响流程的对象”。3D 地形和装饰仍然建议手摆，避免为了数据化而把场景制作复杂化。
+
 ## 6. Field Encounter And Respawn
 
 ### 6.1 EnemySpawnManager
@@ -291,6 +376,10 @@ It also supports group encounter visualization:
 - Nearby enemies can be detected for group encounter.
 - Runtime `LineRenderer` links can show which enemies will join.
 - Link targets are cached and updated in `LateUpdate` to reduce visual jitter.
+
+中文概括：
+
+Field 遭遇系统负责从生成点生成敌人、判断是否应该刷新、玩家碰到敌人后进入战斗。`FieldBattleContext` 记录当前遭遇、战斗前玩家位置、已清除的 spawnId、宝箱开启状态等跨场景数据。联合遇敌会检测附近敌人，并用运行时线条提示哪些敌人会一起进入战斗。
 
 ## 7. Battle System
 
@@ -394,6 +483,10 @@ next friendly actor + first alive enemy target
 
 This gives regular encounters a faster start while preserving boss presentation.
 
+中文概括：
+
+Battle 系统现在已经支持从 `EncounterData` 生成敌人、行动条排序、目标选择、道具、复活、奖励结算和结果面板。普通战斗和 Boss 战可以使用不同的开场镜头配置。为了避免镜头移动时输入导致状态错乱，行动确认会在 camera moving 时被阻止。
+
 ## 8. Encounter And Reward Data
 
 ### 8.1 EncounterData
@@ -454,6 +547,10 @@ Random.value <= dropChance
 
 If no item drops, reward UI still shows the EXP result so the player receives visible feedback.
 
+中文概括：
+
+`EncounterData` 决定一场战斗会生成哪些敌人，以及胜利后给多少经验、可能掉落哪些道具。奖励发放已经从 `BattleManager` 中拆到 `EncounterRewardService`，这样战斗流程和奖励计算不会完全混在一起。
+
 ## 9. Inventory And Item System
 
 ### 9.1 InventoryRuntimeState
@@ -512,6 +609,10 @@ Reserved:
 
 - Buff item data fields exist, but buff runtime behavior is not implemented yet.
 
+中文概括：
+
+背包现在是“固定顺序 slot”结构，而不是简单 Dictionary。这样可以保存道具所在格子，也能支持拖拽交换。道具类型目前支持 HP 回复、MP 回复、复活；Buff 类型已经预留，但实际 buff 效果还没接。
+
 ## 10. Party And Recruit System
 
 ### 10.1 PartyRuntimeState
@@ -565,6 +666,10 @@ Load rollback behavior:
 - If a loaded save no longer has the recruited member, the recruit point becomes visible again.
 - The logic point should stay active; only `visualRoot` should be hidden after recruit.
 
+中文概括：
+
+队伍数据的主来源是 `PartyRuntimeState`。入队点通过 `characterId` 从 `CharacterDataBase` 找角色，再加入队伍。读档时会根据当前队伍状态刷新入队点，如果存档里还没有 Argo，那么 Argo 的入队点应该重新显示出来。
+
 ## 11. Dialogue And Tutorial
 
 ### 11.1 Dialogue
@@ -590,7 +695,57 @@ FieldDialogueController
 
 Recruit points can optionally play dialogue before adding the party member.
 
-### 11.2 Tutorial
+### 11.2 Auto Dialogue Events
+
+Files:
+
+```text
+Assets/Scripts/Filed/FieldObjects/FieldAutoDialogueEventController.cs
+Assets/Scripts/Filed/FieldAutoEventRuntimeState.cs
+```
+
+Auto dialogue events are scene-start checks for story or route events.
+
+Current boss ending flow:
+
+```text
+Boss battle victory
+ -> FieldBattleContext marks boss_spawn_001 as cleared
+ -> return to Boss_FieldScene
+ -> FieldAutoDialogueEventController.Start()
+ -> requiredClearedSpawnId check passes
+ -> DialoguePanelController.Play(endingDialogue)
+ -> FieldAutoEventRuntimeState.MarkCompleted(eventId)
+ -> onDialogueFinished.Invoke()
+ -> DemoEndController.ShowDemoEnd()
+```
+
+Key fields:
+
+```text
+eventId
+requiredClearedSpawnId
+playOnce
+playDelaySeconds
+dialogueData
+dialoguePanel
+onDialogueFinished
+```
+
+Design notes:
+
+- `requiredClearedSpawnId` is used so the ending dialogue only starts after the boss is defeated.
+- `eventId` is saved through `FieldAutoEventRuntimeState`, preventing completed auto events from replaying after Load.
+- `onDialogueFinished` is a UnityEvent so the event controller does not need hard-coded knowledge of Demo End, reward, quest, or scene transition behavior.
+
+中文：
+
+- 自动剧情事件不是玩家按 E 触发，而是场景启动后自己检查条件。
+- Boss 结尾使用 `boss_spawn_001` 作为条件，因为 Boss 胜利后这个 spawnId 会被记录为 cleared。
+- 剧情播完后不靠字符串名字判断，而是通过 Inspector 里的 `onDialogueFinished` 接后续动作。
+- 目前 Boss ending 的后续动作是打开 `DemoEndPanel`。
+
+### 11.3 Tutorial
 
 Files:
 
@@ -623,6 +778,10 @@ Current tutorial support:
 - Skip confirmation.
 - Save / Load completed tutorial ids.
 
+中文概括：
+
+对话系统用于普通 Field 对话、入队前对话和 Boss 结尾剧情。Tutorial 系统和 Dialogue 分开，主要负责多页教程、跳过确认、完成状态保存。自动剧情事件则是场景启动后检查条件，适合 Boss 战后自动播放 ending。
+
 ## 12. Save / Load System
 
 File:
@@ -647,6 +806,7 @@ SaveSystem.Save()
  -> FieldBattleContext.ToSaveData()
  -> FieldSaveContext.TryFillFieldSaveData()
  -> TutorialRuntimeState.ToSaveData()
+ -> FieldAutoEventRuntimeState.ToSaveData()
  -> JsonUtility.ToJson()
  -> File.WriteAllText()
 ```
@@ -661,6 +821,7 @@ SaveSystem.Load(itemDataBase, characterDataBase)
  -> PartyRuntimeState.LoadFromSaveData()
  -> FieldBattleContext.LoadFromSaveData()
  -> TutorialRuntimeState.LoadFromSaveData()
+ -> FieldAutoEventRuntimeState.LoadFromSaveData()
  -> FieldSaveContext.TryApplySavedPlayerTransform()
  -> FieldRecruitController.RefreshAllRecruitStates()
 ```
@@ -673,7 +834,8 @@ GameSaveData
 ├─ inventory
 ├─ party
 ├─ field
-└─ tutorial
+├─ tutorial
+└─ fieldAutoEvents
 ```
 
 Stable id restoration:
@@ -684,7 +846,26 @@ characterId -> CharacterDataBase -> Character
 spawnId -> FieldBattleContext cleared spawn state
 chestId -> FieldBattleContext opened chest state
 tutorialId -> TutorialRuntimeState completed state
+eventId -> FieldAutoEventRuntimeState completed state
 ```
+
+Auto event save behavior:
+
+```text
+FieldAutoEventRuntimeState
+ -> runtime HashSet<string> completedEventIds
+ -> FieldAutoEventSaveData
+ -> serializable List<string> completedEventIds
+```
+
+Reason:
+
+- Runtime uses `HashSet` for quick duplicate checks.
+- Unity `JsonUtility` serializes the save DTO list.
+
+中文概括：
+
+存档系统把运行时数据转成 DTO，再写进 `save.json`。读取时通过各种 database 把 `itemId`、`characterId` 等稳定 ID 还原成运行时对象。现在保存内容包括背包、队伍、Field 状态、教程完成状态和自动剧情完成状态。
 
 ## 13. UI System
 
@@ -714,6 +895,7 @@ Current Field UI:
 - Interaction prompt for E interactions.
 - Dialogue panel.
 - Tutorial panel.
+- Demo end panel.
 
 ### 13.3 Battle UI
 
@@ -734,9 +916,66 @@ Popup semantics:
 - `ShowBattleEventPopup()` is for event messages such as group encounter.
 - `SkillNamePopController` keeps its old class name to preserve Unity Inspector bindings, but now acts as a shared battle popup component.
 
-## 14. Demo Route
+### 13.4 DemoEndPanel
 
-The current demo is moving toward a simple route:
+File:
+
+```text
+Assets/Scripts/UI/DemoEndController.cs
+```
+
+The demo end panel is the current v1 clear screen.
+
+Flow:
+
+```text
+FieldAutoDialogueEventController.onDialogueFinished
+ -> DemoEndController.ShowDemoEnd()
+ -> BasePanel.Show()
+ -> FieldPauseState.SetPaused(true)
+ -> BackToTitle button
+ -> SceneManager.LoadScene("TitleScene")
+```
+
+Notes:
+
+- `DemoEndPanel` uses `BasePanel` for CanvasGroup fade and input blocking.
+- `DemoEndController` intentionally pauses the Field again because `DialoguePanelController` releases `FieldPauseState` when dialogue ends.
+- The panel is a v1 closure point, not a final credits system.
+
+### 13.5 VN Dialogue Panel Preparation
+
+`Boss_FieldScene` currently contains a prepared VN-style dialogue layout:
+
+```text
+VNDialoguePanel
+├─ BackgroundImage
+├─ DimOverlay
+├─ LeftPortrait
+├─ RightPortrait
+└─ DialogueBox
+   ├─ SpeakerNameText
+   └─ DialogueText
+```
+
+Current status:
+
+- The layout exists as scene UI preparation.
+- Runtime dialogue still uses `DialoguePanelController`.
+- A dedicated `VNDialoguePanelController` is planned for a later cinematic version.
+
+中文：
+
+- `DemoEndPanel` 是 v1 的通关收尾。
+- `VNDialoguePanel` 是 v2 演出升级用的 UI 壳子，目前不是主流程必须项。
+
+中文概括：
+
+UI 系统基本都围绕 `BasePanel + CanvasGroup` 做显示和隐藏。Field UI 负责背包、队伍 HUD、E 提示、对话、教程和 Demo 结束面板；Battle UI 负责命令、技能、道具、行动条、奖励、升级和结算。VN 面板目前只是场景里的演出版布局，还没有接运行时控制器。
+
+## 14. Demo v1 Route
+
+The current Demo v1 route is a small graybox RPG flow:
 
 ```text
 Start
@@ -744,7 +983,10 @@ Start
  -> Chest
  -> Recruit Argo
  -> Group Encounter
+ -> Boss Field
  -> Boss
+ -> Ending Dialogue
+ -> Demo Clear
 ```
 
 Purpose:
@@ -754,8 +996,32 @@ Purpose:
 - Recruit Argo: party member join flow and load rollback test.
 - Group Encounter: nearby enemy group detection and visible link lines.
 - Boss: permanent clear, boss intro camera, stronger reward.
+- Ending Dialogue: auto story event after boss clear.
+- Demo Clear: explicit end point for portfolio review.
 
-This route is meant to prove that the systems are connected, not to be final level art.
+This route proves that the systems are connected. It is still graybox and not final level art.
+
+Current v1 completion marker:
+
+```text
+Boss defeated
+ -> boss_spawn_001 cleared
+ -> Boss_FieldScene reload / return
+ -> Boss ending auto dialogue starts
+ -> Dialogue ends
+ -> DemoEndPanel appears
+```
+
+中文：
+
+```text
+Demo v1 的路线已经有明确结束点。
+它现在可以作为“系统闭环版”展示，但还不是“美术完成版”。
+```
+
+中文概括：
+
+Demo v1 路线的作用是证明系统能串起来，而不是展示最终关卡美术。现在最重要的是确保玩家能沿着路线体验到宝箱、入队、普通战斗、联合遇敌、Boss 战和结尾面板。
 
 ## 15. Compatibility And Current Boundaries
 
@@ -773,18 +1039,26 @@ Current boundaries:
 - Equipment system is planned but not implemented.
 - Dialogue and recruit are connected, but a full quest/event system does not exist yet.
 - Tutorial exists, but more content needs to be authored.
-- Demo scene layout is still graybox / route planning stage.
+- Demo scene layout is still graybox.
+- DemoEndPanel is a v1 clear screen, not a full credits or ending sequence.
+- VNDialoguePanel is prepared in the scene, but runtime VN playback is not implemented yet.
+- Chest rewards work, but fully data-driven per-chest reward tables are still planned.
 - `EnemyFieldData` remains mainly for older field enemy compatibility.
+
+中文概括：
+
+当前项目已经能作为 v1 系统闭环 demo，但还有不少边界：装备系统未做、Buff 未实现、VN 演出未接入、宝箱奖励还没有完全 table 化、场景仍是灰盒。后续应该优先打磨流程和内容，而不是继续无限扩系统。
 
 ## 16. Recommended Next Steps
 
 Short-term portfolio tasks:
 
-1. Finish the demo route layout and make the path readable.
-2. Author battle tutorial content for attack, skill, item, run, and target selection.
-3. Add a simple ending point after the boss.
-4. Polish reward popup text and result flow.
+1. Run a full Demo v1 regression checklist.
+2. Make the graybox route more readable through layout, lighting, signs, and enemy placement.
+3. Author battle tutorial content for attack, skill, item, run, and target selection.
+4. Polish reward popup text, toast messages, and result flow.
 5. Add screenshots or diagrams to README.
+6. Decide the first visual direction for Boss Field and VN-style story presentation.
 
 Medium-term system tasks:
 
@@ -793,6 +1067,12 @@ Medium-term system tasks:
 3. Expand interactable data for portal / event / quest objects.
 4. Add save migration handling using `GameSaveData.version`.
 5. Clean up legacy encounter fields after all encounters use `enemyEntries`.
+6. Add data-driven chest reward configuration.
+7. Replace placeholder dialogue with authored opening and ending text.
+
+中文概括：
+
+短期目标应该是测试和打磨 v1：跑完整回归、整理路线可读性、补教程内容、改善 UI 提示。中期再做状态机、装备、宝箱奖励表、存档迁移和正式剧情文本。
 
 ## 17. Portfolio Summary
 
@@ -814,3 +1094,7 @@ One-sentence English summary:
 ```text
 Adventure of Paul Demo keeps heavy 3D scene authoring inside Unity while making RPG gameplay entities, encounters, rewards, runtime state, tutorials, and save data configurable through reusable data-driven systems.
 ```
+
+中文概括：
+
+这个项目展示的是一个回合制 RPG demo 的系统整合能力：Field 与 Battle 跨场景衔接、ScriptableObject 数据驱动、队伍和背包运行时状态、奖励结算、存档读档、宝箱、入队、教程、对话、联合遇敌、Boss 战和 Demo 通关流程。Demo v1 的价值在于它已经不是单个系统测试，而是一条可以从头走到尾的可玩流程。
