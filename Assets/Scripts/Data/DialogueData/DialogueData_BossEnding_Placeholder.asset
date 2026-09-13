@@ -20,11 +20,11 @@ MonoBehaviour:
     text: The boss is to strong. we can't defeat it.At list...Ted! take Argo and
       run .As Far away as you can!
   - speakerId: Argo_002
-    speakerName: 
+    speakerName: Argo
     portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
     text: What? Paul how can you doing that! I'm not letting you face this alone!
   - speakerId: Paul_001
-    speakerName: 
+    speakerName: Paul
     portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
     text: Sorry,but.. it's time to go.Ted!
   - speakerId: 
@@ -32,14 +32,14 @@ MonoBehaviour:
     portrait: {fileID: 0}
     text: Sorry Argo.but you need to live.
   - speakerId: Argo_002
-    speakerName: 
+    speakerName: Argo
     portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
     text: Ted ! You can't do it. Paul ! Paul !  You idiot !
   - speakerId: Paul_001
-    speakerName: 
+    speakerName: Paul
     portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
     text: I am so happy to meat you guys.Thank you ,all of you.I gusee this is goodbye
   - speakerId: Argo_002
-    speakerName: 
+    speakerName: Argo
     portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
     text: "Pau\u2014\u2014"
