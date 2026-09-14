@@ -11,6 +11,7 @@ public class FieldChestController : MonoBehaviour
     [SerializeField] private FieldInteractionPromptController promptController;
     [SerializeField] private FieldToastController toastController;
     [SerializeField] private List<InitialItemStack> rewards = new List<InitialItemStack>();
+    [SerializeField] private ChestRewardData rewardData;
     [SerializeField] private GameObject closedVisual;
     [SerializeField] private GameObject openedVisual;
 
@@ -101,9 +102,12 @@ public class FieldChestController : MonoBehaviour
 
     private void GiveRewards()
     {
+        
         StringBuilder rewardMessage = new StringBuilder();
-
-        foreach (InitialItemStack reward in rewards)
+        // 如果配置了 ChestRewardData，就使用数据表奖励。
+        // 否则继续使用旧的 Inspector rewards，保证旧宝箱不坏。
+        IEnumerable<InitialItemStack> rewardSource = rewardData != null ? rewardData.Rewards : rewards;
+        foreach (InitialItemStack reward in rewardSource)
         {
             if (reward == null || reward.item == null || reward.count <= 0)
                 continue;

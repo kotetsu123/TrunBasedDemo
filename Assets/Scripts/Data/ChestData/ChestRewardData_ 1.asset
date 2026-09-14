@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c961c740ddee24c92b90f42f0f11c1, type: 3}
+  m_Name: ChestRewardData_ 1
+  m_EditorClassIdentifier: 
+  chestId: chest_002
+  rewards:
+  - item: {fileID: 11400000, guid: 1dd1fab1a86b02e469020980ac42b0aa, type: 2}
+    count: 1
+  - item: {fileID: 11400000, guid: a49a2d6a79804c56a32d241a509c682f, type: 2}
+    count: 2
