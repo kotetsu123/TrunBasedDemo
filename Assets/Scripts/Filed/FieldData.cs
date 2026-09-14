@@ -32,12 +32,15 @@ public class FieldObjectEntry
 {
     [SerializeField] private string objectId;
     [SerializeField] private GameObject prefab;
+    [SerializeField] private ChestRewardData chestRewardData;
     [SerializeField] private Vector3 position;
     [SerializeField] private Vector3 rotationEuler;
     [SerializeField] private Vector3 scale = Vector3.one;
+    
 
     public string ObjectId => objectId;
     public GameObject Prefab => prefab;
+    public ChestRewardData ChestRewardData => chestRewardData;
     public Vector3 Position => position;
     public Quaternion Rotation => Quaternion.Euler(rotationEuler);
     public Vector3 Scale => scale;

@@ -72,10 +72,13 @@ public class FieldChestController : MonoBehaviour
             TryOpen();
     }
 
-    public void Configure(string newChestId)
+    public void Configure(string newChestId,ChestRewardData newRewardData)
     {
         if (!string.IsNullOrWhiteSpace(newChestId))
             chestId = newChestId;
+        //When field creator builds the chest, it will assign the ChestRewardData from the field data to the chest controller.
+        if (newRewardData!=null)
+            rewardData = newRewardData;
     }
 
     public void TryOpen()

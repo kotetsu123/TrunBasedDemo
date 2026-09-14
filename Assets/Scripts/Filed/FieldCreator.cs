@@ -168,7 +168,7 @@ public class FieldCreator : MonoBehaviour
             if (chest != null)
             {
                 fieldObject.transform.SetParent(GetInteractableRoot());
-                chest.Configure(entry.ObjectId);
+                chest.Configure(entry.ObjectId,entry.ChestRewardData);
             }
             else
             {
