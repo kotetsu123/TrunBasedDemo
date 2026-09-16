@@ -20,6 +20,7 @@ MonoBehaviour:
     position: {x: -10.19, y: 0.5, z: -9.42}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
+    isStationary: 0
     enemyId: 
     respawnType: 0
     respawnSeconds: 30
@@ -29,6 +30,7 @@ MonoBehaviour:
     position: {x: -1.57, y: 0.5, z: -2.8}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
+    isStationary: 0
     enemyId: 
     respawnType: 0
     respawnSeconds: 30
@@ -38,6 +40,7 @@ MonoBehaviour:
     position: {x: 6.97, y: 0.5, z: -2.48}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
+    isStationary: 0
     enemyId: 
     respawnType: 0
     respawnSeconds: 0
@@ -47,6 +50,7 @@ MonoBehaviour:
     position: {x: -5.6899996, y: 0.5, z: 9.46}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
+    isStationary: 0
     enemyId: 
     respawnType: 0
     respawnSeconds: 0
@@ -56,22 +60,26 @@ MonoBehaviour:
     position: {x: -3.23, y: 0.5, z: 9.46}
     rotationEuler: {x: 0, y: 0, z: 0}
     wanderRadius: 3
+    isStationary: 0
     enemyId: 
     respawnType: 0
     respawnSeconds: 0
   fieldObjects:
-  - objectId: Chest_001
+  - objectId: chest_001
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
+    chestRewardData: {fileID: 11400000, guid: a3e57674a0cf31e4481c1e17ce2a7906, type: 2}
     position: {x: 8.8, y: 0.5, z: -2.48}
     rotationEuler: {x: 0, y: 180, z: 0}
     scale: {x: 1, y: 1, z: 1}
-  - objectId: Chest_002
+  - objectId: chest_002
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
-    position: {x: 3.6, y: 0.5, z: 11.47}
+    chestRewardData: {fileID: 11400000, guid: f084922b5f57bff47bf6323965602d5e, type: 2}
+    position: {x: 9.64, y: 0.5, z: 4.42}
     rotationEuler: {x: 0, y: 180, z: 0}
     scale: {x: 1, y: 1, z: 1}
-  - objectId: Chest_003
+  - objectId: chest_003
     prefab: {fileID: 45645056354724239, guid: 721d5d675ee454d46942e72465407b18, type: 3}
+    chestRewardData: {fileID: 11400000, guid: 7885d0b496458094591b1bee9d4f98a5, type: 2}
     position: {x: 3.6, y: 0.5, z: 11.47}
     rotationEuler: {x: 0, y: 180, z: 0}
     scale: {x: 1, y: 1, z: 1}
