@@ -13,6 +13,8 @@ public class FieldAutoDialogueEventController : MonoBehaviour
     [Header("Dialogue")]
     [SerializeField] private DialogueData dialogueData;
     [SerializeField] private DialoguePanelController dialoguePanel;
+    [SerializeField] private bool useVnDialoguePanel;
+    [SerializeField] private VNDialoguePanelController vnDialoguePanel;
 
     [Header("Completion")]
     [SerializeField] private UnityEvent onDialogueFinished;
@@ -65,6 +67,12 @@ public class FieldAutoDialogueEventController : MonoBehaviour
         if (playDelaySeconds > 0f)
             yield return new WaitForSeconds(playDelaySeconds);
 
+        if (useVnDialoguePanel)
+        {
+            PlayVnDialogue();
+            yield break;
+        }
+
         if (dialoguePanel == null)
             dialoguePanel = DialoguePanelController.Current;
 
@@ -76,6 +84,21 @@ public class FieldAutoDialogueEventController : MonoBehaviour
         }
 
         dialoguePanel.Play(dialogueData, OnDialogueComplete);
+    }
+
+    private void PlayVnDialogue()
+    {
+        if (vnDialoguePanel == null)
+            vnDialoguePanel = VNDialoguePanelController.Current;
+
+        if (vnDialoguePanel == null)
+        {
+            Debug.LogWarning($"[FieldAutoDialogueEvent] VNDialoguePanelController is missing. eventId={eventId}");
+            isPlaying = false;
+            return;
+        }
+
+        vnDialoguePanel.Play(dialogueData, OnDialogueComplete);
     }
 
     private void OnDialogueComplete()
