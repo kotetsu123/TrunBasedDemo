@@ -8550,6 +8550,7 @@ GameObject:
   - component: {fileID: 1500991537}
   - component: {fileID: 1500991539}
   - component: {fileID: 1500991540}
+  - component: {fileID: 1500991541}
   m_Layer: 5
   m_Name: VNDialoguePanel
   m_TagString: Untagged
@@ -8601,6 +8602,28 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &1500991541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1500991536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afb5d8712e6ad9b4ab12e754b3dc7e42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasGroup: {fileID: 1500991540}
+  fadeDuration: 0.15
+  useInteraction: 1
+  speakerNameText: {fileID: 506917890}
+  dialogueText: {fileID: 174447554}
+  leftPortraitImage: {fileID: 561932547}
+  rightPortraitImage: {fileID: 1055910149}
+  inactivePortraitAlpha: 0.45
+  nextKey: 32
+  closeKey: 27
 --- !u!1 &1503692478
 GameObject:
   m_ObjectHideFlags: 0
@@ -11654,6 +11677,8 @@ MonoBehaviour:
   playDelaySeconds: 0.5
   dialogueData: {fileID: 11400000, guid: bbfde43229877974192f31f1e194f1aa, type: 2}
   dialoguePanel: {fileID: 587356434}
+  useVnDialoguePanel: 1
+  vnDialoguePanel: {fileID: 1500991541}
   onDialogueFinished:
     m_PersistentCalls:
       m_Calls:

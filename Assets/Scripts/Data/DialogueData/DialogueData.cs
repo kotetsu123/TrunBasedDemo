@@ -1,18 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum DialoguePortraitSide
+{
+    Left,
+    Right
+}
+
 [System.Serializable]
 public class DialogueLine
 {
     [SerializeField] private string speakerId;
     [SerializeField] private string speakerName;
     [SerializeField] private Sprite portrait;
+    [SerializeField] private DialoguePortraitSide portraitSide;
     [TextArea(2, 4)]
     [SerializeField] private string text;
 
     public string SpeakerId => speakerId;
     public string SpeakerName => speakerName;
     public Sprite Portrait => portrait;
+    public DialoguePortraitSide PortraitSide => portraitSide;
     public string Text => text;
 }
 

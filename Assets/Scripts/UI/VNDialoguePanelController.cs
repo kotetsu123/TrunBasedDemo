@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 public class VNDialoguePanelController : BasePanel
 {
@@ -10,7 +11,11 @@ public class VNDialoguePanelController : BasePanel
     [SerializeField] private TMP_Text dialogueText;
 
     [Header("Portrait")]
-    [SerializeField] private Image portraitImage;
+    [FormerlySerializedAs("portraitImage")]
+    [SerializeField] private Image leftPortraitImage;
+    [SerializeField] private Image rightPortraitImage;
+    [Range(0f, 1f)]
+    [SerializeField] private float inactivePortraitAlpha = 0.45f;
 
     [Header("Input")]
     [SerializeField] private KeyCode nextKey = KeyCode.Space;
@@ -61,6 +66,7 @@ public class VNDialoguePanelController : BasePanel
         onComplete = completeCallback;
         currentLineIndex = 0;
 
+        ResetPortraits();
         FieldPauseState.SetPaused(true);
         Show();
         RefreshLine();
@@ -94,11 +100,50 @@ public class VNDialoguePanelController : BasePanel
         if (dialogueText != null)
             dialogueText.text = line.Text;
 
-        if (portraitImage != null)
+        RefreshPortrait(line);
+    }
+
+    private void RefreshPortrait(DialogueLine line)
+    {
+        bool isLeftSpeaker = line.PortraitSide == DialoguePortraitSide.Left;
+        Image activePortrait = isLeftSpeaker ? leftPortraitImage : rightPortraitImage;
+        Image inactivePortrait = isLeftSpeaker ? rightPortraitImage : leftPortraitImage;
+
+        // Each side keeps its last portrait, while the current speaker is highlighted.
+        if (activePortrait != null && line.Portrait != null)
         {
-            portraitImage.sprite = line.Portrait;
-            portraitImage.enabled = line.Portrait != null;
+            activePortrait.sprite = line.Portrait;
+            activePortrait.enabled = true;
         }
+
+        SetPortraitAlpha(activePortrait, 1f);
+        SetPortraitAlpha(inactivePortrait, inactivePortraitAlpha);
+    }
+
+    private void ResetPortraits()
+    {
+        ResetPortrait(leftPortraitImage);
+        ResetPortrait(rightPortraitImage);
+    }
+
+    private static void ResetPortrait(Image portrait)
+    {
+        if (portrait == null)
+            return;
+
+        portrait.sprite = null;
+        portrait.enabled = false;
+        SetPortraitAlpha(portrait, 1f);
+    }
+
+    private static void SetPortraitAlpha(Image portrait, float alpha)
+    {
+        if (portrait == null)
+            return;
+
+        Color color = portrait.color;
+        color.a = alpha;
+        portrait.color = color;
     }
 
     private void CompleteDialogue()
@@ -109,6 +154,7 @@ public class VNDialoguePanelController : BasePanel
         onComplete = null;
         currentLineIndex = 0;
 
+        ResetPortraits();
         Hide();
         FieldPauseState.SetPaused(false);
         completeCallback?.Invoke();
