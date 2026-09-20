@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +25,7 @@ public class VNDialoguePanelController : BasePanel
     private DialogueData currentDialogue;
     private Action onComplete;
     private int currentLineIndex;
+    private Coroutine typewriterRoutine;
 
     public static VNDialoguePanelController Current { get; private set; }
 
@@ -66,6 +68,7 @@ public class VNDialoguePanelController : BasePanel
         onComplete = completeCallback;
         currentLineIndex = 0;
 
+        StopTypewriter();
         ResetPortraits();
         FieldPauseState.SetPaused(true);
         Show();
@@ -76,6 +79,13 @@ public class VNDialoguePanelController : BasePanel
     {
         if (currentDialogue == null)
             return;
+
+        // The first input completes the current sentence; the next input advances.
+        if (typewriterRoutine != null)
+        {
+            StopTypewriter();
+            return;
+        }
 
         currentLineIndex++;
 
@@ -97,10 +107,64 @@ public class VNDialoguePanelController : BasePanel
         if (speakerNameText != null)
             speakerNameText.text = line.SpeakerName;
 
-        if (dialogueText != null)
-            dialogueText.text = line.Text;
+        RefreshDialogueText(line.Text);
 
         RefreshPortrait(line);
+    }
+
+    private void RefreshDialogueText(string text)
+    {
+        if (dialogueText == null)
+            return;
+
+        StopTypewriter();
+        dialogueText.text = text ?? string.Empty;
+
+        if (!currentDialogue.UseTypewriter || string.IsNullOrEmpty(text))
+            return;
+
+        dialogueText.maxVisibleCharacters = 0;
+        dialogueText.ForceMeshUpdate();
+
+        int characterCount = dialogueText.textInfo.characterCount;
+        if (characterCount > 0)
+        {
+            typewriterRoutine = StartCoroutine(
+                RevealText(characterCount, currentDialogue.CharactersPerSecond));
+        }
+    }
+
+    private IEnumerator RevealText(int characterCount, float charactersPerSecond)
+    {
+        float visibleCharacterCount = 0f;
+        float safeSpeed = Mathf.Max(1f, charactersPerSecond);
+
+        // Field dialogue pauses gameplay, so the text uses unscaled time.
+        while (dialogueText != null && dialogueText.maxVisibleCharacters < characterCount)
+        {
+            visibleCharacterCount += safeSpeed * Time.unscaledDeltaTime;
+            dialogueText.maxVisibleCharacters = Mathf.Min(
+                characterCount,
+                Mathf.FloorToInt(visibleCharacterCount));
+            yield return null;
+        }
+
+        if (dialogueText != null)
+            dialogueText.maxVisibleCharacters = int.MaxValue;
+
+        typewriterRoutine = null;
+    }
+
+    private void StopTypewriter()
+    {
+        if (typewriterRoutine != null)
+        {
+            StopCoroutine(typewriterRoutine);
+            typewriterRoutine = null;
+        }
+
+        if (dialogueText != null)
+            dialogueText.maxVisibleCharacters = int.MaxValue;
     }
 
     private void RefreshPortrait(DialogueLine line)
@@ -154,6 +218,7 @@ public class VNDialoguePanelController : BasePanel
         onComplete = null;
         currentLineIndex = 0;
 
+        StopTypewriter();
         ResetPortraits();
         Hide();
         FieldPauseState.SetPaused(false);
