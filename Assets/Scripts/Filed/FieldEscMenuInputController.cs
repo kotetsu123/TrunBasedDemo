@@ -14,6 +14,10 @@ public class FieldEscMenuInputController : MonoBehaviour
         if (escPanel == null)
             return;
 
+        // Tutorial owns ESC while it is open, including its skip confirmation dialog.
+        if (TutorialPanelController.IsTutorialActive)
+            return;
+
         // Inventory gets the first chance to consume ESC, including the frame where it just closed itself.
         if (inventoryInputController != null && inventoryInputController.TryCloseByEsc())
             return;

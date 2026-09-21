@@ -23,6 +23,7 @@ public class TutorialPanelController : BasePanel
     private bool isSkipConfirmOpen;
 
     public static TutorialPanelController Current { get; private set; }
+    public static bool IsTutorialActive => Current != null && Current.currentTutorial != null;
 
     protected override void Awake()
     {

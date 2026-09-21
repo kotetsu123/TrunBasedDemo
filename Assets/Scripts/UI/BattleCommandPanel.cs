@@ -50,19 +50,27 @@ public class BattleCommandPanel : MonoBehaviour
     }
     public void OnClickAttack()
     {
-        OnCommandSelected?.Invoke(CommandType.Attack);
+        SelectCommand(CommandType.Attack);
     }
     public void OnClickSkill()
     {
-        OnCommandSelected?.Invoke(CommandType.Skill);
+        SelectCommand(CommandType.Skill);
     }
     public void OnClickItem()
     {
-        OnCommandSelected?.Invoke(CommandType.Item);
+        SelectCommand(CommandType.Item);
     }
     public void OnClickRun()
     {
-        OnCommandSelected?.Invoke(CommandType.Run);
+        SelectCommand(CommandType.Run);
+    }
+
+    private void SelectCommand(CommandType command)
+    {
+        if (TutorialPanelController.IsTutorialActive)
+            return;
+
+        OnCommandSelected?.Invoke(command);
     }
    
 }
