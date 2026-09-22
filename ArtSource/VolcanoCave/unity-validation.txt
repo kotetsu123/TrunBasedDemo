@@ -1,0 +1,11 @@
+Alignment: 26/26 wall origins within 2cm
+Original wall colliders unchanged
+New environment colliders: 0
+Exit trigger unchanged
+Reachable exit: true
+Reachable grid cells: 8797
+Triangles: 45328
+Renderers: 131
+Material slots: 131
+Shared materials: 5
+Shader errors: 0

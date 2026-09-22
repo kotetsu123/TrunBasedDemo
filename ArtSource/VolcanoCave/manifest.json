@@ -1,0 +1,14 @@
+{
+  "seed": 20260920,
+  "blender_version": "5.2.2 LTS",
+  "mesh_count": 129,
+  "triangles": 45328,
+  "exit_arch_center": [
+    11.962857723236084,
+    0,
+    15.479999542236328
+  ],
+  "wall_count": 26,
+  "material_slots_before": 524,
+  "material_slots_after": 129
+}

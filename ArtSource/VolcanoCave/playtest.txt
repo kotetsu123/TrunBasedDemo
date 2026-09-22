@@ -1,0 +1,21 @@
+Runtime environment smoke test; no player save files are written.
+DEFERRED: battle / battle-return tests per user request (forced battle Tutorial). Enemy colliders are disabled only in this temporary test session.
+PASS FildScene enters Play Mode
+PASS field enemies spawned
+PASS three chests spawned
+PASS recruit point spawned
+PASS player spawned
+PASS player start position preserved
+PASS occluding rock segments fade during camera sweep
+PASS previously faded segments restore full visibility
+PASS 36 camera poses: 3 locations x 4 azimuths x 3 pitches (-15,25,60)
+PASS physics traversal from spawn through center to exit approach: 108.0m, 228 waypoints, player remains grounded
+PASS chest interaction updates runtime state
+PASS Argo recruitment updates party
+PASS exit trigger loads Boss_FieldScene at BossFieldEntry
+PASS Boss return spawn preserved
+PASS environment survives scene round trips
+PASS opened chest survives scene round trip
+PASS recruited party survives scene round trip
+Editor frame draw calls (Game + open editor views, including shadows/light passes): 470; rendered triangles: 191114. Not a standalone player benchmark.
+PASS Runtime smoke sequence complete
