@@ -31,12 +31,14 @@ public class DialogueData : ScriptableObject
     [SerializeField] private List<DialogueLine> lines = new List<DialogueLine>();
 
     [Header("Presentation")]
+    [SerializeField] private Sprite background;
     [SerializeField] private bool useTypewriter;
     [Min(1f)]
     [SerializeField] private float charactersPerSecond = 40f;
 
     public string DialogueId => dialogueId;
     public IReadOnlyList<DialogueLine> Lines => lines;
+    public Sprite Background => background;
     public bool UseTypewriter => useTypewriter;
     public float CharactersPerSecond => charactersPerSecond;
 }

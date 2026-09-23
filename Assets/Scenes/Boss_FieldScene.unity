@@ -8619,6 +8619,7 @@ MonoBehaviour:
   useInteraction: 1
   speakerNameText: {fileID: 506917890}
   dialogueText: {fileID: 174447554}
+  backgroundImage: {fileID: 1813889201}
   leftPortraitImage: {fileID: 561932547}
   rightPortraitImage: {fileID: 1055910149}
   inactivePortraitAlpha: 0.45

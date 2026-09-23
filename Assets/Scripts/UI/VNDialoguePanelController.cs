@@ -11,6 +11,9 @@ public class VNDialoguePanelController : BasePanel
     [SerializeField] private TMP_Text speakerNameText;
     [SerializeField] private TMP_Text dialogueText;
 
+    [Header("Background")]
+    [SerializeField] private Image backgroundImage;
+
     [Header("Portrait")]
     [FormerlySerializedAs("portraitImage")]
     [SerializeField] private Image leftPortraitImage;
@@ -69,6 +72,7 @@ public class VNDialoguePanelController : BasePanel
         currentLineIndex = 0;
 
         StopTypewriter();
+        RefreshBackground();
         ResetPortraits();
         FieldPauseState.SetPaused(true);
         Show();
@@ -190,6 +194,25 @@ public class VNDialoguePanelController : BasePanel
         ResetPortrait(rightPortraitImage);
     }
 
+    private void RefreshBackground()
+    {
+        if (backgroundImage == null)
+            return;
+
+        // 每份 DialogueData 可以选择自己的 VN 背景；没有配置时隐藏背景图。
+        backgroundImage.sprite = currentDialogue.Background;
+        backgroundImage.enabled = currentDialogue.Background != null;
+    }
+
+    private void ResetBackground()
+    {
+        if (backgroundImage == null)
+            return;
+
+        backgroundImage.sprite = null;
+        backgroundImage.enabled = false;
+    }
+
     private static void ResetPortrait(Image portrait)
     {
         if (portrait == null)
@@ -219,6 +242,7 @@ public class VNDialoguePanelController : BasePanel
         currentLineIndex = 0;
 
         StopTypewriter();
+        ResetBackground();
         ResetPortraits();
         Hide();
         FieldPauseState.SetPaused(false);
