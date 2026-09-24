@@ -31,6 +31,7 @@ MonoBehaviour:
     isActing: 0
     isDead: 0
     isPlayer: 0
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   - characterId: test_001_A
@@ -51,6 +52,7 @@ MonoBehaviour:
     isActing: 0
     isDead: 0
     isPlayer: 0
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   - characterId: test_001_B
@@ -71,6 +73,7 @@ MonoBehaviour:
     isActing: 0
     isDead: 0
     isPlayer: 0
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   - characterId: test_001_C
@@ -91,6 +94,7 @@ MonoBehaviour:
     isActing: 0
     isDead: 0
     isPlayer: 0
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   - characterId: boss_001
@@ -111,5 +115,6 @@ MonoBehaviour:
     isActing: 0
     isDead: 0
     isPlayer: 0
+    enemyAiType: 1
     battleEnded: 0
     intent: 0

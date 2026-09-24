@@ -717,8 +717,9 @@ public class BattleManager : MonoBehaviour
     private SkillData ChooseEnemySkill(BaseController actor)
     {
         var skills = actor.Skills;
-      
-        if (actor.data.Hp < actor.data.MaxHp * 0.5f&&actor.healUsedCount<2)
+        bool canUseGenericHeal=actor.data.enemyAiType!=EnemyAiType.Boss;
+
+        if (canUseGenericHeal&&actor.data.Hp < actor.data.MaxHp * 0.5f&&actor.healUsedCount<2)
         {
             var heal = FindSkillByType(actor.Skills, SkillType.Heal);
        

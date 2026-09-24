@@ -39,7 +39,9 @@ public class Character
     public bool isActing;
     public bool isDead;
     public bool isPlayer;
-    public bool battleEnded; public ActionIntent intent = ActionIntent.Normal;
+    public EnemyAiType enemyAiType=EnemyAiType.Normal;
+    public bool battleEnded; 
+    public ActionIntent intent = ActionIntent.Normal;
 
    // public List<SkillData> skills;
 
@@ -133,6 +135,7 @@ public class Character
             isActing = this.isActing,
             isDead = this.isDead,
             isPlayer = this.isPlayer,
+            enemyAiType=this.enemyAiType,
             battleEnded = this.battleEnded,
             intent = this.intent
         };
