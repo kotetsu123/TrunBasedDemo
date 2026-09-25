@@ -25,7 +25,19 @@ public abstract class BaseController : MonoBehaviour
     [Header("Floating Text")]
     [SerializeField] private GameObject floatingTextPrefab;
     [SerializeField] private Transform floatringTexAnchor;
-    public IReadOnlyList<SkillData> Skills => skills;
+    public IReadOnlyList<SkillData> Skills
+    {
+        get
+        {
+            if (data!=null&&
+                data.Skills!=null&&
+                data.Skills.Count>0)
+            {
+                return data.Skills;
+            }
+            return skills;
+        }      
+    }
     public abstract bool isPlayer { get; }
    // public abstract bool isDead { get; }
     public virtual bool isDead=>data.isDead;

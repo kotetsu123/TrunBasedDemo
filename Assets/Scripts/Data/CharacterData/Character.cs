@@ -35,6 +35,11 @@ public class Character
 
     public Sprite Portrait;
 
+    [Header("Battle skills")]
+    [SerializeField]private List<SkillData> skills = new List<SkillData>();
+
+    public IReadOnlyList<SkillData> Skills => skills;
+
     public bool isOnField;
     public bool isActing;
     public bool isDead;
@@ -130,12 +135,13 @@ public class Character
             MaxActionValue = this.MaxActionValue,
 
             Portrait = this.Portrait,
+            skills = this.skills != null ? new List<SkillData>(this.skills) : new List<SkillData>(),
 
             isOnField = this.isOnField,
             isActing = this.isActing,
             isDead = this.isDead,
             isPlayer = this.isPlayer,
-            enemyAiType=this.enemyAiType,
+            enemyAiType = this.enemyAiType,
             battleEnded = this.battleEnded,
             intent = this.intent
         };
