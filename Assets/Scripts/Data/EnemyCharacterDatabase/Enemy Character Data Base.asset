@@ -27,6 +27,7 @@ MonoBehaviour:
     ActionValue: 0
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: f64590402d88d7f4f811915f9fb637d1, type: 3}
+    skills: []
     isOnField: 0
     isActing: 0
     isDead: 0
@@ -48,6 +49,7 @@ MonoBehaviour:
     ActionValue: -13.333331
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+    skills: []
     isOnField: 1
     isActing: 0
     isDead: 0
@@ -69,6 +71,7 @@ MonoBehaviour:
     ActionValue: -13.333331
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+    skills: []
     isOnField: 1
     isActing: 0
     isDead: 0
@@ -90,6 +93,7 @@ MonoBehaviour:
     ActionValue: -13.333331
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 0e5381affc0ad694fb4a2b0a21e47d61, type: 3}
+    skills: []
     isOnField: 1
     isActing: 0
     isDead: 0
@@ -111,6 +115,9 @@ MonoBehaviour:
     ActionValue: 0
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 531c2ee4a983c1744ac374c09e1791f1, type: 3}
+    skills:
+    - {fileID: 11400000, guid: edf50fd4ed016294da85a03b36c342b9, type: 2}
+    - {fileID: 11400000, guid: 98a4d05ce4017f949a04c792d3ed9d19, type: 2}
     isOnField: 1
     isActing: 0
     isDead: 0

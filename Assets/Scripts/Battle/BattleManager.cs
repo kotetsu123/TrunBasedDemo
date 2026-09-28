@@ -581,21 +581,41 @@ public class BattleManager : MonoBehaviour
     }
     IEnumerator WaitForEnemyAction(BaseController actor)
     {
-        yield return new WaitForSeconds(0.5f);//停顿一下
+        // 保留敌方回合开始前的短暂停顿。
+        yield return new WaitForSeconds(0.5f);
 
-        var skill=ChooseEnemySkill(actor);
-        /*if (skill == null)
+        SkillData skill = ChooseEnemySkill(actor);
+
+        if (skill == null)
         {
-            Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} has no usable skill.");
+            Debug.LogWarning(
+                $"[EnemyAI] {actor?.data?.Name} has no usable skill.");
             yield break;
-        }*/
-        var target = ChooseEnemyTarget(actor, skill);
-        /* if (target == null)
-         {
-             Debug.LogWarning($"[EnemyAI] {actor?.data?.Name} could not find a valid target for {skill.skillName}.");
-             yield break;
-         }*/
-       yield return StartCoroutine(PlayEnemyActionSequence(actor, target, skill));
+        }
+
+        // 群体技能不需要选择单个 target，
+        // 由群体行动协程统一取得全部存活对手。
+        if (skill.targetType == SkillTargetType.EnemyAll)
+        {
+            yield return StartCoroutine(
+                PlayEnemyAllActionSequence(actor, skill));
+        }
+        else
+        {
+            BaseController target =
+                ChooseEnemyTarget(actor, skill);
+
+            if (target == null)
+            {
+                Debug.LogWarning(
+                    $"[EnemyAI] {actor?.data?.Name} could not find " +
+                    $"a valid target for {skill.skillName}.");
+                yield break;
+            }
+
+            yield return StartCoroutine(
+                PlayEnemyActionSequence(actor, target, skill));
+        }
 
         yield return new WaitForSeconds(1f);
     }
@@ -682,6 +702,41 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(skilllimpactHoldTime);
         cameraDirector?.UnlockCamera();
     }
+    /// <summary>
+    /// 敌方对全部存活对手使用群体技能的行动流程。
+    /// </summary>
+    /// <param name="actor"></param>
+    /// <param name="skill"></param>
+    /// <returns></returns>
+    private IEnumerator PlayEnemyAllActionSequence(BaseController actor, SkillData skill)
+    {
+        if (actor == null || actor.data == null || skill == null)
+            yield break;
+        //在执行技能前，获取所有目标
+        List<BaseController> targets= GetAliveOpponentTargets(actor);
+
+        if (targets.Count == 0)
+            yield break;
+
+        cameraDirector?.LockCamera();
+        cameraDirector?.FocusPlayerGroup();
+        yield return new WaitForSeconds(skillCameraLeadTime);
+
+        yield return new WaitForSeconds(0.5f);
+        actor.UseSkillOnTargets(skill, targets);
+        //检查所有目标是否死亡
+        foreach(BaseController target in targets)
+        {
+            if (battleEnded)
+                break;
+            CheckBattleEnd(actor, target);
+        }
+        // 保留伤害结果的展示时间。
+        yield return new WaitForSeconds(skilllimpactHoldTime);
+
+        cameraDirector?.UnlockCamera();
+    }
+
     private void PlaySkillCamera(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
     {
         if (actor == null || skill == null)
@@ -764,7 +819,7 @@ public class BattleManager : MonoBehaviour
         }
         return result;
     }
-    private BaseController ChooseEnemyTarget(BaseController actor,SkillData skill)
+    private BaseController ChooseEnemyTarget(BaseController actor, SkillData skill)
     {
         if (actor == null || skill == null)
             return null;
@@ -781,7 +836,9 @@ public class BattleManager : MonoBehaviour
             case SkillTargetType.Self:
                 return actor;
             default:
-                return actor;
+                Debug.LogWarning($"[EnemyAI] Unsupported target type: {skill.targetType}");
+
+                return null;
         }
     }
     private BaseController GetBestHealTarget(BaseController actor)
@@ -1456,6 +1513,34 @@ public class BattleManager : MonoBehaviour
 
         int index = UnityEngine.Random.Range(0, candidates.Count);
         return candidates[index];
+    }
+    /// <summary>
+    /// 取得施法者敌对阵容当中，所有存活的目标单位
+    /// 群体攻击会使用这个函数来获取所有敌方目标
+    /// </summary>
+    /// <param name="actor"></param>
+    /// <returns></returns>
+    private List<BaseController> GetAliveOpponentTargets(BaseController actor)
+    {
+        List<BaseController>targets=new List<BaseController>();
+
+        if (actor == null || actor.data == null)
+            return targets;
+        foreach(BaseController unit in controllers)
+        {
+            if (unit == null || unit.data == null)
+                continue;
+            //跳过相同阵营的单位
+            if (unit.data.Team == actor.data.Team)
+                continue;
+            //群体攻击只作用于当前场中存在的单位
+            if (!unit.data.isOnField)
+                continue;
+            if (unit.isDead || unit.data.isDead || unit.data.Hp <= 0)
+                continue;
+            targets.Add(unit);
+        }
+        return targets;
     }
     private BaseController GetRandomAllyTarget(BaseController actor)
     {

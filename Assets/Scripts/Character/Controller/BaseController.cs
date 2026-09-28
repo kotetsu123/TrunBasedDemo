@@ -192,24 +192,62 @@ public abstract class BaseController : MonoBehaviour
         data.Hp = Mathf.Min(data.Hp, data.MaxHp);
         data.isDead = false;
     }
-    //ʹ�ü���
+    ///<summary>
+    ///对单个目标使用技能
+    ///</summary>
     public void UseSkill(SkillData skill, BaseController target)
     {
-        Debug.Log($"[UseSkill] actor={data.Name}, target={target?.data.Name}, skill={skill.skillName}, type={skill.skillType}, targetType={skill.targetType}");
+        
+        if (target == null || target.data == null)
+            return;
+        if (!TryBeginSkill(skill))
+            return;
+        ApplySkillEffect(skill, target);
+        CompleteSkillUse(skill);
+
+    }
+    public void UseSkillOnTargets(SkillData skill, IReadOnlyList<BaseController> targets)
+    {
+        if (targets == null || targets.Count == 0)
+            return;
+        if (!TryBeginSkill(skill))
+            return;
+        foreach(BaseController target in targets)
+        {
+            if (target == null || target.data == null)
+                continue;
+            ApplySkillEffect(skill, target);
+        }
+        CompleteSkillUse(skill);
+    }
+    /// <summary>
+    /// 开始一次使用技能，负责检查并且消耗mp
+    /// </summary>
+    private bool TryBeginSkill(SkillData skill)
+    {
+        if (skill == null || data == null)
+            return false;
         if (data.Mp < skill.mpCost)
         {
             Debug.Log("Not enough MP");
-            return;
+            return false;
         }
         BattleManager.Instance?.ShowSkillName(skill.skillName);
 
-        int prevMp = data.Mp; 
-        data.Mp-= skill.mpCost;
-        data.Mp = Mathf.Max(0, data.Mp);
+        int prevMp = data.Mp;
+        data.Mp = Mathf.Max(0, data.Mp - skill.mpCost);
         data.NotifyMpChange(prevMp, data.Mp);
 
-       // bool revivedTarget = false;
-
+        return true;
+    }
+    /// <summary>
+    /// 将技能效果应用到目标上
+    /// 这个函数不负责mp，因此可以被多次调用，适用于群体技能
+    /// </summary>
+    /// <param name="skill"></param>
+    /// <param name="target"></param>
+    private void ApplySkillEffect(SkillData skill, BaseController target)
+    {
         switch (skill.skillType)
         {
             case SkillType.Damage:
@@ -222,21 +260,26 @@ public abstract class BaseController : MonoBehaviour
             case SkillType.Heal:
                 {
                     Debug.Log("Heal branch entered");
-                    target.Heal(skill.power);
-                    if (data.Team == Team.Enemy)
-                    {
-                        healUsedCount++;
-                    }
+                    target.Heal(skill.power);                   
                     Debug.Log($"[SkillType HEAL]{data.Name} healed {target.data.Name} for {skill.power}");
                     break;
                 }
             case SkillType.Revive:
                 {
-                  target.Revive(skill.power);
+                    target.Revive(skill.power);
                     break;
                 }
-
-        }  
+        }
+    }
+    /// <summary>
+    /// 完成一次技能使用，记录只应计算一次的状态。
+    /// </summary>
+    private void CompleteSkillUse(SkillData skill)
+    {
+        if (skill.skillType == SkillType.Heal && data.Team == Team.Enemy)
+        {
+            healUsedCount++;
+        }
     }
     protected void ShowFloatingText(string message,Color color)
     {
