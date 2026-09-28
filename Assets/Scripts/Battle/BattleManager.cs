@@ -719,10 +719,21 @@ public class BattleManager : MonoBehaviour
             yield break;
 
         cameraDirector?.LockCamera();
-        cameraDirector?.FocusPlayerGroup();
+        if (cameraDirector != null)
+        {
+            cameraDirector.FocusActorTurnShot(actor);
+            yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+
+            //给施法者一个短暂的停顿，模拟施法动作
+            yield return new WaitForSeconds(0.25f);
+            //群体技能镜头聚焦玩家组
+            cameraDirector?.FocusPlayerGroup();
+            yield return new WaitUntil(()=> cameraDirector == null || !cameraDirector.IsMoving);
+        }
+        // 镜头到达玩家全队后稍微停顿，再结算伤害。
         yield return new WaitForSeconds(skillCameraLeadTime);
 
-        yield return new WaitForSeconds(0.5f);
+       
         actor.UseSkillOnTargets(skill, targets);
         //检查所有目标是否死亡
         foreach(BaseController target in targets)
