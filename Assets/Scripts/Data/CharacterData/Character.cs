@@ -6,6 +6,26 @@ using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
+[Serializable]
+public class EnemySkillWeightEntry
+{
+    [SerializeField] private SkillData skill;
+
+    [SerializeField, Min(0)]
+    private int weight = 1;
+
+    public SkillData Skill => skill;
+    public int Weight => Mathf.Max(0,weight);
+    public EnemySkillWeightEntry Copy()
+    {
+        return new EnemySkillWeightEntry
+        {
+            skill = this.skill,
+            weight = this.weight
+        };
+    }
+}
+
 
 [Serializable]
 public class Character
@@ -39,6 +59,10 @@ public class Character
     [SerializeField]private List<SkillData> skills = new List<SkillData>();
 
     public IReadOnlyList<SkillData> Skills => skills;
+
+    [Header("Enemy AI Skill Weights")]
+    [SerializeField]
+    private List<EnemySkillWeightEntry> enemySkillWeights = new List<EnemySkillWeightEntry>();
 
     public bool isOnField;
     public bool isActing;
@@ -84,6 +108,32 @@ public class Character
         Debug.Log($"[GainExp] {Name} after: Lv{Level}, Exp={Exp}/{GetExpToNextLevel()}, levelUps={levelUpCount}");
         return levelUpCount;
     }
+    /// <summary>
+    /// 获取当前角色使用指定技能时的AI权重
+    /// 没有单独配置的技能，返回默认权重1
+    /// </summary>
+    public int GetEnemySkillWeight(SkillData skill)
+    {
+        if (skill == null)
+        {
+            Debug.LogWarning($"[GetEnemySkillWeight] {Name} skill is null");
+            return 0;
+        }
+        //兼容尚未配置权重列表的旧角色数据
+        if(enemySkillWeights==null)
+            return 1;
+
+      foreach(EnemySkillWeightEntry entry in enemySkillWeights)
+        {
+            if (entry == null || entry.Skill != skill)
+                continue;
+           
+            return entry.Weight;
+        }
+      //没有特别配置时，保持所有技能等概率
+        return 1;
+    }
+
     public void LevelUp()
     {
         Level++;
@@ -135,7 +185,12 @@ public class Character
             MaxActionValue = this.MaxActionValue,
 
             Portrait = this.Portrait,
+
             skills = this.skills != null ? new List<SkillData>(this.skills) : new List<SkillData>(),
+
+            enemySkillWeights = this.enemySkillWeights != null
+            ? this.enemySkillWeights.ConvertAll(entry => entry != null ? entry.Copy() : null)
+            : new List<EnemySkillWeightEntry>(),
 
             isOnField = this.isOnField,
             isActing = this.isActing,
@@ -143,7 +198,8 @@ public class Character
             isPlayer = this.isPlayer,
             enemyAiType = this.enemyAiType,
             battleEnded = this.battleEnded,
-            intent = this.intent
+            intent = this.intent,
+
         };
     }
 }

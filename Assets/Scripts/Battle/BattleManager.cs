@@ -798,8 +798,8 @@ public class BattleManager : MonoBehaviour
        
         if (damageSkills.Count == 0)
             return null;
-        int index = UnityEngine.Random.Range(0, damageSkills.Count);      
-        return damageSkills[index];
+        
+        return ChooseWeightedEnemySkill(actor, damageSkills);
     }
     //单个
     private SkillData FindSkillByType(IReadOnlyList<SkillData> skills,SkillType type)
@@ -811,6 +811,67 @@ public class BattleManager : MonoBehaviour
             var skill = skills[i];
             if (skill != null && skill.skillType == type)
                 return skill;
+        }
+        return null;
+    }
+    /// <summary>
+    /// 根据当前角色配置的技能权重，从候选技能中抽取一个。
+    /// 没有配置权重的技能默认使用权重 1。
+    /// </summary>
+    private SkillData ChooseWeightedEnemySkill(BaseController actor,IReadOnlyList<SkillData> candidateSkills)
+    {
+        if (actor == null || actor.data == null)
+            return null;
+        if (candidateSkills == null || candidateSkills.Count == 0)
+            return null;
+        int totalWeight = 0;
+
+        //计算总权重
+        foreach(SkillData skill in candidateSkills)
+        {
+            if(skill==null)
+                continue;
+
+            int weight= actor.data.GetEnemySkillWeight(skill);
+            totalWeight += Mathf.Max(0,weight);
+        }
+        if (totalWeight <= 0)
+        {
+            Debug.LogWarning(
+           $"[EnemyAI] All skill weights are zero. " +
+           $"actor={actor.data.Name}");
+            return null;
+        }
+        //random.range 的 int版本不包含上限，所以这里用 totalWeight 作为上限
+        int roll=UnityEngine.Random.Range(0,totalWeight);
+        int accumulatedWeight= 0;
+
+        foreach(SkillData skill in candidateSkills)
+        {
+            if (skill == null)
+                continue;
+            int weight = Mathf.Max(
+                0,
+                actor.data.GetEnemySkillWeight(skill));
+
+            if (weight == 0)
+                continue;
+
+            int rangeStart = accumulatedWeight;
+            accumulatedWeight += weight;
+
+            if (roll < accumulatedWeight)
+            {
+                Debug.Log(
+                     $"[EnemyAI] Weighted skill selected. " +
+                     $"actor={actor.data.Name}, " +
+                     $"skill={skill.skillName}, " +
+                     $"roll={roll}, " +
+                     $"range=[{rangeStart}, {accumulatedWeight}), " +
+                     $"totalWeight={totalWeight}");
+
+                return skill;
+            }
         }
         return null;
     }
