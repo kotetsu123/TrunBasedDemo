@@ -837,10 +837,13 @@ public class BattleManager : MonoBehaviour
         }
         if (totalWeight <= 0)
         {
+            // Invalid weights should not make the enemy skip its turn.
             Debug.LogWarning(
-           $"[EnemyAI] All skill weights are zero. " +
-           $"actor={actor.data.Name}");
-            return null;
+                $"[EnemyAI] All candidate skill weights are zero. " +
+                $"Falling back to random selection. actor={actor.data.Name}");
+
+            int randomIndex = UnityEngine.Random.Range(0, candidateSkills.Count);
+            return candidateSkills[randomIndex];
         }
         //random.range 的 int版本不包含上限，所以这里用 totalWeight 作为上限
         int roll=UnityEngine.Random.Range(0,totalWeight);
