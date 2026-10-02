@@ -110,6 +110,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float skilllimpactHoldTime = 0.15f;
 
     private Dictionary<ItemData, int> _itemCounts = new Dictionary<ItemData, int>();
+    private readonly Dictionary<BaseController, Dictionary<SkillData, int>> _enemySkillCooldowns = new();
 
     private CommandType _currentCommand=CommandType.None;
 
@@ -590,6 +591,8 @@ public class BattleManager : MonoBehaviour
         {
             Debug.LogWarning(
                 $"[EnemyAI] {actor?.data?.Name} has no usable skill.");
+
+            AdvanceEnemySkillCooldowns(actor);
             yield break;
         }
 
@@ -616,6 +619,10 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(
                 PlayEnemyActionSequence(actor, target, skill));
         }
+
+        // Existing cooldowns advance once after this enemy finishes its own turn.
+        AdvanceEnemySkillCooldowns(actor);
+        RegisterEnemySkillCooldown(actor, skill);
 
         yield return new WaitForSeconds(1f);
     }
@@ -789,12 +796,13 @@ public class BattleManager : MonoBehaviour
         {
             var heal = FindSkillByType(actor.Skills, SkillType.Heal);
        
-            if (heal!=null&&GetBestHealTarget(actor)!=null)
+            if (heal != null && IsEnemySkillReady(actor, heal) && GetBestHealTarget(actor) != null)
             {
                 return heal;
             }
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
+        damageSkills.RemoveAll(skill => !IsEnemySkillReady(actor, skill));
        
         if (damageSkills.Count == 0)
             return null;
@@ -802,6 +810,68 @@ public class BattleManager : MonoBehaviour
         return ChooseWeightedEnemySkill(actor, damageSkills);
     }
     //µ¥¸ö
+    /// <summary>
+    /// Returns whether this enemy can currently select the skill.
+    /// </summary>
+    private bool IsEnemySkillReady(BaseController actor, SkillData skill)
+    {
+        if (actor == null || skill == null)
+            return false;
+
+        return !_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns)
+            || !cooldowns.TryGetValue(skill, out int remainingTurns)
+            || remainingTurns <= 0;
+    }
+
+    /// <summary>
+    /// Advances cooldowns only when the owning enemy completes one of its own turns.
+    /// </summary>
+    private void AdvanceEnemySkillCooldowns(BaseController actor)
+    {
+        if (actor == null
+            || !_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns))
+        {
+            return;
+        }
+
+        List<SkillData> skills = new List<SkillData>(cooldowns.Keys);
+
+        foreach (SkillData skill in skills)
+        {
+            int nextRemainingTurns = cooldowns[skill] - 1;
+
+            if (nextRemainingTurns <= 0)
+                cooldowns.Remove(skill);
+            else
+                cooldowns[skill] = nextRemainingTurns;
+        }
+
+        if (cooldowns.Count == 0)
+            _enemySkillCooldowns.Remove(actor);
+    }
+
+    /// <summary>
+    /// Starts the configured cooldown after the enemy has used the skill.
+    /// </summary>
+    private void RegisterEnemySkillCooldown(BaseController actor, SkillData skill)
+    {
+        if (actor == null || skill == null || skill.enemyCooldownTurns <= 0)
+            return;
+
+        if (!_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns))
+        {
+            cooldowns = new Dictionary<SkillData, int>();
+            _enemySkillCooldowns.Add(actor, cooldowns);
+        }
+
+        cooldowns[skill] = skill.enemyCooldownTurns;
+
+        Debug.Log(
+            $"[EnemyAI] Skill cooldown started. " +
+            $"actor={actor.data?.Name}, " +
+            $"skill={skill.skillName}, " +
+            $"turns={skill.enemyCooldownTurns}");
+    }
     private SkillData FindSkillByType(IReadOnlyList<SkillData> skills,SkillType type)
     {
         if (skills == null) return null;

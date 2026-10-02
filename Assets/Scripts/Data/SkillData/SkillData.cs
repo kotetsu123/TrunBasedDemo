@@ -10,6 +10,10 @@ public class SkillData : ScriptableObject
     public SkillTargetType targetType;
     public int mpCost;
     public int power;
+
+    [Header("Enemy AI")]
+    [Min(0)]
+    public int enemyCooldownTurns;
 }
 public enum SkillType
 {
