@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FieldCameraController : MonoBehaviour
 {
+    [SerializeField] private FieldCameraSettings cameraSettings;
+
     [SerializeField] private Transform target;
 
     [Header("Follow")]
@@ -20,12 +22,34 @@ public class FieldCameraController : MonoBehaviour
 
     private Vector3 followVelocity;
 
+    private void Awake()
+    {
+        ApplyDefaultCameraSettings();
+    }
+
     private void LateUpdate()
     {
         if (target == null) return;
 
         HandleCameraRotation();
         FollowTarget();
+    }
+    private void ApplyDefaultCameraSettings()
+    {
+        //如果没有配置时，使用inspector 当中的属性
+        if(cameraSettings==null)
+            return;
+
+        //应用配置文件中的属性
+        distance = cameraSettings.Distance;
+        height = cameraSettings.Height;
+        smoothTime = cameraSettings.SmoothTime;
+
+        pitch = cameraSettings.DefaultPitch;
+        rotateSpeed = cameraSettings.RotateSpeed;
+        minPitch = cameraSettings.MinPitch;
+        maxPitch = cameraSettings.MaxPitch;
+
     }
     private void HandleCameraRotation()
     {
