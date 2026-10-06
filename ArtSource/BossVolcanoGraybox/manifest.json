@@ -1,0 +1,16 @@
+{
+  "seed": 20261005,
+  "blender_version": "5.2.2 LTS",
+  "mesh_count": 1,
+  "vertices": 226,
+  "triangles": 448,
+  "dimensions_blender_xyz": [
+    40.97683334350586,
+    35.77445983886719,
+    24.64157485961914
+  ],
+  "pivot": "bottom center",
+  "material_slots": 1,
+  "closed_manifold": true,
+  "fbx": "Assets\\Art\\Environment\\VolcanoCave\\BossVolcano_Graybox.fbx"
+}
