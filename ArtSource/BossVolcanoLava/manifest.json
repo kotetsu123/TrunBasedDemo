@@ -1,0 +1,15 @@
+{
+  "reference": "ArtSource\\BossVolcanoGraybox\\BossVolcano_Graybox.blend",
+  "reference_sha256": "b248c41ea91c04523a1bd1c058d65da96f54b2140e82c2187873a34beb814d40",
+  "vertices": 1089,
+  "triangles": 1920,
+  "material_slots": 1,
+  "uv_layers": 1,
+  "front_unity": "-Z",
+  "placement": "front-right slope",
+  "surface_distance_min": 0.044236235320568085,
+  "surface_distance_max": 0.0763401985168457,
+  "fbx_roundtrip_max_error": 1.9073486328125e-06,
+  "unity_playmode_verified": false,
+  "fbx": "Assets\\Art\\Environment\\VolcanoCave\\BossVolcano_LavaFlow.fbx"
+}
