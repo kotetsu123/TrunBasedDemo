@@ -1,0 +1,108 @@
+{
+  "reference": "ArtSource/VolcanoCave/VolcanoCave.blend",
+  "reference_sha256": "8c895b1cbd2c4a49a6c231817f1eb97a99097bf93a6e5c188285a2855aff659e",
+  "reference_fbx_sha256": "6250d2fbefeda0ed98368bb7e57d0a866995601c5688b851a6dfd1a391fd67df",
+  "blender_version": "5.2.2 LTS",
+  "pivot": "bottom center",
+  "material": "VC_Rock",
+  "generated_colliders": false,
+  "unity_playmode_verified": false,
+  "assets": [
+    {
+      "name": "VC_Boulder_A",
+      "source_object": "Rim_0_00",
+      "selection": "all",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Boulder_A.fbx",
+      "dimensions_unity_xyz": [
+        3.5404927730560303,
+        5.800000190734863,
+        3.5052733421325684
+      ],
+      "vertices": 112,
+      "triangles": 208,
+      "pieces": 4,
+      "fbx_geometry_error": 4.3213367462158203e-07,
+      "fbx_color_error": 0.0
+    },
+    {
+      "name": "VC_Boulder_B",
+      "source_object": "Rim_1_02",
+      "selection": "all",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Boulder_B.fbx",
+      "dimensions_unity_xyz": [
+        3.8769400119781494,
+        4.0,
+        4.212497711181641
+      ],
+      "vertices": 112,
+      "triangles": 208,
+      "pieces": 4,
+      "fbx_geometry_error": 3.371747880871523e-07,
+      "fbx_color_error": 0.0
+    },
+    {
+      "name": "VC_Rock_Small_A",
+      "source_object": "Rim_0_08",
+      "selection": "secondary",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Rock_Small_A.fbx",
+      "dimensions_unity_xyz": [
+        0.9486154913902283,
+        1.600000023841858,
+        0.7789603471755981
+      ],
+      "vertices": 28,
+      "triangles": 52,
+      "pieces": 1,
+      "fbx_geometry_error": 1.1920928955078125e-07,
+      "fbx_color_error": 0.0
+    },
+    {
+      "name": "VC_Rock_Small_B",
+      "source_object": "Overhang_Corner_24_-22",
+      "selection": "all",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Rock_Small_B.fbx",
+      "dimensions_unity_xyz": [
+        1.6999999284744263,
+        0.4745238125324249,
+        1.8658759593963623
+      ],
+      "vertices": 28,
+      "triangles": 52,
+      "pieces": 1,
+      "fbx_geometry_error": 6.705522537231445e-08,
+      "fbx_color_error": 0.0
+    },
+    {
+      "name": "VC_Rubble_A",
+      "source_object": "Rubble_00",
+      "selection": "all",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Rubble_A.fbx",
+      "dimensions_unity_xyz": [
+        1.9406366348266602,
+        0.4059736132621765,
+        2.275486469268799
+      ],
+      "vertices": 100,
+      "triangles": 180,
+      "pieces": 5,
+      "fbx_geometry_error": 8.940696716308594e-08,
+      "fbx_color_error": 0.0
+    },
+    {
+      "name": "VC_Rubble_B",
+      "source_object": "Rubble_03",
+      "selection": "all",
+      "fbx": "Assets/Art/Environment/VolcanoCave/Rocks/VC_Rubble_B.fbx",
+      "dimensions_unity_xyz": [
+        1.369339942932129,
+        0.27803945541381836,
+        2.3147571086883545
+      ],
+      "vertices": 100,
+      "triangles": 180,
+      "pieces": 5,
+      "fbx_geometry_error": 8.940696716308594e-08,
+      "fbx_color_error": 0.0
+    }
+  ]
+}
