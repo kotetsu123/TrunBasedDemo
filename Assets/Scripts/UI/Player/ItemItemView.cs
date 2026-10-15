@@ -14,7 +14,7 @@ public class ItemItemView : MonoBehaviour
     private ItemData _itemData;
     private Action<ItemData> _onClick;
 
-    public void Bind(ItemData item, int count, Action<ItemData> onClick)
+    public void Bind(ItemData item, int count, Action<ItemData> onClick, bool canSelect = true)
     {
         _itemData = item;
         _onClick = onClick;
@@ -25,7 +25,7 @@ public class ItemItemView : MonoBehaviour
             ItemCountTxt.text = $"x{count}";
         if(button != null)
         {
-            button.interactable = count > 0;
+            button.interactable = count > 0 && canSelect;
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(HandleClick);
         }

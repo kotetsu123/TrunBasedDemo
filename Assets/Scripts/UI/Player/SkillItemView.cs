@@ -15,7 +15,7 @@ public class SkillItemView : MonoBehaviour
     private SkillData _skill;
     private Action<SkillData> _onClick;
 
-    public void Bind(SkillData skill,int currentMp,Action<SkillData> onClick)
+    public void Bind(SkillData skill,int currentMp,Action<SkillData> onClick,bool canSelect = true)
     {
         _skill = skill;
         _onClick = onClick;
@@ -23,7 +23,7 @@ public class SkillItemView : MonoBehaviour
         skillNameTxt.text=skill.skillName;
         mpCostTxt.text = $"MP{skill.mpCost}";
 
-        bool canUse=currentMp>=skill.mpCost;
+        bool canUse=currentMp>=skill.mpCost && canSelect;
         button.interactable = canUse;
 
         button.onClick.RemoveAllListeners();

@@ -12,6 +12,7 @@ public class SkillPanelController : BasePanel
     [SerializeField] private SkillItemView skillItemPrefab;
 
     private readonly List<SkillItemView> _items = new();
+    private BaseController _actor;
 
   protected override void Awake()
     {
@@ -26,6 +27,10 @@ public class SkillPanelController : BasePanel
     }
     public void OnClickSkill(SkillData skill)
     {
+        var battle = BattleManager.Instance;
+        if (battle == null || !battle.CanSelectSkill(_actor, skill))
+            return;
+
         OnSkillSelected?.Invoke(skill);
     }
     public void OnClickBack()
@@ -34,16 +39,22 @@ public class SkillPanelController : BasePanel
     }
     public void Rebuild(BaseController actor)
     {
-        Debug.Log($"[SkillPanelRebuild] actor name is {actor.name}");
+        _actor = actor;
         ClearItems();
-        if (actor == null) return;
+        if (actor == null || actor.data == null) return;
+
+        Debug.Log($"[SkillPanelRebuild] actor name is {actor.name}");
+        var battle = BattleManager.Instance;
 
         Debug.Log($"[SkillPanel] skill count = {actor.Skills.Count}");
         foreach (var skill in actor.Skills)
         {
+            if (skill == null) continue;
+
             Debug.Log($"[SkillPanel] create item for {skill.skillName}");
             var item = Instantiate(skillItemPrefab, contentRoot);
-            item.Bind(skill, actor.data.Mp, OnClickSkill);
+            bool canSelect = battle != null && battle.CanSelectSkill(actor, skill);
+            item.Bind(skill, actor.data.Mp, OnClickSkill, canSelect);
             _items.Add(item);
         }
     }

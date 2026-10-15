@@ -1747,6 +1747,8 @@ public class BattleManager : MonoBehaviour
     }
     private void HandleSkillSelected(SkillData skill)
     {
+        if (!CanSelectSkill(_currentActor, skill)) return;
+
         _selectedSkill = skill;
         skillPanel.Hide();
 
@@ -2094,7 +2096,25 @@ public class BattleManager : MonoBehaviour
     public bool CanUseItem(ItemData item)
     {
         /*return GetItemCount(item) > 0;*/
-        return IsBattleUsableItem(item) && InventoryRuntimeState.CanUseItem(item);
+        return IsBattleUsableItem(item) && InventoryRuntimeState.CanUseItem(item) &&
+            (item.itemtype != ItemType.Revive || HasDeadAllyTarget(_currentActor));
+    }
+    public bool CanSelectSkill(BaseController actor, SkillData skill)
+    {
+        if (actor == null || actor.data == null || skill == null)
+            return false;
+        if (actor.data.Mp < skill.mpCost)
+            return false;
+
+        return skill.targetType != SkillTargetType.AllyDeadSingle || HasDeadAllyTarget(actor);
+    }
+    private bool HasDeadAllyTarget(BaseController actor)
+    {
+        if (actor == null || actor.data == null || formation == null)
+            return false;
+
+        return formation.GetDeadPlayersInSlotOrder().Any(target =>
+            target.data.Team == actor.data.Team);
     }
     private bool IsBattleUsableItem(ItemData item)
     {

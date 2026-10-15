@@ -48,7 +48,7 @@ public class ItemPanelController : BasePanel
             int count = battle.GetItemCount(item);
 
             var view = Instantiate(itemViewPrefab, contentRoot);
-            view.Bind(item, count, HandleItemClicked);
+            view.Bind(item, count, HandleItemClicked, battle.CanUseItem(item));
             _spwanItems.Add(view);
         }
        
