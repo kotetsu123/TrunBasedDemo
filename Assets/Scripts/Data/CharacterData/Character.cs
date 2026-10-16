@@ -139,10 +139,7 @@ public class Character
         Level++;
 
         //每升一级，增加10点攻击力和5点最大HP
-        MaxHp += 5;
-        MaxMp += 5;
-        Attack += 10;
-        Speed += 0.5f;
+        ApplyLevelStatGrowth(1);
         //HP和MP回复满
         int prevHp = Hp;
         int prevMp = Mp;
@@ -154,6 +151,17 @@ public class Character
         NotifyMpChange(prevMp, Mp);
 
         Debug.Log($"[LevelUp] {Name} leveled up! -> Lv.{Level}");
+    }
+    // Legacy saves share these rules without changing level, refilling HP/MP, or publishing events.
+    internal void ApplyLevelStatGrowth(int levelCount)
+    {
+        if (levelCount <= 0)
+            return;
+
+        MaxHp += 5 * levelCount;
+        MaxMp += 5 * levelCount;
+        Attack += 10 * levelCount;
+        Speed += 0.5f * levelCount;
     }
     public int GetExpToNextLevel()
     {

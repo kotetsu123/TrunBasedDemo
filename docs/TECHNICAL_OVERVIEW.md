@@ -92,7 +92,7 @@ The existing folder name `Filed` and class names such as `FiledPartyHudItem` are
 
 `Character` is a serializable C# class, not a ScriptableObject asset by itself. Character database assets contain lists of these templates.
 
-Battle spawning, recruitment, and loading use character copies. However, `PartyRuntimeState.InitializeIfEmpty` currently adds initial party members directly from the supplied list. Initial setup is therefore not a universal deep-copy boundary.
+Initial party setup, battle spawning, recruitment, and loading use `Character.Copy()` so runtime stat changes do not modify character templates. Configuration references such as portraits and skills are still shared.
 
 ### ID Dictionary
 
@@ -633,7 +633,7 @@ Character growth currently includes:
 | Per-level Attack / Speed | +10 / +0.5 |
 | On level-up | Refill HP and MP |
 
-Growth is therefore not limited to HP and MP. Saving all derived growth correctly is a separate concern covered in the persistence limitations.
+Growth is therefore not limited to HP and MP. Saves retain Attack and Speed alongside HP/MP and progression. `Character.ApplyLevelStatGrowth` shares the numeric growth rules between normal level-up and legacy-save reconstruction; only normal level-up refills resources and publishes change events.
 
 ### Logical Point and Visual Child
 
@@ -844,7 +844,7 @@ SaveSystem builds a snapshot and writes:
 | --- | --- |
 | GameSaveData | Version 1 plus inventory, party, Field, tutorial, auto-event snapshots |
 | InventorySaveData | Ordered slots, itemId, count, and empty entries |
-| PartySaveData | Ordered members, characterId, HP/max HP, MP/max MP, level, EXP, isDead |
+| PartySaveData | Ordered members, characterId, HP/max HP, MP/max MP, level, EXP, Attack, Speed, hasCombatStats, isDead |
 | FieldSaveData | Scene name, optional player position/Euler rotation, cleared spawn IDs, UTC records, opened chest IDs |
 | TutorialSaveData | Completed tutorial IDs |
 | FieldAutoEventSaveData | Completed automatic event IDs |
@@ -873,11 +873,15 @@ Missing database references/IDs produce warnings; they are not harmless placehol
 
 Load buttons use HasSaveFile to disable the no-file path. File existence is not proof that JSON content is valid or all referenced IDs can be resolved.
 
+Each new party-member snapshot sets `hasCombatStats` and restores the saved Attack/Speed exactly, including zero values. Old snapshots lack this marker, so loading reconstructs growth from the saved level relative to the template's level using the current shared growth rules. Saved HP/MP and their maxima are then restored without triggering level-up healing or events. Saving again writes the migrated stats and marker.
+
+Legacy reconstruction assumes the templates and growth rules still match the old playthrough. Historical custom stat changes absent from the old save cannot be recovered exactly.
+
 ### Current Persistence Boundaries
 
 | Boundary | Consequence |
 | --- | --- |
-| Attack, Speed, and maximum action value are not stored/recomputed from level | Loading a leveled character can restore level/HP/MP but use template combat stats |
+| Maximum action value remains template-driven | It is not changed by the current level-up rules or saved separately; future persistent modifiers need an explicit snapshot policy |
 | No complete in-place Field rebuild on Load | Existing chest/enemy visuals are not universally reconciled; recruitment has a dedicated refresh |
 | Auto ending checks run at Start | Loading progress into the same active scene does not automatically rerun that startup check |
 | Single file; Save uses direct write | No multi-slot UI, atomic replacement, backup recovery, or migration pipeline |
@@ -888,7 +892,7 @@ Load buttons use HasSaveFile to disable the no-file path. File existence is not 
 
 “Serializable snapshots are implemented” is accurate. “Save/Load restores every possible runtime state” is not.
 
-**中文概括：** Save 是把实时状态转成 DTO 再写 JSON；Load 是用 ID 查模板，再用保存的数值重建 RuntimeState。存档已经覆盖队伍、背包、位置、清怪、宝箱、教程和自动剧情，但成长后的 Attack/Speed 还没完整保存或重算，同场景读档也不是自动重建全部对象。损坏文件、备份与迁移仍是缺口。
+**中文概括：** Save 是把实时状态转成 DTO 再写 JSON；Load 是用 ID 查模板，再用保存的数值重建 RuntimeState。新存档完整保存 Attack/Speed，旧存档按模板等级和共用升级规则补回成长，再次保存会写入新字段。同场景读档仍不是自动重建全部对象，损坏文件、备份与通用迁移仍是缺口。
 
 ## 20. Current Content and Configuration Recipes
 
@@ -987,7 +991,7 @@ These foundations are enough to support a scoped playable demo. They are not a r
 | Equipment | Equipment data, slots, stat application, UI, and persistence |
 | Item effects | Complete buff-item execution and richer effect rules |
 | Boss behavior | More authored skills/conditions, affordability-aware selection, success-aware cooldown registration |
-| Growth persistence | Save or deterministically recompute Attack/Speed and other derived stats |
+| Future stat persistence | Extend snapshots when equipment, buffs, or other persistent derived stats are introduced; current level-up Attack/Speed are saved |
 | Load robustness | Atomic/backup save, guarded read/parse, migration, full in-place object reconciliation |
 | Field navigation | Pathfinding rather than direct movement plus stuck recovery |
 | Pause ownership | Coordinated modal ownership rather than one shared bool |

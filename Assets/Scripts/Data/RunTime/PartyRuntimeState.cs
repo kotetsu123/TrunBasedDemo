@@ -67,7 +67,7 @@ public class PartyRuntimeState
             if (member == null)
                 continue;
 
-            partyMembers.Add(member);
+            partyMembers.Add(member.Copy());
         }
 
         Debug.Log($"[PartyRunTimeState] Initialized party count={partyMembers.Count}");
@@ -256,6 +256,9 @@ public class PartyRuntimeState
                 memberSave.maxMp = member.MaxMp;
                 memberSave.level = member.Level;
                 memberSave.exp = member.Exp;
+                memberSave.hasCombatStats = true;
+                memberSave.attack = member.Attack;
+                memberSave.speed = member.Speed;
                 memberSave.isDead = member.isDead;
             }
 
@@ -294,11 +297,23 @@ public class PartyRuntimeState
             // Copy the database character before applying save data so runtime changes do not modify source data.
             Character runtimeMember = baseCharacter.Copy();
 
+            runtimeMember.Level = Mathf.Max(1, memberSave.level);
+            if (memberSave.hasCombatStats)
+            {
+                runtimeMember.Attack = memberSave.attack;
+                runtimeMember.Speed = memberSave.speed;
+            }
+            else
+            {
+                // Older saves kept the level but not Attack/Speed. Rebuild growth without level-up side effects.
+                int levelsGained = Mathf.Max(0, runtimeMember.Level - Mathf.Max(1, baseCharacter.Level));
+                runtimeMember.ApplyLevelStatGrowth(levelsGained);
+            }
+
             runtimeMember.MaxHp = memberSave.maxHp;
             runtimeMember.Hp = Mathf.Clamp(memberSave.hp, 0, runtimeMember.MaxHp);
             runtimeMember.MaxMp = memberSave.maxMp;
             runtimeMember.Mp = Mathf.Clamp(memberSave.mp, 0, runtimeMember.MaxMp);
-            runtimeMember.Level = Mathf.Max(1, memberSave.level);
             runtimeMember.Exp = Mathf.Max(0, memberSave.exp);
             runtimeMember.isDead = memberSave.isDead || runtimeMember.Hp <= 0;
 

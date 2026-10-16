@@ -90,7 +90,7 @@ Build Settings 中启用的场景是 `TitleScene`、`FildScene`、`BattleScene` 
 
 `Character` 是一个可序列化的 C# 类，本身并不是 ScriptableObject 资源。角色数据库资源中保存的是这些模板的列表。
 
-战斗生成、入队和读档会使用角色副本。不过，`PartyRuntimeState.InitializeIfEmpty` 目前会直接把传入列表中的初始成员加入队伍。因此，不能把所有初始化过程都视为已经完成深拷贝的边界。
+初始队伍创建、战斗生成、入队和读档都使用 `Character.Copy()`，避免运行时属性变化修改角色模板。头像和技能等配置资源引用仍然共享。
 
 ### ID 对照表
 
@@ -609,7 +609,7 @@ PartyRuntimeState 按顺序保存队伍，也包含死亡成员。回写按稳�
 | 每级 Attack / Speed | +10 / +0.5 |
 | 升级时 | 补满 HP 和 MP |
 
-因此，成长并不局限于 HP 和 MP。如何正确保存所有成长后的属性是另一个问题，见持久化限制部分。
+因此，成长并不局限于 HP 和 MP。存档会同时保留 Attack、Speed、HP/MP 和成长进度。`Character.ApplyLevelStatGrowth` 让正常升级和旧存档恢复共用数值成长规则；只有正常升级会补满 HP/MP 并发布变化事件。
 
 ### 逻辑点与视觉子节点
 
@@ -810,7 +810,7 @@ SaveSystem 构建快照，并写入：
 | --- | --- |
 | GameSaveData | 版本号 1，以及背包、队伍、Field、教程和自动事件快照 |
 | InventorySaveData | 有序格子、itemId、数量，以及空条目 |
-| PartySaveData | 有序成员、characterId、HP/最大 HP、MP/最大 MP、等级、EXP、isDead |
+| PartySaveData | 有序成员、characterId、HP/最大 HP、MP/最大 MP、等级、EXP、Attack、Speed、hasCombatStats、isDead |
 | FieldSaveData | 场景名、可选的玩家位置与欧拉角旋转、已清除 spawn ID、UTC 记录、已开启 chest ID |
 | TutorialSaveData | 已完成教程 ID |
 | FieldAutoEventSaveData | 已完成自动事件 ID |
@@ -839,11 +839,15 @@ Title Load 恢复状态、清除临时战斗返回数据，并加载存档中的
 
 Load 按钮使用 HasSaveFile 禁用无文件时的入口。文件存在，并不能证明 JSON 内容有效，也不能证明里面所有 ID 都能解析。
 
+新队员快照会设置 `hasCombatStats`，并在读取时原样恢复保存的 Attack/Speed，包括零值。旧快照没有这个标记，因此读取时会根据保存等级与模板等级的差值，使用当前共用成长规则补回属性。随后恢复保存的 HP/MP 与上限，不触发升级回血或升级事件。再次保存会写入恢复后的属性和标记。
+
+旧存档恢复以角色模板和成长规则没有偏离当时版本为前提。旧文件中未记录的历史自定义属性变化，无法精确还原。
+
 ### 当前持久化边界
 
 | 边界 | 影响 |
 | --- | --- |
-| Attack、Speed 和最大行动值没有保存，也没有按等级重新计算 | 读取升级角色时，等级、HP/MP 可以恢复，但战斗属性可能使用模板值 |
+| 最大行动值仍来自模板 | 当前升级规则不改变它，也没有单独保存；未来加入永久属性修正时，需要明确快照策略 |
 | Load 不会完整地原地重建 Field | 不会统一校正所有现有宝箱与敌人视觉；入队有专门刷新 |
 | 自动结局条件在 Start 中检查 | 把进度加载到当前活动场景时，不会自动重新运行启动检查 |
 | 单文件，Save 直接写入 | 没有多存档槽 UI、原子替换、备份恢复或迁移流程 |
@@ -947,7 +951,7 @@ Boss 角色当前拥有 Fire 与 MagmaBurst，权重分别为 3 和 1。MagmaBur
 | 装备 | 装备数据、槽位、属性应用、UI 和持久化 |
 | 道具效果 | 完整 buff 道具执行，以及更丰富的效果规则 |
 | Boss 行为 | 更多技能与条件、考虑可支付消耗的选择，以及根据执行成功与否登记冷却 |
-| 成长持久化 | 保存 Attack/Speed 和其他派生属性，或根据规则确定性地重新计算 |
+| 未来属性持久化 | 引入装备、buff 或其他需要持久化的派生属性时扩展快照；当前升级后的 Attack/Speed 已保存 |
 | Load 可靠性 | 原子或备份存档、带防护的读取与解析、迁移，以及完整的原地对象状态同步 |
 | Field 导航 | 寻路，而不是直接移动加卡住恢复 |
 | 暂停归属 | 协调模态界面的暂停所属关系，而不是一个共用 bool |

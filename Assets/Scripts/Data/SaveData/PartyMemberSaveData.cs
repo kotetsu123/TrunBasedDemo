@@ -17,6 +17,11 @@ public class PartyMemberSaveData
     public int level;
     public int exp;
 
+    // Distinguish legacy saves from valid saved zero values.
+    public bool hasCombatStats;
+    public int attack;
+    public float speed;
+
     public bool isDead;
     
 }
