@@ -1,0 +1,16 @@
+Runtime cave smoke test. Enemy encounters are disabled only in this temporary session. No save writes.
+Spawned enemies: 5; chests: 3
+Physical route available to (-10.00, 0.50, -9.50) (40 cells)
+Physical route available to (7.50, 0.50, -2.48) (49 cells)
+Physical route available to (0.80, 0.50, 3.80) (27 cells)
+Physical route available to (6.10, 0.50, 4.42) (12 cells)
+Physical route available to (8.40, 0.50, 4.42) (4 cells)
+Physical route available to (-5.69, 0.50, 9.46) (38 cells)
+Physical route available to (2.80, 0.50, 10.00) (19 cells)
+Physical route available to (-11.00, 0.50, 13.00) (37 cells)
+Physical route available to (10.43, 0.50, 15.48) (54 cells)
+Progress 64/280 at (-4.39, 0.52, -2.77) rotation (0.00, 58.04, 0.00)
+Progress 127/280 at (5.83, 0.51, 4.25) rotation (0.00, 87.83, 0.00)
+Progress 191/280 at (2.08, 0.51, 9.76) rotation (0.00, 231.50, 0.00)
+Progress 256/280 at (0.62, 0.51, 17.25) rotation (0.00, 90.05, 0.00)
+PASS Walked 132.3m through 280 waypoints; grounded; camera inside; runtime errors: 0

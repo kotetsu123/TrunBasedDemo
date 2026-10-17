@@ -1,0 +1,14 @@
+Carved tunnel layout v2
+Gameplay transforms/colliders unchanged
+Original graybox retained, inactive walls: 26/26
+Exit reachable: True
+All objectives reachable: 11
+Reachable half-meter cells: 1160
+Ceiling coverage rays: 1160
+Camera poses: 624
+Constrained camera poses: 576
+Triangles: 62548
+Old-save recovery cases: 3
+Shader errors: 0
+Edit-mode physics checks; not a full playthrough.
+Saved scene reload: PASS
