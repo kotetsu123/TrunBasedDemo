@@ -4,6 +4,7 @@ public class FieldEscMenuInputController : MonoBehaviour
 {
     [SerializeField] private FieldEscMenuPanelController escPanel;
     [SerializeField] private FieldInventoryInputController inventoryInputController;
+    [SerializeField] private FieldStatusPanelController statusPanel;
     [SerializeField] private KeyCode toggleKey = KeyCode.Escape;
 
     private void Update()
@@ -16,6 +17,9 @@ public class FieldEscMenuInputController : MonoBehaviour
 
         // Tutorial owns ESC while it is open, including its skip confirmation dialog.
         if (TutorialPanelController.IsTutorialActive)
+            return;
+
+        if (statusPanel != null && statusPanel.TryCloseByEsc())
             return;
 
         // Inventory gets the first chance to consume ESC, including the frame where it just closed itself.

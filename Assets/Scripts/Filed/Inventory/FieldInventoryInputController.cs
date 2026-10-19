@@ -5,6 +5,7 @@ using UnityEngine;
 public class FieldInventoryInputController : MonoBehaviour
 {
     [SerializeField] private FieldInventoryPanelController inventorypanel;
+    [SerializeField] private FieldStatusPanelController statusPanel;
     [SerializeField] private KeyCode toggleKey = KeyCode.B;
     [SerializeField] private KeyCode closeKey = KeyCode.Escape;
 
@@ -15,6 +16,9 @@ public class FieldInventoryInputController : MonoBehaviour
 
     private void Update()
     {
+        if (statusPanel != null && (statusPanel.IsShowing || statusPanel.ClosedThisFrame))
+            return;
+
         if (Input.GetKeyDown(toggleKey))
         {
             ToggleInventory();

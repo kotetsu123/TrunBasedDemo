@@ -9,6 +9,7 @@ public class FieldEscMenuPanelController : BasePanel
     [SerializeField] private Button saveButton;
     [SerializeField] private Button loadButton;
     [SerializeField] private Button closeButton;
+    [SerializeField] private Button statusButton;
 
     [Header("Load Data")]
     [SerializeField] private ItemDataBase itemDataBase;
@@ -19,6 +20,7 @@ public class FieldEscMenuPanelController : BasePanel
     [SerializeField] private FieldInventoryPanelController inventoryPanel;
     [SerializeField] private FieldPartyHudController partyHudController;
     [SerializeField] private FieldToastController toastController;
+    [SerializeField] private FieldStatusPanelController statusPanel;
 
     [Header("Message")]
     [SerializeField] private TMP_Text messageText;
@@ -35,6 +37,8 @@ public class FieldEscMenuPanelController : BasePanel
             loadButton.onClick.AddListener(OnClickLoad);
         if (closeButton != null)
             closeButton.onClick.AddListener(OnClickClose);
+        if (statusButton != null)
+            statusButton.onClick.AddListener(OnClickStatus);
     }
 
     private void OnDestroy()
@@ -45,6 +49,8 @@ public class FieldEscMenuPanelController : BasePanel
             loadButton.onClick.RemoveListener(OnClickLoad);
         if (closeButton != null)
             closeButton.onClick.RemoveListener(OnClickClose);
+        if (statusButton != null)
+            statusButton.onClick.RemoveListener(OnClickStatus);
     }
 
     public override void Show()
@@ -93,6 +99,7 @@ public class FieldEscMenuPanelController : BasePanel
         // Loading in the same Field scene already applies position through FieldSaveContext.
         inventoryPanel?.Refresh();
         partyHudController?.Refresh();
+        statusPanel?.Refresh();
         const string loadedMessage = "Loaded";
         SetMessage(loadedMessage);
         ShowToast(loadedMessage);
@@ -102,6 +109,11 @@ public class FieldEscMenuPanelController : BasePanel
     {
         Hide();
         FieldPauseState.SetPaused(false);
+    }
+
+    public void OnClickStatus()
+    {
+        statusPanel?.OpenFromMenu(this);
     }
 
     private void RefreshLoadButtonState()
