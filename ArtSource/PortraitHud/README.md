@@ -1,0 +1,9 @@
+# Portrait HUD Frame
+
+Runtime asset: `Assets/Art/UI/PortraitHudFrame.png`.
+
+Generated with the built-in image generation tool on 2026-10-19. The PNG has a transparent center and background. Resource arcs and character portraits are separate Unity UI elements, not baked into the frame.
+
+## Final Prompt
+
+Use case: stylized-concept. Asset type: production 2D Unity RPG HUD portrait FRAME sprite, single isolated cutout on genuine transparent background. Create an original understated fantasy circular portrait frame inspired by early-2000s Chinese fantasy RPG interfaces. ONLY the empty decorative frame, no portrait, no character, no background, no colored health or mana bars, no text or symbols. Square canvas. The circular transparent aperture must be precisely centered in the canvas and occupy 76 percent of the canvas width; the slim round structural rim has outer diameter 86 percent of canvas width. The center opening is completely transparent, not a dark disc. The round rim should be thin blue-grey oxidized silver with engraved curling cloud motifs, subtle cool blue enamel recessed edges, restrained silver highlights, hand-painted game UI texture. A compact elegant pair of cloud-scroll flourishes grows from the lower-right rim into the bottom-right margin, staying inside the canvas, not a large wing. Keep the left half and top edge simple, since animated resource arcs will be overlaid just outside the main circular rim. Orthographic front view, no perspective. Strong clean silhouette readable at only 120 pixels, crisp anti-aliased edges, restrained detail, sophisticated rather than chunky. Avoid neon cyan, thick tubing, futuristic gauges, clock faces, gold, jewels, excessive spikes, elaborate heraldry, drop shadows outside the sprite, any filled center. True transparent background and transparent aperture.

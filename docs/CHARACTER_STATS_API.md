@@ -66,10 +66,20 @@ statsController.SelectPreviousMember();
 
 `FildScene` 和 `Boss_FieldScene` 已接入 `Assets/Prefabs/UI/FieldUI/StatusPanel.prefab`，从 ESC 菜单的 Status 按钮打开。此页使用现有头像和运行时属性，支持鼠标点选队友、左右按钮以及 A/D 或左右方向键切换。阵亡角色仍可查看，空队伍显示空状态。
 
-`FieldStatusPanelController` 订阅属性接口并显示数据，`FieldStatusMemberView` 负责队员条目。每次打开以及菜单内同场景读档成功后刷新；读档重建角色时按 ID 重新绑定。HP/MP 事件和正常升级会同步刷新显示。装备、技能页、右上角头像入口与底部导航仍留待后续整合。
+`FieldStatusPanelController` 订阅属性接口并显示数据，`FieldStatusMemberView` 负责队员条目。每次打开以及菜单内同场景读档成功后刷新；读档重建角色时按 ID 重新绑定。HP/MP 事件和正常升级会同步刷新显示。装备、技能页与底部导航仍留待后续整合。
 
-Status 打开时保持探索暂停。关闭按钮、右键或 ESC 返回原 ESC 菜单，继续暂停；再关闭 ESC 菜单才恢复探索。背包快捷键在 Status 打开及刚关闭的同一帧不生效。
+Status 打开时保持探索暂停。从 ESC 菜单打开时，关闭按钮、右键或 ESC 返回原 ESC 菜单，继续暂停；再关闭 ESC 菜单才恢复探索。从头像 HUD 打开时，关闭 Status 直接恢复探索。背包快捷键在 Status 打开及刚关闭的同一帧不生效。
 
 页面与队员条目都是可编辑的 uGUI 预制体，后续布局直接在 Unity 中编辑 `StatusPanel.prefab` 和 `StatusMember.prefab`。两个 Field 场景已保存预制体实例及菜单、输入引用，运行只依赖这些预制体和运行时脚本。
 
 首次接入时已检查队友切换、属性事件、升级、存档数据重建后的绑定、空队伍、阵亡与返回暂停状态，并查看了 1280×720 和 800×600 两种比例的预览。存档数据重建在内存中进行，不代替手动点击 Load 的完整回归。初始布局生成器和临时 Play Mode 检查工具已移除。
+
+## 探索头像 HUD（2026-10-19）
+
+两个 Field 场景使用 `Assets/Prefabs/UI/FieldUI/PortraitHud.prefab`，位于右上角。上半弧红色显示 HP，下半弧蓝色显示 MP；点击头像打开当前领队的 Status，姓名和详细属性在 Status 中查看，HUD 不显示姓名或悬停提示。教程、对话或其他暂停菜单打开时，头像入口不可用。
+
+头像使用圆形遮罩，外层为 `Assets/Art/UI/PortraitHudFrame.png` 的蓝银色云纹装饰框。装饰框不接收射线，位于血蓝弧内缘上方；弧形颜色降低饱和度，保留独立的暗色空槽。框图由内置图像生成工具制作，提示要求为居中透明圆孔、细蓝银色边框、右下云纹、无头像与文字；HP/MP 仍由 uGUI 动态填充，不是框图的一部分。
+
+`FieldPortraitHudController` 显示运行时队伍中的第一位非空成员，不跟随 Status 页的浏览选择切换领队。HP/MP 事件和数值变化会刷新弧形；队伍对象被读档或战斗返回替换时自动重新绑定。空队伍隐藏 HUD，阵亡时显示 KO，零最大值显示空弧形。
+
+原左侧队伍 HUD 在两个场景内保留但关闭。道具的队友目标选择面板仍独立使用。Boss 场景的测试入队按钮移至左上角，为头像留出位置。头像 HUD、图片和运行时脚本可直接编辑，临时制作辅助脚本已在完成验证后移除。
