@@ -66,7 +66,7 @@ statsController.SelectPreviousMember();
 
 `FildScene` 和 `Boss_FieldScene` 已接入 `Assets/Prefabs/UI/FieldUI/StatusPanel.prefab`，从 ESC 菜单的 Status 按钮打开。此页使用现有头像和运行时属性，支持鼠标点选队友、左右按钮以及 A/D 或左右方向键切换。阵亡角色仍可查看，空队伍显示空状态。
 
-`FieldStatusPanelController` 订阅属性接口并显示数据，`FieldStatusMemberView` 负责队员条目。每次打开以及菜单内同场景读档成功后刷新；读档重建角色时按 ID 重新绑定。HP/MP 事件和正常升级会同步刷新显示。装备、技能页与底部导航仍留待后续整合。
+`FieldStatusPanelController` 订阅属性接口并显示数据，`FieldStatusMemberView` 负责队员条目。每次打开以及菜单内同场景读档成功后刷新；读档重建角色时按 ID 重新绑定。HP/MP 事件和正常升级会同步刷新显示。装备和技能页仍留待后续整合；Status / Item 底部导航见下节。
 
 Status 打开时保持探索暂停。从 ESC 菜单打开时，关闭按钮、右键或 ESC 返回原 ESC 菜单，继续暂停；再关闭 ESC 菜单才恢复探索。从头像 HUD 打开时，关闭 Status 直接恢复探索。背包快捷键在 Status 打开及刚关闭的同一帧不生效。
 
@@ -83,3 +83,15 @@ Status 打开时保持探索暂停。从 ESC 菜单打开时，关闭按钮、�
 `FieldPortraitHudController` 显示运行时队伍中的第一位非空成员，不跟随 Status 页的浏览选择切换领队。HP/MP 事件和数值变化会刷新弧形；队伍对象被读档或战斗返回替换时自动重新绑定。空队伍隐藏 HUD，阵亡时显示 KO，零最大值显示空弧形。
 
 原左侧队伍 HUD 在两个场景内保留但关闭。道具的队友目标选择面板仍独立使用。Boss 场景的测试入队按钮移至左上角，为头像留出位置。头像 HUD、图片和运行时脚本可直接编辑，临时制作辅助脚本已在完成验证后移除。
+
+## Status / Item 菜单（2026-10-20）
+
+两个 Field 场景共用 `Assets/Prefabs/UI/FieldUI/SystemMenu.prefab` 的底部 Status、Item 页签和关闭入口。`FieldSystemMenuController` 只协调现有属性页与背包页，不新增装备、技能、存档页面，也不改成跨场景常驻 UI。场景实例分别绑定自己的 `statusPanel` 和 `inventoryPanel`；控制器初始化时绑定属性页与原背包输入组件。
+
+`OpenStatus()`、`OpenItems()` 切换到对应页面，`ToggleItems()` 供原 B 键入口使用：探索中打开 Item，Status 中切到 Item，Item 中关闭整个菜单。页签切换先立即隐藏另一页与道具选人弹窗，再显示并刷新新页面，全程保持探索暂停。背包的 `IsOpen` 由当前页面推导，不再另行记录一个可能与页面不一致的开关。
+
+从头像或 B 键进入时，关闭后恢复探索；从 ESC 菜单的 Status 入口进入时，无论最终停在哪一页，关闭都返回 ESC 菜单并保持暂停。顶部关闭按钮直接关闭整个菜单；ESC 或右键在道具选人期间只取消选人，再次按下才关闭菜单。同一帧的取消、关闭由控制器消费，避免其他输入组件再次打开 ESC 菜单。教程或其他暂停界面打开时，B 键不能叠加打开系统菜单。
+
+Item 沿用现有运行时背包、槽位顺序、拖放与道具效果。格子、说明和使用按钮布局为底部导航留出空间，长列表仍可滚动；选人弹窗和反馈提示使用独立 Canvas 排序，保持在页面内容上方。切回 Status 会重新读取角色属性，因此使用道具后的 HP/MP 可直接查看。Save/Load 仍在原 ESC 菜单中。
+
+本次已在两个场景检查头像入口、页签点击、B 键入口、ESC 返回、道具选人取消、切页清理、实际治疗与扣除一份道具、治疗后属性刷新，以及空队伍。1280×720 和 800×600 的截图及边界检查确认底部页签、默认 20 个格子和数量文字不互相遮挡；实际键盘输入验证了 B 打开 Item、ESC 关闭后恢复探索。检查使用运行时数据副本并在结束时恢复，没有写入存档文件。临时制作和 Play Mode 检查脚本已移除。

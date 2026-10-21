@@ -36,12 +36,14 @@ public sealed class FieldStatusPanelController : BasePanel
 
     private readonly List<FieldStatusMemberView> memberViews = new List<FieldStatusMemberView>();
     private FieldEscMenuPanelController returnMenu;
+    private FieldSystemMenuController systemMenu;
     private bool previousPause;
     private int lastCloseFrame = -1;
 
     public override bool IsOpen => isShowing;
     public bool IsShowing => isShowing;
-    public bool ClosedThisFrame => lastCloseFrame == Time.frameCount;
+    public bool ClosedThisFrame => lastCloseFrame == Time.frameCount ||
+        (systemMenu != null && systemMenu.ClosedThisFrame);
     private bool isShowing;
 
     protected override void Awake()
@@ -67,13 +69,14 @@ public sealed class FieldStatusPanelController : BasePanel
     private void Update()
     {
         if (!isShowing) return;
-        if (Input.GetMouseButtonDown(1)) { Close(); return; }
+        if (systemMenu == null && Input.GetMouseButtonDown(1)) { Close(); return; }
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) PreviousMember();
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) NextMember();
     }
 
     public void OpenFromMenu(FieldEscMenuPanelController menu)
     {
+        if (systemMenu != null) { systemMenu.OpenFromMenu(menu); return; }
         if (isShowing) return;
         returnMenu = menu;
         returnMenu?.Hide();
@@ -82,9 +85,17 @@ public sealed class FieldStatusPanelController : BasePanel
 
     public override void Show()
     {
+        if (systemMenu != null) { systemMenu.OpenStatus(); return; }
         if (!isShowing) previousPause = FieldPauseState.IsPaused;
-        isShowing = true;
         FieldPauseState.SetPaused(true);
+        ShowPage();
+    }
+
+    public void BindSystemMenu(FieldSystemMenuController menu) { systemMenu = menu; }
+
+    internal void ShowPage()
+    {
+        isShowing = true;
         Refresh();
         base.Show();
     }
@@ -100,6 +111,7 @@ public sealed class FieldStatusPanelController : BasePanel
 
     public bool TryCloseByEsc()
     {
+        if (systemMenu != null) return systemMenu.TryCloseByEsc();
         if (ClosedThisFrame) return true;
         if (!isShowing) return false;
         Close();
@@ -108,6 +120,7 @@ public sealed class FieldStatusPanelController : BasePanel
 
     public void Close()
     {
+        if (systemMenu != null) { systemMenu.Close(); return; }
         if (!isShowing) return;
         Hide();
         lastCloseFrame = Time.frameCount;

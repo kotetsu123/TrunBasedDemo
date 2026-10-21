@@ -28,6 +28,7 @@ public class FieldInventoryPanelController : BasePanel
     private readonly List<FieldInventoryItemView> spawnedItems = new();
     private ItemData selectedItem;
     private bool isSelectingTarget;
+    private int lastTargetCancelFrame = -1;
 
     public bool IsSelectingTarget => isSelectingTarget;
 
@@ -64,6 +65,13 @@ public class FieldInventoryPanelController : BasePanel
         HideDescription();
         partyTargetPanel?.Hide();
         base.Hide();
+    }
+
+    public override void HideImmediate()
+    {
+        HideDescription();
+        partyTargetPanel?.HideImmediate();
+        base.HideImmediate();
     }
     private void Update()
     {
@@ -150,11 +158,20 @@ public class FieldInventoryPanelController : BasePanel
     }
     private void CancelTargetSelection()
     {
+        lastTargetCancelFrame = Time.frameCount;
         isSelectingTarget = false;
         partyTargetPanel?.Hide();
         SetUseButtonInteractable(CanUseSelectedItem());
 
         Debug.Log("[FieldInventory] Item target selection canceled.");
+    }
+
+    public bool TryCancelTargetSelection()
+    {
+        if (lastTargetCancelFrame == Time.frameCount) return true;
+        if (!isSelectingTarget) return false;
+        CancelTargetSelection();
+        return true;
     }
     private void HandlePartyMemberSelected(Character target)
     {
