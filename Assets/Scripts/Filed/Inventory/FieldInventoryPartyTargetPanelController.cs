@@ -5,6 +5,8 @@ public class FieldInventoryPartyTargetPanelController : BasePanel
 {
     [SerializeField] private FiledPartyHudItem[] items;
 
+    private bool showMp;
+
     public event Action<Character> OnPartyMemberSelected;
 
     protected override void Awake()
@@ -17,6 +19,11 @@ public class FieldInventoryPartyTargetPanelController : BasePanel
     {
         Refresh();
         base.Show();
+    }
+    public void ShowForItem(ItemType itemType)
+    {
+        showMp = itemType == ItemType.RestoreMp;
+        Show();
     }
 
     private void Refresh()
@@ -31,6 +38,7 @@ public class FieldInventoryPartyTargetPanelController : BasePanel
             if (party != null && i < party.Count)
             {
                 items[i].Bind(party[i], HandlePartyMemberClicked);
+                items[i].SetShowMp(showMp);
             }
             else
             {

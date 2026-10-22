@@ -153,7 +153,7 @@ public class FieldInventoryPanelController : BasePanel
     {
         isSelectingTarget = true;
         SetUseButtonInteractable(false);
-        partyTargetPanel?.Show();
+        partyTargetPanel?.ShowForItem(selectedItem.itemtype);
         Debug.Log("[FieldInventory] Select a party member to use item.");
     }
     private void CancelTargetSelection()

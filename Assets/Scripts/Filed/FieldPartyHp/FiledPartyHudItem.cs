@@ -8,6 +8,9 @@ using UnityEngine.UI;
 public class FiledPartyHudItem : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private Image hpfill;
+    [SerializeField] private Image mpfill;
+    [SerializeField] private GameObject hpbarRoot;
+    [SerializeField] private GameObject mpbarRoot;
     [SerializeField] private Color _hpFillDefaultColor;
     [SerializeField] private Image portraitImage;
     // [SerializeField]
@@ -49,6 +52,7 @@ public class FiledPartyHudItem : MonoBehaviour, IPointerClickHandler
 
         gameObject.SetActive(true);
         _boundData.OnHpChanged +=HandleHpChanged ;
+        _boundData.OnMpChanged += HandleMpChanged;
 
         Refresh();
     }
@@ -71,11 +75,22 @@ public class FiledPartyHudItem : MonoBehaviour, IPointerClickHandler
                 graphic.raycastTarget = enabled;
         }
     }
+    public void SetShowMp(bool showMp)
+    {
+        hpbarRoot.SetActive(!showMp);
+        mpbarRoot.SetActive(showMp);
+
+        Refresh();
+    }
     private void Refresh()
     {
         
         if (_boundData == null)
             return;
+        if(mpfill!=null)
+        {
+            mpfill.fillAmount = _boundData.MaxMp <= 0 ? 0f : Mathf.Clamp01((float)_boundData.Mp / _boundData.MaxMp);
+        }
         if(hpfill!=null)
             hpfill.fillAmount=_boundData.MaxHp<=0?0f:(float)_boundData.Hp/_boundData.MaxHp;
         bool lowHP = hpfill.fillAmount > 0f && hpfill.fillAmount <= 0.3f;
@@ -98,13 +113,19 @@ public class FiledPartyHudItem : MonoBehaviour, IPointerClickHandler
     {
         Refresh();
     }
-    
+    private void HandleMpChanged(int prev,int cur)
+    {
+        Refresh();
+    }
+
+
     private void Unbind()
     {
         if (_boundData == null)
             return ;
 
         _boundData.OnHpChanged -= HandleHpChanged;
+        _boundData.OnMpChanged -= HandleMpChanged;
         _boundData = null;
         _onClicked = null;
         SetRaycastTarget(false);
