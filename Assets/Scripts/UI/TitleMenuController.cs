@@ -13,6 +13,7 @@ public class TitleMenuController : MonoBehaviour
     [SerializeField] private Button loadGameButton;
     [SerializeField] private ItemDataBase itemDataBase;
     [SerializeField] private CharacterDataBase characterDataBase;
+    [SerializeField] private SaveLoadPanelController saveLoadPanel;
 
     private void Start()
     {
@@ -38,6 +39,7 @@ public class TitleMenuController : MonoBehaviour
 
     public void OnLoadGameClicked()
     {
+        if (saveLoadPanel != null) { saveLoadPanel.OpenFromTitle(); return; }
         if (!SaveSystem.HasSaveFile())
         {
             RefreshLoadButtonState();

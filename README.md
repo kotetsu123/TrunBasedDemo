@@ -6,6 +6,8 @@ A Unity turn-based RPG prototype focused on data-driven field encounters, runtim
 
 这是一个 Unity 回合制 RPG 系统 demo。当前目标不是完成一款完整游戏，而是把 RPG 中常见的核心系统串成一个可以运行、可以扩展、也适合作品集展示的玩法闭环。
 
+近期需求、完成清单与暂缓范围见 [Demo 完成清单与工作记忆](docs/DEMO_COMPLETION_PLAN.md)（2026-10-22 更新）。
+
 当前 demo 的主要流程是：
 
 - 在 3D Field 场景中探索。
@@ -150,6 +152,8 @@ SaveSystem 会把运行时数据保存成 JSON，包括：
 - 更多作品集用截图和架构图
 
 ## Project Focus
+
+See the [demo completion plan and decision log](docs/DEMO_COMPLETION_PLAN.md) for recent requirements, proposals, and deferred work (updated 2026-10-22).
 
 This project is a portfolio-oriented RPG systems demo. The current scope is not a full game, but a connected gameplay loop:
 

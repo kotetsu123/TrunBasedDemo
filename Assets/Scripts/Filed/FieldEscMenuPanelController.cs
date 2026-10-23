@@ -21,6 +21,7 @@ public class FieldEscMenuPanelController : BasePanel
     [SerializeField] private FieldPartyHudController partyHudController;
     [SerializeField] private FieldToastController toastController;
     [SerializeField] private FieldStatusPanelController statusPanel;
+    [SerializeField] private FieldSystemMenuController systemMenu;
 
     [Header("Message")]
     [SerializeField] private TMP_Text messageText;
@@ -62,6 +63,7 @@ public class FieldEscMenuPanelController : BasePanel
 
     public void OnClickSave()
     {
+        if (systemMenu != null) { systemMenu.OpenSaveLoadFromMenu(this, true); return; }
         bool saved = SaveSystem.Save();
         string message = saved ? "Saved" : "Save failed";
         SetMessage(message);
@@ -71,6 +73,7 @@ public class FieldEscMenuPanelController : BasePanel
 
     public void OnClickLoad()
     {
+        if (systemMenu != null) { systemMenu.OpenSaveLoadFromMenu(this, false); return; }
         if (!SaveSystem.HasSaveFile())
         {
             const string message = "No save file";
