@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 public class TimeLineIcon : MonoBehaviour
@@ -19,6 +20,7 @@ public class TimeLineIcon : MonoBehaviour
 
     private RectTransform rect;
     private BaseController owner;//对应角色
+    private TMP_Text intentText;
     private float barHeight ;//ActionbarPanel 的高度
 
 
@@ -43,6 +45,33 @@ public class TimeLineIcon : MonoBehaviour
         {
             highlight.SetActive(on);
         }
+    }
+
+    public void SetIntent(string message)
+    {
+        if (intentText == null && !string.IsNullOrEmpty(message))
+        {
+            var label = new GameObject("Intent", typeof(RectTransform), typeof(TextMeshProUGUI));
+            label.transform.SetParent(transform, false);
+            var labelRect = (RectTransform)label.transform;
+            labelRect.anchorMin = new Vector2(1f, 0.5f);
+            labelRect.anchorMax = new Vector2(1f, 0.5f);
+            labelRect.pivot = new Vector2(0f, 0.5f);
+            labelRect.anchoredPosition = new Vector2(8f, 0f);
+            labelRect.sizeDelta = new Vector2(190f, 24f);
+            intentText = label.GetComponent<TMP_Text>();
+            intentText.fontSize = 16f;
+            intentText.color = new Color(1f, 0.75f, 0.25f);
+            intentText.alignment = TextAlignmentOptions.Left;
+            intentText.enableWordWrapping = false;
+            intentText.enableAutoSizing = true;
+            intentText.fontSizeMin = 10f;
+            intentText.fontSizeMax = 16f;
+            intentText.raycastTarget = false;
+        }
+        if (intentText == null) return;
+        intentText.text = message ?? string.Empty;
+        intentText.gameObject.SetActive(!string.IsNullOrEmpty(message));
     }
 
     // Update is called once per frame

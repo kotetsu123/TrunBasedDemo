@@ -585,6 +585,44 @@ public class BattleManager : MonoBehaviour
         // 保留敌方回合开始前的短暂停顿。
         yield return new WaitForSeconds(0.5f);
 
+        if (actor == null || actor.data == null || actor.isDead || actor.data.Hp <= 0 || battleEnded)
+            yield break;
+
+        EnemyController boss = actor as EnemyController;
+        if (boss != null && boss.HasBossPhaseTwoPattern)
+        {
+            if (boss.TryEnterBossPhaseTwo())
+            {
+                ShowBattleEventPopup("Phase 2");
+                yield return new WaitForSeconds(1.2f);
+            }
+
+            if (boss.IsBossPhaseTwo)
+            {
+                SkillData aoe = actor.data.bossPhaseTwoAoeSkill;
+                if (boss.IsBossCharging)
+                {
+                    boss.ClearBossCharge();
+                    if (actor.data.Mp >= aoe.mpCost && GetAliveOpponentTargets(actor).Count > 0)
+                    {
+                        // This fixed two-action pattern replaces the random AI cooldown for this skill.
+                        yield return StartCoroutine(PlayEnemyAllActionSequence(actor, aoe));
+                        AdvanceEnemySkillCooldowns(actor);
+                        yield return new WaitForSeconds(1f);
+                        yield break;
+                    }
+                }
+                else if (boss.TryBeginBossCharge())
+                {
+                    cameraDirector?.FocusActorTurnShot(actor);
+                    ShowBattleEventPopup("Charging: " + aoe.skillName);
+                    AdvanceEnemySkillCooldowns(actor);
+                    yield return new WaitForSeconds(1.2f);
+                    yield break;
+                }
+            }
+        }
+
         SkillData skill = ChooseEnemySkill(actor);
 
         if (skill == null)
@@ -803,6 +841,10 @@ public class BattleManager : MonoBehaviour
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
         damageSkills.RemoveAll(skill => !IsEnemySkillReady(actor, skill));
+
+        // Configured phase-two AOE must never bypass its charging turn through random selection.
+        if (actor is EnemyController boss && boss.HasBossPhaseTwoPattern&&boss.IsBossPhaseTwo)
+            damageSkills.RemoveAll(skill => skill == actor.data.bossPhaseTwoAoeSkill);
        
         if (damageSkills.Count == 0)
             return null;
@@ -815,7 +857,7 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private bool IsEnemySkillReady(BaseController actor, SkillData skill)
     {
-        if (actor == null || skill == null)
+        if (actor == null || actor.data == null || skill == null || actor.data.Mp < skill.mpCost)
             return false;
 
         return !_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns)

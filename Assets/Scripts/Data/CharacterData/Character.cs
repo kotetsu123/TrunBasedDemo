@@ -64,6 +64,11 @@ public class Character
     [SerializeField]
     private List<EnemySkillWeightEntry> enemySkillWeights = new List<EnemySkillWeightEntry>();
 
+    [Header("Boss Phase Two")]
+    [Range(0.01f, 0.99f)]
+    public float bossPhaseTwoHpRatio = 0.5f;
+    public SkillData bossPhaseTwoAoeSkill;
+
     public bool isOnField;
     public bool isActing;
     public bool isDead;
@@ -199,6 +204,9 @@ public class Character
             enemySkillWeights = this.enemySkillWeights != null
             ? this.enemySkillWeights.ConvertAll(entry => entry != null ? entry.Copy() : null)
             : new List<EnemySkillWeightEntry>(),
+
+            bossPhaseTwoHpRatio = this.bossPhaseTwoHpRatio,
+            bossPhaseTwoAoeSkill = this.bossPhaseTwoAoeSkill,
 
             isOnField = this.isOnField,
             isActing = this.isActing,

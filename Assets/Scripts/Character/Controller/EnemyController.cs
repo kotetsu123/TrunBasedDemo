@@ -14,6 +14,62 @@ public class EnemyController : BaseController
     private Canvas worldUICanvas;
     private bool _uiInitialized;
 
+    public bool IsBossPhaseTwo { get; private set; }
+    public bool IsBossCharging { get; private set; }
+
+    public bool HasBossPhaseTwoPattern => data != null
+        && data.Team == Team.Enemy
+        && data.enemyAiType == EnemyAiType.Boss
+        && data.bossPhaseTwoAoeSkill != null
+        && data.bossPhaseTwoAoeSkill.skillType == SkillType.Damage
+        && data.bossPhaseTwoAoeSkill.targetType == SkillTargetType.EnemyAll;
+
+    public override void Init(Character character)
+    {
+        base.Init(character);
+        IsBossPhaseTwo = false;
+        ClearBossCharge();
+    }
+
+    public bool TryEnterBossPhaseTwo()
+    {
+        if (!HasBossPhaseTwoPattern || IsBossPhaseTwo || data.isDead
+            || data.Hp <= 0 || data.MaxHp <= 0)
+            return false;
+
+        if (data.Hp > data.MaxHp * Mathf.Clamp01(data.bossPhaseTwoHpRatio))
+            return false;
+
+        IsBossPhaseTwo = true;
+        return true;
+    }
+
+    public bool TryBeginBossCharge()
+    {
+        if (!HasBossPhaseTwoPattern || !IsBossPhaseTwo || IsBossCharging
+            || data.isDead || data.Hp <= 0 || data.Mp < data.bossPhaseTwoAoeSkill.mpCost)
+            return false;
+
+        IsBossCharging = true;
+        SetBossIntent("Charging: " + data.bossPhaseTwoAoeSkill.skillName);
+        return true;
+    }
+
+    public void ClearBossCharge()
+    {
+        IsBossCharging = false;
+        SetBossIntent(null);
+    }
+
+    private void SetBossIntent(string message)
+    {
+        hpBarInstance?.SetIntent(message);
+        if (BattleManager.Instance != null
+            && BattleManager.Instance.TimeLineIcons.TryGetValue(this, out TimeLineIcon icon)
+            && icon != null)
+            icon.SetIntent(message);
+    }
+
     //Spawner 后面instantiate 后调用这个
    public void InjectWorldUICanvas(Canvas canvas)
     {
@@ -61,6 +117,7 @@ public class EnemyController : BaseController
     }
     protected override void OnDeath()
     {
+        ClearBossCharge();
         if(hpBarInstance!=null)
         Destroy(hpBarInstance.gameObject); 
         base.OnDeath();
