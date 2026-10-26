@@ -9,6 +9,11 @@ public abstract class BaseController : MonoBehaviour
 
     public Character data;
 
+    public event Action OnDotChanged;
+    public int DotTurnsRemaining { get; private set; }
+    public int DotDamagePerTurn { get; private set; }
+    public string DotName { get; private set; }
+
     public int healUsedCount = 0;
 
 
@@ -76,6 +81,7 @@ public abstract class BaseController : MonoBehaviour
     }
     public void Heal(int amout)
     {
+        if (data == null || data.isDead || data.Hp <= 0 || amout <= 0) return;
         int prevHp = data.Hp;
         data.Hp = Mathf.Min(data.MaxHp, data.Hp + amout);
 
@@ -110,6 +116,7 @@ public abstract class BaseController : MonoBehaviour
         if (!wasDead) return;
 
         data.isDead=false;
+        ClearDot();
         //isDead=false;
 
         int prevHp= data.Hp;
@@ -125,13 +132,15 @@ public abstract class BaseController : MonoBehaviour
     //������"��չ"�Ĺ���
     protected virtual void OnDeath()
     {
-        BattleManager.Instance.NotifyDeath(this);
+        ClearDot();
+        BattleManager.Instance?.NotifyDeath(this);
     }
     public virtual  void Init(Character data)
     {
         //Debug.LogError($"[Init CALLED]{gameObject.name}");
 
         this.data = data;
+        ClearDot();
         //����ս��״̬
         this.data.ActionValue = this.data.MaxActionValue;
         NormalizeRuntimeHpState();
@@ -198,7 +207,7 @@ public abstract class BaseController : MonoBehaviour
     public void UseSkill(SkillData skill, BaseController target)
     {
         
-        if (target == null || target.data == null)
+        if (!CanApplySkillTo(skill, target))
             return;
         if (!TryBeginSkill(skill))
             return;
@@ -210,9 +219,17 @@ public abstract class BaseController : MonoBehaviour
     {
         if (targets == null || targets.Count == 0)
             return;
+        var validTargets = new List<BaseController>();
+        foreach (BaseController target in targets)
+        {
+            if (CanApplySkillTo(skill, target) && !validTargets.Contains(target))
+                validTargets.Add(target);
+        }
+        if (validTargets.Count == 0)
+            return;
         if (!TryBeginSkill(skill))
             return;
-        foreach(BaseController target in targets)
+        foreach(BaseController target in validTargets)
         {
             if (target == null || target.data == null)
                 continue;
@@ -220,12 +237,77 @@ public abstract class BaseController : MonoBehaviour
         }
         CompleteSkillUse(skill);
     }
+
+    private bool CanApplySkillTo(SkillData skill, BaseController target)
+    {
+        if (skill == null || data == null || target == null || target.data == null)
+            return false;
+        bool dead = target.isDead || target.data.isDead || target.data.Hp <= 0;
+        bool sameTeam = data.Team == target.data.Team;
+        switch (skill.targetType)
+        {
+            case SkillTargetType.EnemySingle:
+            case SkillTargetType.EnemyAll:
+                return !dead && !sameTeam;
+            case SkillTargetType.AllySingle:
+            case SkillTargetType.AllyAll:
+                return !dead && sameTeam;
+            case SkillTargetType.AllyDeadSingle:
+                return dead && sameTeam && skill.skillType == SkillType.Revive;
+            case SkillTargetType.Self:
+                return !dead && target == this;
+            default:
+                return false;
+        }
+    }
+
+    public void ApplyDot(SkillData skill)
+    {
+        if (data == null || data.isDead || data.Hp <= 0 || skill == null
+            || skill.skillType != SkillType.Dot || skill.power <= 0 || skill.dotDurationTurns <= 0)
+            return;
+
+        DotName = skill.skillName;
+        DotDamagePerTurn = skill.power;
+        DotTurnsRemaining = skill.dotDurationTurns;
+        OnDotChanged?.Invoke();
+    }
+
+    public void TickDotAtTurnEnd()
+    {
+        if (DotTurnsRemaining <= 0) return;
+        if (data == null || data.isDead || data.Hp <= 0)
+        {
+            ClearDot();
+            return;
+        }
+
+        int damage = DotDamagePerTurn;
+        DotTurnsRemaining--;
+        if (DotTurnsRemaining == 0)
+        {
+            DotDamagePerTurn = 0;
+            DotName = null;
+        }
+        TakeDamage(damage);
+        OnDotChanged?.Invoke();
+    }
+
+    public void ClearDot()
+    {
+        DotTurnsRemaining = 0;
+        DotDamagePerTurn = 0;
+        DotName = null;
+        OnDotChanged?.Invoke();
+    }
     /// <summary>
     /// 开始一次使用技能，负责检查并且消耗mp
     /// </summary>
     private bool TryBeginSkill(SkillData skill)
     {
-        if (skill == null || data == null)
+        if (skill == null || data == null || data.isDead || data.Hp <= 0)
+            return false;
+        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
             return false;
         if (data.Mp < skill.mpCost)
         {
@@ -269,6 +351,9 @@ public abstract class BaseController : MonoBehaviour
                     target.Revive(skill.power);
                     break;
                 }
+            case SkillType.Dot:
+                target.ApplyDot(skill);
+                break;
         }
     }
     /// <summary>

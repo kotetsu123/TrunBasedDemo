@@ -21,6 +21,7 @@ public class TimeLineIcon : MonoBehaviour
     private RectTransform rect;
     private BaseController owner;//对应角色
     private TMP_Text intentText;
+    private TMP_Text dotText;
     private float barHeight ;//ActionbarPanel 的高度
 
 
@@ -31,13 +32,16 @@ public class TimeLineIcon : MonoBehaviour
     }
     public void Bind(BaseController character)
     {
+        if (owner != null) owner.OnDotChanged -= RefreshDot;
         owner = character;
+        if (owner != null) owner.OnDotChanged += RefreshDot;
         if (portImage!=null)
         {
             // Character data is the main portrait source. The controller/prefab portrait only stays as a fallback.
             portImage.sprite = owner.data.Portrait != null ? owner.data.Portrait : owner.portrait;
             portImage.enabled = portImage.sprite != null;
         }
+        RefreshDot();
     }
    public void SetHighLight(bool on)
     {
@@ -72,6 +76,39 @@ public class TimeLineIcon : MonoBehaviour
         if (intentText == null) return;
         intentText.text = message ?? string.Empty;
         intentText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+    }
+
+    private void RefreshDot()
+    {
+        bool active = owner != null && owner.DotTurnsRemaining > 0;
+        if (dotText == null && active)
+        {
+            var label = new GameObject("DotStatus", typeof(RectTransform), typeof(TextMeshProUGUI));
+            label.transform.SetParent(transform, false);
+            var labelRect = (RectTransform)label.transform;
+            labelRect.anchorMin = new Vector2(1f, 0.5f);
+            labelRect.anchorMax = new Vector2(1f, 0.5f);
+            labelRect.pivot = new Vector2(0f, 0.5f);
+            labelRect.anchoredPosition = new Vector2(8f, -22f);
+            labelRect.sizeDelta = new Vector2(190f, 18f);
+            dotText = label.GetComponent<TMP_Text>();
+            dotText.color = new Color(1f, 0.45f, 0.3f);
+            dotText.alignment = TextAlignmentOptions.Left;
+            dotText.fontSize = 14f;
+            dotText.enableWordWrapping = false;
+            dotText.enableAutoSizing = true;
+            dotText.fontSizeMin = 10f;
+            dotText.fontSizeMax = 14f;
+            dotText.raycastTarget = false;
+        }
+        if (dotText == null) return;
+        dotText.text = active ? $"{owner.DotName} ({owner.DotTurnsRemaining})" : string.Empty;
+        dotText.gameObject.SetActive(active);
+    }
+
+    private void OnDestroy()
+    {
+        if (owner != null) owner.OnDotChanged -= RefreshDot;
     }
 
     // Update is called once per frame

@@ -427,10 +427,26 @@ public class BattleManager : MonoBehaviour
                 isActing = false;
                 if (actor != null && actor.data != null)
                     actor.data.isActing = false;
+                yield break;
             }
         }
+        if (!battleEnded && actor != null && actor.data != null && !actor.isDead)
+        {
+            int previousHp = actor.data.Hp;
+            actor.TickDotAtTurnEnd();
+            if (actor.data.Hp < previousHp)
+            {
+                CheckBattleEnd(actor, actor);
+                yield return new WaitForSeconds(0.3f);
+            }
+        }
+        if (actor == null || actor.data == null)
+        {
+            isActing = false;
+            yield break;
+        }
         //行动完成后恢复行动值      
-        if (!battleEnded)
+        if (!battleEnded && !actor.isDead && actor.data.Hp > 0)
         {
             actor.data.ActionValue = actor.data.MaxActionValue;
             _timelineDirty = true;
@@ -528,17 +544,7 @@ public class BattleManager : MonoBehaviour
                         continue;
                     }
 
-                    var target = _currentTarget;
-                    if (_currentTargetType == SkillTargetType.Self)
-                    {
-                        target = actor;
-                    }
-                    if (targetSelector.IsValidTarget(actor, target, _currentTargetType))
-                    {
-                       
-                        actionChosen = true;
-                        yield return StartCoroutine(PlaySkillSequence(actor, target, _selectedSkill, _currentTargetType));
-                    }
+                    yield return StartCoroutine(ConfirmSelectedSkill(actor));
                 }
             }
             else if (_currentCommand == CommandType.Item)
@@ -606,7 +612,7 @@ public class BattleManager : MonoBehaviour
                     if (actor.data.Mp >= aoe.mpCost && GetAliveOpponentTargets(actor).Count > 0)
                     {
                         // This fixed two-action pattern replaces the random AI cooldown for this skill.
-                        yield return StartCoroutine(PlayEnemyAllActionSequence(actor, aoe));
+                        yield return StartCoroutine(PlayGroupSkillSequence(actor, aoe));
                         AdvanceEnemySkillCooldowns(actor);
                         yield return new WaitForSeconds(1f);
                         yield break;
@@ -636,10 +642,10 @@ public class BattleManager : MonoBehaviour
 
         // 群体技能不需要选择单个 target，
         // 由群体行动协程统一取得全部存活对手。
-        if (skill.targetType == SkillTargetType.EnemyAll)
+        if (IsGroupTarget(skill.targetType))
         {
             yield return StartCoroutine(
-                PlayEnemyAllActionSequence(actor, skill));
+                PlayGroupSkillSequence(actor, skill));
         }
         else
         {
@@ -687,7 +693,7 @@ public class BattleManager : MonoBehaviour
     }
     private IEnumerator PlaySkillSequence(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
     {
-        if(actor==null||target==null||_selectedSkill==null)
+        if(actor==null||target==null||skill==null)
             yield break;
         //摄像头锁定
         cameraDirector?.LockCamera();
@@ -753,12 +759,12 @@ public class BattleManager : MonoBehaviour
     /// <param name="actor"></param>
     /// <param name="skill"></param>
     /// <returns></returns>
-    private IEnumerator PlayEnemyAllActionSequence(BaseController actor, SkillData skill)
+    private IEnumerator PlayGroupSkillSequence(BaseController actor, SkillData skill)
     {
         if (actor == null || actor.data == null || skill == null)
             yield break;
         //在执行技能前，获取所有目标
-        List<BaseController> targets= GetAliveOpponentTargets(actor);
+        List<BaseController> targets = GetGroupSkillTargets(actor, skill);
 
         if (targets.Count == 0)
             yield break;
@@ -772,13 +778,14 @@ public class BattleManager : MonoBehaviour
             //给施法者一个短暂的停顿，模拟施法动作
             yield return new WaitForSeconds(0.25f);
             //群体技能镜头聚焦玩家组
-            cameraDirector?.FocusPlayerGroup();
+            FocusSkillGroup(actor, skill);
             yield return new WaitUntil(()=> cameraDirector == null || !cameraDirector.IsMoving);
         }
         // 镜头到达玩家全队后稍微停顿，再结算伤害。
         yield return new WaitForSeconds(skillCameraLeadTime);
 
        
+        targets = GetGroupSkillTargets(actor, skill);
         actor.UseSkillOnTargets(skill, targets);
         //检查所有目标是否死亡
         foreach(BaseController target in targets)
@@ -840,6 +847,7 @@ public class BattleManager : MonoBehaviour
             }
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
+        damageSkills.AddRange(FindSkillsByType(actor.Skills, SkillType.Dot));
         damageSkills.RemoveAll(skill => !IsEnemySkillReady(actor, skill));
 
         // Configured phase-two AOE must never bypass its charging turn through random selection.
@@ -858,6 +866,8 @@ public class BattleManager : MonoBehaviour
     private bool IsEnemySkillReady(BaseController actor, SkillData skill)
     {
         if (actor == null || actor.data == null || skill == null || actor.data.Mp < skill.mpCost)
+            return false;
+        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
             return false;
 
         return !_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns)
@@ -1087,6 +1097,7 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;
 
          battleEnded = true;
+        ClearBattleDots();
         //强制关闭输入
         OnInputStateChanged?.Invoke(false);
         //清空上一次升级结果
@@ -1589,6 +1600,7 @@ public class BattleManager : MonoBehaviour
         if (_currentCommand == CommandType.Skill)
         {
             if (_selectedSkill == null) return false;
+            if (IsGroupTarget(_selectedSkill.targetType)) return false;
             // return _selectedSkill.targetType != SkillTargetType.Self;
             return true;
         }
@@ -1729,6 +1741,70 @@ public class BattleManager : MonoBehaviour
         }
         return targets;
     }
+
+    private static bool IsGroupTarget(SkillTargetType type)
+    {
+        return type == SkillTargetType.AllyAll || type == SkillTargetType.EnemyAll;
+    }
+
+    private List<BaseController> GetGroupSkillTargets(BaseController actor, SkillData skill)
+    {
+        var targets = new List<BaseController>();
+        if (actor == null || actor.data == null || skill == null || !IsGroupTarget(skill.targetType))
+            return targets;
+
+        bool allies = skill.targetType == SkillTargetType.AllyAll;
+        foreach (BaseController unit in controllers)
+        {
+            if (unit == null || unit.data == null || unit.isDead || unit.data.isDead
+                || unit.data.Hp <= 0 || !unit.data.isOnField)
+                continue;
+            if ((unit.data.Team == actor.data.Team) == allies && !targets.Contains(unit))
+                targets.Add(unit);
+        }
+        return targets;
+    }
+
+    private void FocusSkillGroup(BaseController actor, SkillData skill)
+    {
+        bool playerGroup = skill.targetType == SkillTargetType.AllyAll
+            ? actor.data.Team == Team.Player
+            : actor.data.Team != Team.Player;
+        if (playerGroup)
+            cameraDirector?.FocusPlayerGroup();
+        else
+            cameraDirector?.FocusEnemyGroup();
+    }
+
+    private IEnumerator ConfirmSelectedSkill(BaseController actor)
+    {
+        SkillData skill = _selectedSkill;
+        if (!CanConfirmAction() || !CanSelectSkill(actor, skill))
+            yield break;
+
+        if (IsGroupTarget(skill.targetType))
+        {
+            if (GetGroupSkillTargets(actor, skill).Count == 0)
+                yield break;
+            actionChosen = true;
+            yield return StartCoroutine(PlayGroupSkillSequence(actor, skill));
+            yield break;
+        }
+
+        BaseController target = skill.targetType == SkillTargetType.Self ? actor : _currentTarget;
+        if (!targetSelector.IsValidTarget(actor, target, skill.targetType))
+            yield break;
+        actionChosen = true;
+        yield return StartCoroutine(PlaySkillSequence(actor, target, skill, skill.targetType));
+    }
+
+    private void ClearBattleDots()
+    {
+        foreach (BaseController unit in controllers.ToArray())
+        {
+            if (unit != null) unit.ClearDot();
+        }
+    }
     private BaseController GetRandomAllyTarget(BaseController actor)
     {
         var list=controllers
@@ -1796,6 +1872,15 @@ public class BattleManager : MonoBehaviour
 
         _currentCommand = CommandType.Skill;
         _currentTargetType = skill.targetType;
+
+        if (IsGroupTarget(skill.targetType))
+        {
+            SetCurrentTarget(null);
+            SetPreviewTarget(null);
+            FocusSkillGroup(_currentActor, skill);
+            NotifyInputState();
+            return;
+        }
 
      
         if (skill.targetType == SkillTargetType.EnemySingle)
@@ -2068,6 +2153,7 @@ public class BattleManager : MonoBehaviour
     private void HandleRun(BaseController actor)
     {
         battleEnded = true;
+        ClearBattleDots();
 
         _currentCommand = CommandType.None;
         _selectedSkill = null;
@@ -2147,6 +2233,12 @@ public class BattleManager : MonoBehaviour
             return false;
         if (actor.data.Mp < skill.mpCost)
             return false;
+        if (actor.isDead || actor.data.isDead || actor.data.Hp <= 0)
+            return false;
+        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
+            return false;
+        if (IsGroupTarget(skill.targetType))
+            return GetGroupSkillTargets(actor, skill).Count > 0;
 
         return skill.targetType != SkillTargetType.AllyDeadSingle || HasDeadAllyTarget(actor);
     }

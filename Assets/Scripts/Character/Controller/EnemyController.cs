@@ -98,22 +98,10 @@ public class EnemyController : BaseController
     }
     public override void TakeDamage(int damage)
     {
-        base.TakeDamage(damage);   
-        if (data.Hp < 0)
-        {
-            data.Hp = 0;
-        }
-        if (hpBarInstance == null)
-        {
-            Debug.Log($"[hpbarInstance] 是null , 无法更新血条！");
-        }
-        hpBarInstance.UpdateHp();
-        if (data.Hp == 0)
-        {
-            data.isDead = true;
-            //hpBarInstance.Hide();
-            OnDeath();
-        }
+        // BaseController owns death handling, including lethal DOT ticks.
+        base.TakeDamage(damage);
+        if (hpBarInstance != null)
+            hpBarInstance.UpdateHp();
     }
     protected override void OnDeath()
     {
