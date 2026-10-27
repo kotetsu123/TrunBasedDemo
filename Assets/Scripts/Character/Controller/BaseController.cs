@@ -9,10 +9,9 @@ public abstract class BaseController : MonoBehaviour
 
     public Character data;
 
-    public event Action OnDotChanged;
-    public int DotTurnsRemaining { get; private set; }
-    public int DotDamagePerTurn { get; private set; }
-    public string DotName { get; private set; }
+    public event Action OnDebuffChanged;
+    private readonly DebuffState _activeDebuff = new DebuffState();
+    public DebuffState ActiveDebuff => _activeDebuff;
 
     public int healUsedCount = 0;
 
@@ -116,7 +115,7 @@ public abstract class BaseController : MonoBehaviour
         if (!wasDead) return;
 
         data.isDead=false;
-        ClearDot();
+        ClearDebuff();
         //isDead=false;
 
         int prevHp= data.Hp;
@@ -132,7 +131,7 @@ public abstract class BaseController : MonoBehaviour
     //������"��չ"�Ĺ���
     protected virtual void OnDeath()
     {
-        ClearDot();
+        ClearDebuff();
         BattleManager.Instance?.NotifyDeath(this);
     }
     public virtual  void Init(Character data)
@@ -140,7 +139,7 @@ public abstract class BaseController : MonoBehaviour
         //Debug.LogError($"[Init CALLED]{gameObject.name}");
 
         this.data = data;
-        ClearDot();
+        ClearDebuff();
         //����ս��״̬
         this.data.ActionValue = this.data.MaxActionValue;
         NormalizeRuntimeHpState();
@@ -261,44 +260,41 @@ public abstract class BaseController : MonoBehaviour
         }
     }
 
-    public void ApplyDot(SkillData skill)
+    public void ApplyDebuff(SkillData skill)
     {
         if (data == null || data.isDead || data.Hp <= 0 || skill == null
-            || skill.skillType != SkillType.Dot || skill.power <= 0 || skill.dotDurationTurns <= 0)
+            || !skill.HasValidDebuff)
             return;
 
-        DotName = skill.skillName;
-        DotDamagePerTurn = skill.power;
-        DotTurnsRemaining = skill.dotDurationTurns;
-        OnDotChanged?.Invoke();
+        _activeDebuff.Refresh(skill.debuffEffect, skill.skillName, skill.power, skill.debuffDurationTurns);
+        OnDebuffChanged?.Invoke();
     }
 
-    public void TickDotAtTurnEnd()
+    public void TickDebuffAtTurnEnd()
     {
-        if (DotTurnsRemaining <= 0) return;
+        if (!_activeDebuff.IsActive) return;
         if (data == null || data.isDead || data.Hp <= 0)
         {
-            ClearDot();
+            ClearDebuff();
             return;
         }
 
-        int damage = DotDamagePerTurn;
-        DotTurnsRemaining--;
-        if (DotTurnsRemaining == 0)
+        if (_activeDebuff.TryAdvanceTurn(out DebuffEffectType effectType, out int power))
         {
-            DotDamagePerTurn = 0;
-            DotName = null;
+            switch (effectType)
+            {
+                case DebuffEffectType.DamageOverTime:
+                    TakeDamage(power);
+                    break;
+            }
+            OnDebuffChanged?.Invoke();
         }
-        TakeDamage(damage);
-        OnDotChanged?.Invoke();
     }
 
-    public void ClearDot()
+    public void ClearDebuff()
     {
-        DotTurnsRemaining = 0;
-        DotDamagePerTurn = 0;
-        DotName = null;
-        OnDotChanged?.Invoke();
+        _activeDebuff.Clear();
+        OnDebuffChanged?.Invoke();
     }
     /// <summary>
     /// 开始一次使用技能，负责检查并且消耗mp
@@ -307,7 +303,7 @@ public abstract class BaseController : MonoBehaviour
     {
         if (skill == null || data == null || data.isDead || data.Hp <= 0)
             return false;
-        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
+        if (skill.skillType == SkillType.ApplyDebuff && !skill.HasValidDebuff)
             return false;
         if (data.Mp < skill.mpCost)
         {
@@ -351,8 +347,8 @@ public abstract class BaseController : MonoBehaviour
                     target.Revive(skill.power);
                     break;
                 }
-            case SkillType.Dot:
-                target.ApplyDot(skill);
+            case SkillType.ApplyDebuff:
+                target.ApplyDebuff(skill);
                 break;
         }
     }

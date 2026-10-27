@@ -21,7 +21,7 @@ public class TimeLineIcon : MonoBehaviour
     private RectTransform rect;
     private BaseController owner;//对应角色
     private TMP_Text intentText;
-    private TMP_Text dotText;
+    private TMP_Text debuffText;
     private float barHeight ;//ActionbarPanel 的高度
 
 
@@ -32,16 +32,16 @@ public class TimeLineIcon : MonoBehaviour
     }
     public void Bind(BaseController character)
     {
-        if (owner != null) owner.OnDotChanged -= RefreshDot;
+        if (owner != null) owner.OnDebuffChanged -= RefreshDebuff;
         owner = character;
-        if (owner != null) owner.OnDotChanged += RefreshDot;
+        if (owner != null) owner.OnDebuffChanged += RefreshDebuff;
         if (portImage!=null)
         {
             // Character data is the main portrait source. The controller/prefab portrait only stays as a fallback.
             portImage.sprite = owner.data.Portrait != null ? owner.data.Portrait : owner.portrait;
             portImage.enabled = portImage.sprite != null;
         }
-        RefreshDot();
+        RefreshDebuff();
     }
    public void SetHighLight(bool on)
     {
@@ -78,12 +78,12 @@ public class TimeLineIcon : MonoBehaviour
         intentText.gameObject.SetActive(!string.IsNullOrEmpty(message));
     }
 
-    private void RefreshDot()
+    private void RefreshDebuff()
     {
-        bool active = owner != null && owner.DotTurnsRemaining > 0;
-        if (dotText == null && active)
+        bool active = owner != null && owner.ActiveDebuff.IsActive;
+        if (debuffText == null && active)
         {
-            var label = new GameObject("DotStatus", typeof(RectTransform), typeof(TextMeshProUGUI));
+            var label = new GameObject("DebuffStatus", typeof(RectTransform), typeof(TextMeshProUGUI));
             label.transform.SetParent(transform, false);
             var labelRect = (RectTransform)label.transform;
             labelRect.anchorMin = new Vector2(1f, 0.5f);
@@ -91,24 +91,26 @@ public class TimeLineIcon : MonoBehaviour
             labelRect.pivot = new Vector2(0f, 0.5f);
             labelRect.anchoredPosition = new Vector2(8f, -22f);
             labelRect.sizeDelta = new Vector2(190f, 18f);
-            dotText = label.GetComponent<TMP_Text>();
-            dotText.color = new Color(1f, 0.45f, 0.3f);
-            dotText.alignment = TextAlignmentOptions.Left;
-            dotText.fontSize = 14f;
-            dotText.enableWordWrapping = false;
-            dotText.enableAutoSizing = true;
-            dotText.fontSizeMin = 10f;
-            dotText.fontSizeMax = 14f;
-            dotText.raycastTarget = false;
+            debuffText = label.GetComponent<TMP_Text>();
+            debuffText.color = new Color(1f, 0.45f, 0.3f);
+            debuffText.alignment = TextAlignmentOptions.Left;
+            debuffText.fontSize = 14f;
+            debuffText.enableWordWrapping = false;
+            debuffText.enableAutoSizing = true;
+            debuffText.fontSizeMin = 10f;
+            debuffText.fontSizeMax = 14f;
+            debuffText.raycastTarget = false;
         }
-        if (dotText == null) return;
-        dotText.text = active ? $"{owner.DotName} ({owner.DotTurnsRemaining})" : string.Empty;
-        dotText.gameObject.SetActive(active);
+        if (debuffText == null) return;
+        debuffText.text = active
+            ? $"{owner.ActiveDebuff.DisplayName} ({owner.ActiveDebuff.RemainingTurns})"
+            : string.Empty;
+        debuffText.gameObject.SetActive(active);
     }
 
     private void OnDestroy()
     {
-        if (owner != null) owner.OnDotChanged -= RefreshDot;
+        if (owner != null) owner.OnDebuffChanged -= RefreshDebuff;
     }
 
     // Update is called once per frame

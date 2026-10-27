@@ -433,7 +433,7 @@ public class BattleManager : MonoBehaviour
         if (!battleEnded && actor != null && actor.data != null && !actor.isDead)
         {
             int previousHp = actor.data.Hp;
-            actor.TickDotAtTurnEnd();
+            actor.TickDebuffAtTurnEnd();
             if (actor.data.Hp < previousHp)
             {
                 CheckBattleEnd(actor, actor);
@@ -847,7 +847,7 @@ public class BattleManager : MonoBehaviour
             }
         }
         var damageSkills = FindSkillsByType(actor.Skills, SkillType.Damage);
-        damageSkills.AddRange(FindSkillsByType(actor.Skills, SkillType.Dot));
+        damageSkills.AddRange(FindSkillsByType(actor.Skills, SkillType.ApplyDebuff));
         damageSkills.RemoveAll(skill => !IsEnemySkillReady(actor, skill));
 
         // Configured phase-two AOE must never bypass its charging turn through random selection.
@@ -867,7 +867,7 @@ public class BattleManager : MonoBehaviour
     {
         if (actor == null || actor.data == null || skill == null || actor.data.Mp < skill.mpCost)
             return false;
-        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
+        if (skill.skillType == SkillType.ApplyDebuff && !skill.HasValidDebuff)
             return false;
 
         return !_enemySkillCooldowns.TryGetValue(actor, out Dictionary<SkillData, int> cooldowns)
@@ -1097,7 +1097,7 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;
 
          battleEnded = true;
-        ClearBattleDots();
+        ClearBattleDebuffs();
         //强制关闭输入
         OnInputStateChanged?.Invoke(false);
         //清空上一次升级结果
@@ -1798,11 +1798,11 @@ public class BattleManager : MonoBehaviour
         yield return StartCoroutine(PlaySkillSequence(actor, target, skill, skill.targetType));
     }
 
-    private void ClearBattleDots()
+    private void ClearBattleDebuffs()
     {
         foreach (BaseController unit in controllers.ToArray())
         {
-            if (unit != null) unit.ClearDot();
+            if (unit != null) unit.ClearDebuff();
         }
     }
     private BaseController GetRandomAllyTarget(BaseController actor)
@@ -2153,7 +2153,7 @@ public class BattleManager : MonoBehaviour
     private void HandleRun(BaseController actor)
     {
         battleEnded = true;
-        ClearBattleDots();
+        ClearBattleDebuffs();
 
         _currentCommand = CommandType.None;
         _selectedSkill = null;
@@ -2235,7 +2235,7 @@ public class BattleManager : MonoBehaviour
             return false;
         if (actor.isDead || actor.data.isDead || actor.data.Hp <= 0)
             return false;
-        if (skill.skillType == SkillType.Dot && (skill.power <= 0 || skill.dotDurationTurns <= 0))
+        if (skill.skillType == SkillType.ApplyDebuff && !skill.HasValidDebuff)
             return false;
         if (IsGroupTarget(skill.targetType))
             return GetGroupSkillTargets(actor, skill).Count > 0;

@@ -17,5 +17,6 @@ MonoBehaviour:
   targetType: 0
   mpCost: 5
   power: 10
-  dotDurationTurns: 2
+  debuffEffect: 0
+  debuffDurationTurns: 2
   enemyCooldownTurns: 2
