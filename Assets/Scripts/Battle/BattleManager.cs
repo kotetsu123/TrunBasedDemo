@@ -608,15 +608,22 @@ public class BattleManager : MonoBehaviour
                 SkillData aoe = actor.data.bossPhaseTwoAoeSkill;
                 if (boss.IsBossCharging)
                 {
-                    boss.ClearBossCharge();
                     if (actor.data.Mp >= aoe.mpCost && GetAliveOpponentTargets(actor).Count > 0)
                     {
                         // This fixed two-action pattern replaces the random AI cooldown for this skill.
-                        yield return StartCoroutine(PlayGroupSkillSequence(actor, aoe));
+                        try
+                        {
+                            yield return StartCoroutine(PlayGroupSkillSequence(actor, aoe));
+                        }
+                        finally
+                        {
+                            if (boss != null) boss.ClearBossCharge();
+                        }
                         AdvanceEnemySkillCooldowns(actor);
                         yield return new WaitForSeconds(1f);
                         yield break;
                     }
+                    boss.ClearBossCharge();
                 }
                 else if (boss.TryBeginBossCharge())
                 {
@@ -1097,7 +1104,7 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;
 
          battleEnded = true;
-        ClearBattleDebuffs();
+        ClearBattleStatuses();
         //强制关闭输入
         OnInputStateChanged?.Invoke(false);
         //清空上一次升级结果
@@ -1798,11 +1805,13 @@ public class BattleManager : MonoBehaviour
         yield return StartCoroutine(PlaySkillSequence(actor, target, skill, skill.targetType));
     }
 
-    private void ClearBattleDebuffs()
+    private void ClearBattleStatuses()
     {
         foreach (BaseController unit in controllers.ToArray())
         {
-            if (unit != null) unit.ClearDebuff();
+            if (unit == null) continue;
+            unit.ClearDebuff();
+            if (unit is EnemyController enemy) enemy.ClearBossCharge();
         }
     }
     private BaseController GetRandomAllyTarget(BaseController actor)
@@ -2153,7 +2162,7 @@ public class BattleManager : MonoBehaviour
     private void HandleRun(BaseController actor)
     {
         battleEnded = true;
-        ClearBattleDebuffs();
+        ClearBattleStatuses();
 
         _currentCommand = CommandType.None;
         _selectedSkill = null;

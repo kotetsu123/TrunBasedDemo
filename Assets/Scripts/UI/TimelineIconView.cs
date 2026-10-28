@@ -18,6 +18,8 @@ public class TimelineIconView : MonoBehaviour
     [Header("Glow")]
     [SerializeField] private float nextAlpha = 0.35f;
     [SerializeField] private float activeAlpha = 0.65f;
+    [SerializeField] private Color dangerousGlowColor = new Color(1f, 0.45f, 0.05f);
+    [SerializeField, Range(0f, 1f)] private float dangerousAlpha = 0.85f;
 
     [Header("Layout")]
     [SerializeField]private float normalWidth = 60;
@@ -39,12 +41,14 @@ public class TimelineIconView : MonoBehaviour
     private Tween _tween;
     private bool _active;
     private TimeLineState _state= TimeLineState.Normal;
+    private bool _dangerous;
+    private Color _nextGlowColor = Color.white;
 
     private void Awake()
     {
+        if (glowImage != null)
+            _defalutGlowColor = glowImage.color;
         ForceInactive(TimeLineState.Normal);
-            if (glowImage != null)
-                _defalutGlowColor = glowImage.color;
     }
     private void Reset()
     {
@@ -101,17 +105,32 @@ public class TimelineIconView : MonoBehaviour
             visualRoot.localScale = Vector3.one;
 
         if (glow)
-            glow.alpha=(state==TimeLineState.Next)?nextAlpha:0f;
+            glow.alpha = GetGlowAlpha(state);
+        ApplyGlowColor(state);
     }
+    public void SetDangerous(bool dangerous)
+    {
+        if (_dangerous == dangerous) return;
+        _dangerous = dangerous;
+        ApplyState(_state, _nextGlowColor, true);
+    }
+
     public void SetState(TimeLineState state,Color nextGlowColor)
+    {
+        ApplyState(state, nextGlowColor, false);
+    }
+
+    private void ApplyState(TimeLineState state, Color nextGlowColor, bool intentChanged)
     {
         //Debug.Log($"[SetState] f={Time.frameCount} t={Time.time:F3} id={GetInstanceID()} state={state}");
 
         //Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");
         //if (_state == state) return;
         ApplyLayoutSize(state);
+        _nextGlowColor = nextGlowColor;
+        ApplyGlowColor(state);
 
-        if (_state == state)
+        if (_state == state && !intentChanged)
         {
             Debug.Log($"[SetState] SKIP same state id={GetInstanceID()} state={state}");
             return;
@@ -125,20 +144,7 @@ public class TimelineIconView : MonoBehaviour
         float targetScale=(state==TimeLineState.Active)? actionScale:
             (state==TimeLineState.Next)?nextScale:1f;
 
-        float tarrgetAlpha =
-            (state == TimeLineState.Active) ? activeAlpha :
-            (state == TimeLineState.Next) ? nextAlpha :
-            0f;
-        //颜色：next状态可能需要特殊颜色，active和normal使用默认颜色
-        if (glowImage != null)
-        {
-            glowImage.color= (state == TimeLineState.Next) ? nextGlowColor :  _defalutGlowColor;
-        }
-
-        //Next的颜色
-        if (state == TimeLineState.Next && glowImage!=null)
-            glowImage.color= nextGlowColor;
-
+        float tarrgetAlpha = GetGlowAlpha(state);
         var seq = DOTween.Sequence().SetLink(gameObject);//.SetUpdate(true);
         Debug.Log($"[SetState] f={Time.frameCount} created tween id={GetInstanceID()} state={state} targetScale={targetScale}");
         //scaled 动画
@@ -163,6 +169,21 @@ public class TimelineIconView : MonoBehaviour
         Debug.Log($"[ScaleTest] visualRoot={visualRoot.name} parent={visualRoot.parent?.name} startScale={visualRoot.localScale}");
         Debug.Log($"[ScaleParam] actionScale={actionScale} animTime={animTime}");
     }
+
+    private void ApplyGlowColor(TimeLineState state)
+    {
+        if (glowImage != null)
+            glowImage.color = _dangerous ? dangerousGlowColor
+                : state == TimeLineState.Next ? _nextGlowColor : _defalutGlowColor;
+    }
+
+    private float GetGlowAlpha(TimeLineState state)
+    {
+        if (_dangerous) return dangerousAlpha;
+        return state == TimeLineState.Active ? activeAlpha
+            : state == TimeLineState.Next ? nextAlpha : 0f;
+    }
+
     private void ApplyLayoutSize(TimeLineState state)
     {
         if(layoutElement==null)return;

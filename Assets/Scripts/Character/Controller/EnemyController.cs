@@ -63,6 +63,11 @@ public class EnemyController : BaseController
 
     private void SetBossIntent(string message)
     {
+        if (data != null)
+            data.intent = IsBossCharging && data.bossPhaseTwoAoeSkill != null
+                && data.bossPhaseTwoAoeSkill.isDangerous
+                ? ActionIntent.SkillDanerous : ActionIntent.Normal;
+
         hpBarInstance?.SetIntent(message);
         if (BattleManager.Instance != null
             && BattleManager.Instance.TimeLineIcons.TryGetValue(this, out TimeLineIcon icon)

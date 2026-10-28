@@ -42,6 +42,7 @@ public class TimeLineIcon : MonoBehaviour
             portImage.enabled = portImage.sprite != null;
         }
         RefreshDebuff();
+        RefreshIntentColor();
     }
    public void SetHighLight(bool on)
     {
@@ -53,6 +54,7 @@ public class TimeLineIcon : MonoBehaviour
 
     public void SetIntent(string message)
     {
+        RefreshIntentColor();
         if (intentText == null && !string.IsNullOrEmpty(message))
         {
             var label = new GameObject("Intent", typeof(RectTransform), typeof(TextMeshProUGUI));
@@ -76,6 +78,12 @@ public class TimeLineIcon : MonoBehaviour
         if (intentText == null) return;
         intentText.text = message ?? string.Empty;
         intentText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+    }
+
+    private void RefreshIntentColor()
+    {
+        GetComponent<TimelineIconView>()?.SetDangerous(owner != null && owner.data != null
+            && owner.data.intent == ActionIntent.SkillDanerous);
     }
 
     private void RefreshDebuff()

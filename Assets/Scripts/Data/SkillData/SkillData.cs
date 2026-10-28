@@ -24,6 +24,8 @@ public class SkillData : ScriptableObject
         && power > 0 && debuffDurationTurns > 0;
 
     [Header("Enemy AI")]
+    [Tooltip("Show a danger warning on the timeline while preparing this skill.")]
+    public bool isDangerous;
     [Min(0)]
     public int enemyCooldownTurns;
 }

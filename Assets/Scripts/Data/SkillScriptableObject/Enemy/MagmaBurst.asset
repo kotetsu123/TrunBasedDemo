@@ -17,4 +17,5 @@ MonoBehaviour:
   targetType: 1
   mpCost: 0
   power: 10
+  isDangerous: 1
   enemyCooldownTurns: 2
