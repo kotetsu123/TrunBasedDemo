@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,6 +25,17 @@ public class EnemyController : BaseController
         && data.bossPhaseTwoAoeSkill.skillType == SkillType.Damage
         && data.bossPhaseTwoAoeSkill.targetType == SkillTargetType.EnemyAll;
 
+    protected override int CalculateSkillDamage(SkillData skill)
+    {
+        int damage = base.CalculateSkillDamage(skill);
+
+        if (IsBossCharging && skill == data.bossPhaseTwoAoeSkill)
+        {
+            float multiplier = Mathf.Max(1f, data.bossChargeDamageMultiplier);
+            damage = Mathf.RoundToInt(damage * multiplier);
+        }
+        return damage;
+    }
     public override void Init(Character character)
     {
         base.Init(character);

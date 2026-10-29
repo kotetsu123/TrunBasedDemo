@@ -68,6 +68,8 @@ public class Character
     [Range(0.01f, 0.99f)]
     public float bossPhaseTwoHpRatio = 0.5f;
     public SkillData bossPhaseTwoAoeSkill;
+    [Min(1f)]
+    public float bossChargeDamageMultiplier = 1.5f;
 
     public bool isOnField;
     public bool isActing;
@@ -207,6 +209,7 @@ public class Character
 
             bossPhaseTwoHpRatio = this.bossPhaseTwoHpRatio,
             bossPhaseTwoAoeSkill = this.bossPhaseTwoAoeSkill,
+            bossChargeDamageMultiplier = this.bossChargeDamageMultiplier,
 
             isOnField = this.isOnField,
             isActing = this.isActing,

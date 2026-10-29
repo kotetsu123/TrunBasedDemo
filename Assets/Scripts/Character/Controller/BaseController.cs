@@ -318,6 +318,10 @@ public abstract class BaseController : MonoBehaviour
 
         return true;
     }
+    protected virtual int CalculateSkillDamage(SkillData skill)
+    {
+        return data.Attack + skill.power;
+    }
     /// <summary>
     /// 将技能效果应用到目标上
     /// 这个函数不负责mp，因此可以被多次调用，适用于群体技能
@@ -330,7 +334,7 @@ public abstract class BaseController : MonoBehaviour
         {
             case SkillType.Damage:
                 {
-                    int damage = data.Attack + skill.power;
+                    int damage = CalculateSkillDamage(skill);
                     target.TakeDamage(damage);
                     Debug.Log($"{data.Name} used {skill.skillName} on {target.data.Name}");
                     break;
