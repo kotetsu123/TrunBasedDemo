@@ -137,6 +137,9 @@ MonoBehaviour:
       weight: 1
     bossPhaseTwoHpRatio: 0.5
     bossPhaseTwoAoeSkill: {fileID: 11400000, guid: edf50fd4ed016294da85a03b36c342b9, type: 2}
+    bossPhaseTwoSingleSkill: {fileID: 11400000, guid: 98a4d05ce4017f949a04c792d3ed9d19, type: 2}
+    bossPhaseTwoDebuffSkill: {fileID: 11400000, guid: 0eb4ed56dccf4b3ba39db54d1605da10, type: 2}
+    bossChargeDamageMultiplier: 1.5
     isOnField: 1
     isActing: 0
     isDead: 0

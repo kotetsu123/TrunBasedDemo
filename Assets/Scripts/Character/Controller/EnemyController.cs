@@ -17,6 +17,7 @@ public class EnemyController : BaseController
 
     public bool IsBossPhaseTwo { get; private set; }
     public bool IsBossCharging { get; private set; }
+    private int _bossPhaseTwoOpeningStep;
 
     public bool HasBossPhaseTwoPattern => data != null
         && data.Team == Team.Enemy
@@ -53,6 +54,28 @@ public class EnemyController : BaseController
             return false;
 
         IsBossPhaseTwo = true;
+        _bossPhaseTwoOpeningStep = 0;
+        return true;
+    }
+
+    public bool TryTakeBossPhaseTwoOpeningSkill(out SkillData skill)
+    {
+        skill = null;
+        if (!IsBossPhaseTwo || !HasBossPhaseTwoPattern || IsBossCharging
+            || data.isDead || data.Hp <= 0 || _bossPhaseTwoOpeningStep >= 2)
+            return false;
+
+        SkillData single = data.bossPhaseTwoSingleSkill;
+        SkillData debuff = data.bossPhaseTwoDebuffSkill;
+        if (single == null || single.skillType != SkillType.Damage
+            || single.targetType != SkillTargetType.EnemySingle
+            || debuff == null || !debuff.HasValidDebuff
+            || debuff.targetType != SkillTargetType.EnemySingle)
+            return false;
+
+        // Consume one opening slot per boss action, even when its skill is unavailable.
+        skill = _bossPhaseTwoOpeningStep == 0 ? single : debuff;
+        _bossPhaseTwoOpeningStep++;
         return true;
     }
 
@@ -70,6 +93,7 @@ public class EnemyController : BaseController
     public void ClearBossCharge()
     {
         IsBossCharging = false;
+        _bossPhaseTwoOpeningStep = 0;
         SetBossIntent(null);
     }
 

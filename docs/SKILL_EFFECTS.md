@@ -12,12 +12,14 @@ Skill effects and target scope are separate. Group healing is `Heal` plus
 
 | Template | Skill Type | Target Type | Debuff Effect | Power | MP Cost | Duration |
 | --- | --- | --- | --- | --- | --- | --- |
-| Burn | ApplyDebuff | EnemySingle | DamageOverTime | 10 per tick | 5 | 2 target actions |
+| Burn | ApplyDebuff | EnemySingle | DamageOverTime | 10 per tick | 0 | 2 target actions |
 | PartyHeal | Heal | AllyAll | Not used | 40 per living ally | 25 total | Not used |
 
-The templates are in `Assets/Scripts/Data/SkillScriptableObject`. They are not
-automatically assigned to Paul, other party members, or the boss. Their values
-are examples, not final balance. A DOT can also target `EnemyAll`.
+PartyHeal remains an unassigned template in `Assets/Scripts/Data/SkillScriptableObject`.
+Burn is boss-only, lives in that folder's `Enemy` subfolder, and is configured for
+the boss's second-phase rotation. It is not assigned to Paul or other party members.
+Its initial test cost of 5 MP was changed to 0 on 2026-10-29, as confirmed by the user.
+These values are not final balance. The general DOT behavior also supports `EnemyAll`.
 
 ### State Management and Compatibility
 
@@ -28,7 +30,7 @@ power, and remaining duration. Its shared `Refresh`, `TryAdvanceTurn`, and
 `DamageOverTime` branch calls `TakeDamage`. Expiration preserves the final tick.
 `OnDebuffChanged` updates the timeline label without coupling UI to DOT fields.
 
-The Burn GUID, damage, duration, MP cost, and target scope are unchanged.
+The Burn GUID, damage, duration and target scope are preserved; its current MP cost is 0.
 `debuffDurationTurns` has `[FormerlySerializedAs("dotDurationTurns")]` so older
 skill assets retain their configured duration. Old serialized skill type 3 now
 means `ApplyDebuff`; a missing effect field defaults to `DamageOverTime`.
@@ -66,11 +68,9 @@ weights/cooldowns; its existing heal trigger and boss-healing policy remain.
 
 ### Scope
 
-This change supplies skill behavior only. Boss phase-two selection still uses
-the previously implemented fixed charge/AOE cycle. A rotation mixing DOT,
-single-target attacks, and occasional charged AOE is a separate next step.
-It does not add defense, equipment, cleanse, DOT stacking, or a general buff
-framework.
+The Debuff foundation supplies skill behavior, not boss scheduling. The separate
+boss rotation now mixes Fire, Burn, charge and enhanced AOE; see [Boss Phase Two](BOSS_PHASE_TWO.md).
+It does not add defense, equipment, cleanse, DOT stacking, or a general buff framework.
 
 ### Verification
 
@@ -106,11 +106,13 @@ or standalone-build verification.
 
 | 模板 | Skill Type | Target Type | Debuff Effect | Power | MP Cost | 持续 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Burn | ApplyDebuff | EnemySingle | DamageOverTime | 每次扣血 10 | 5 | 目标自己的 2 次行动 |
+| Burn | ApplyDebuff | EnemySingle | DamageOverTime | 每次扣血 10 | 0 | 目标自己的 2 次行动 |
 | PartyHeal | Heal | AllyAll | 不使用 | 每位存活队友恢复 40 | 总计 25 | 不使用 |
 
-模板位于 `Assets/Scripts/Data/SkillScriptableObject`，不会自动分配给 Paul、
-其他队友或 Boss。数值仅用于试验，尚未平衡。DOT 也可以配置为 `EnemyAll`。
+PartyHeal 仍是 `Assets/Scripts/Data/SkillScriptableObject` 中尚未分配的模板。
+Burn 已确认是 Boss 专属技能，位于该目录的 `Enemy` 子目录，并已接入 Boss 二阶段轮转，
+没有分配给 Paul 或其他队友。按用户于 2026-10-29 确认的设定，原先测试用的 5 MP 改为 0。
+这些数值仍未完成难度平衡；通用 DOT 逻辑也支持 `EnemyAll`。
 
 ### 状态管理与兼容
 
@@ -120,7 +122,7 @@ or standalone-build verification.
 最后一次效果先取出再清除状态，避免到期时漏掉最后一次伤害。
 UI 监听 `OnDebuffChanged`，不再依赖 DOT 专用字段。
 
-Burn 的 GUID、伤害、持续次数、MP 和目标范围保持不变。
+Burn 的 GUID、伤害、持续次数和目标范围保留，当前 MP 消耗为 0。
 新字段 `debuffDurationTurns` 使用 `[FormerlySerializedAs("dotDurationTurns")]`，
 旧技能资源会保留原来填写的持续次数；旧枚举值 3 现在对应 `ApplyDebuff`，
 旧资源没有具体效果字段时默认是 `DamageOverTime`，无需重建 SO 或重新拖场景引用。
@@ -151,8 +153,9 @@ Burn 的 GUID、伤害、持续次数、MP 和目标范围保持不变。
 
 ### 本次范围
 
-本次只补技能能力。Boss 二阶段目前仍是上一版固定蓄力/群攻，之后再单独调整为
-单体、DOT 和偶尔蓄力群攻的轮转。没有新增防御、装备、净化、DOT 叠层或完整 Buff 框架。
+Debuff 基础负责技能效果，不负责 Boss 排期。独立的 Boss 轮转现在已经接入
+Fire、Burn、蓄力和强化群攻，详见 [Boss 二阶段](BOSS_PHASE_TWO.md)。
+没有新增防御、装备、净化、DOT 叠层或完整 Buff 框架。
 
 ### 验证
 

@@ -594,6 +594,7 @@ public class BattleManager : MonoBehaviour
         if (actor == null || actor.data == null || actor.isDead || actor.data.Hp <= 0 || battleEnded)
             yield break;
 
+        SkillData skill = null;
         EnemyController boss = actor as EnemyController;
         if (boss != null && boss.HasBossPhaseTwoPattern)
         {
@@ -625,6 +626,11 @@ public class BattleManager : MonoBehaviour
                     }
                     boss.ClearBossCharge();
                 }
+                else if (boss.TryTakeBossPhaseTwoOpeningSkill(out SkillData openingSkill))
+                {
+                    if (IsEnemySkillReady(actor, openingSkill))
+                        skill = openingSkill;
+                }
                 else if (boss.TryBeginBossCharge())
                 {
                     cameraDirector?.FocusActorTurnShot(actor);
@@ -636,7 +642,8 @@ public class BattleManager : MonoBehaviour
             }
         }
 
-        SkillData skill = ChooseEnemySkill(actor);
+        if (skill == null)
+            skill = ChooseEnemySkill(actor);
 
         if (skill == null)
         {

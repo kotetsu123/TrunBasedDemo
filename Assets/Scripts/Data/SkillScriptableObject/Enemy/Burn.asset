@@ -15,7 +15,7 @@ MonoBehaviour:
   skillName: Burn
   skillType: 3
   targetType: 0
-  mpCost: 5
+  mpCost: 0
   power: 10
   debuffEffect: 0
   debuffDurationTurns: 2
