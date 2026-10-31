@@ -10,6 +10,7 @@ public abstract class BaseController : MonoBehaviour
     public Character data;
 
     public event Action OnDebuffChanged;
+    public event Action<int> OnDamageTaken;
     private readonly DebuffState _activeDebuff = new DebuffState();
     public DebuffState ActiveDebuff => _activeDebuff;
 
@@ -69,6 +70,7 @@ public abstract class BaseController : MonoBehaviour
         if (actualDamage > 0)
         {
             ShowFloatingText($"-{actualDamage}", Color.red);
+            OnDamageTaken?.Invoke(actualDamage);
         }
         data.NotifyHpChange(prev, data.Hp);
         if (data.Hp <= 0)
