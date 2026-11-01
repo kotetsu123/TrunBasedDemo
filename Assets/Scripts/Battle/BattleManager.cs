@@ -29,6 +29,7 @@ public class BattleManager : MonoBehaviour
 
     // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
+    private readonly HashSet<BaseController> _dyingEnemies = new HashSet<BaseController>();
     
     public bool isActing = false;
     public bool battleEnded = false;
@@ -1091,13 +1092,15 @@ public class BattleManager : MonoBehaviour
     void CheckBattleEnd(BaseController attacker, BaseController target)
     {
         if (battleEnded) return;
-        if (target == null || target.data == null) return;
-        if (target.data.Hp > 0) return;
+        if (target != null && (target.data == null || target.data.Hp > 0)) return;
         _lastLevelUpResults.Clear();
         //不要立刻battle Ended=true
         //判断是否还有任何存在的单位
         bool enemyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Enemy);
         bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Player);
+
+        // A dying enemy still owns its slot until the visual finishes and reserves can fill it.
+        if (!enemyAlive && allyAlive && _dyingEnemies.Count > 0) return;
 
         if (!enemyAlive||!allyAlive)
         {
@@ -1448,6 +1451,8 @@ public class BattleManager : MonoBehaviour
     }*/
     public void NotifyDeath(BaseController dead)
     {
+        if (dead == null || dead.data == null) return;
+        if (dead.data.Team == Team.Enemy && !_dyingEnemies.Add(dead)) return;
         if(_currentTarget==dead)
             SetCurrentTarget(null);
         StartCoroutine(HandleDeathCoroutine(dead));
@@ -1486,9 +1491,9 @@ public class BattleManager : MonoBehaviour
         //站位层，只有敌人需要释放站位
         if (dead.data.Team == Team.Enemy)
         {
-            //从站位中释放//只有enmey才会
-            formation.Release(dead, out _);
             dead.data.isOnField = false;
+            foreach (var collider in dead.GetComponentsInChildren<Collider>(true))
+                collider.enabled = false;
         }
             //刷新时间轴(避免ui 还显示旧顺序)
             // _timelineDirty = true;//需要时间轴更新
@@ -1498,16 +1503,25 @@ public class BattleManager : MonoBehaviour
         //表现层，隐藏并摧毁角色本体//敌人的情况下
         if (dead.data.Team == Team.Enemy)
         {
-            if (dead.gameObject != null)
+            try
+            {
+                var feedback = dead.GetComponent<BattleDeathFeedback>();
+                if (feedback != null && feedback.isActiveAndEnabled)
+                    yield return feedback.Play();
+            }
+            finally
+            {
+                _dyingEnemies.Remove(dead);
+            }
+
+            if (dead != null)
+            {
                 dead.gameObject.SetActive(false);
-
-            //等待一帧真正销毁（防协程美剧中途爆炸）
-            yield return null;
-            //敌人真正销毁，并且补位
-            if (dead.gameObject != null)
+                formation.Release(dead, out _);
                 Destroy(dead.gameObject);
-
+            }
             spawner?.TryFillOneEnemy();
+            CheckBattleEnd(null, null);
         }
         else
         {
