@@ -15,6 +15,7 @@ public class TimeLineUI : MonoBehaviour
 
     //cache: baseController->TimelineIconView
     private readonly Dictionary<BaseController, TimelineIconView> _map = new();
+    private readonly List<BaseController> _staleControllers = new();
 
     private void Awake()
     {
@@ -45,13 +46,15 @@ public class TimeLineUI : MonoBehaviour
         //也就是全部重置状态，
         //这个方法的主要作用是。建立缓存+重置
         _map.Clear();
+        _lastActive = null;
+        _lastNext = null;
         if (battle == null) return;
 
         foreach(var kv in battle.TimeLineIcons)
         {
             var controller = kv.Key;
             var icon = kv.Value;
-            if (controller == null || icon == null) continue;
+            if (!IsVisibleActor(controller) || icon == null) continue;
 
             var view=icon.GetComponent<TimelineIconView>();
             if (view == null)
@@ -66,7 +69,12 @@ public class TimeLineUI : MonoBehaviour
         //战斗开始，同步当前状态
         var cur = battle.CurrentActor;
         if (cur != null && _map.TryGetValue(cur, out var curView) && curView != null)
+        {
             curView.SetState(TimeLineState.Active, Color.white);
+            _lastActive = cur;
+        }
+
+        if (_lastOrdered != null) RefreshNext(_lastOrdered);
 
         foreach (var kv in _map)
             Debug.Log($"[Map] controller={kv.Key.data.Name}-> viewID={kv.Value.GetInstanceID()}");
@@ -74,6 +82,7 @@ public class TimeLineUI : MonoBehaviour
     }
     private void HandleActionChanged(BaseController prev, BaseController cur)
     {
+        SynchronizeCache();
 
         //1）关掉上一个Active
         if (_lastActive != null && _map.TryGetValue(_lastActive, out var prevView) && prevView != null)
@@ -88,7 +97,7 @@ public class TimeLineUI : MonoBehaviour
             curView.SetState(TimeLineState.Active, Color.white);
 
        
-       _lastActive = cur;
+       _lastActive = IsVisibleActor(cur) ? cur : null;
 
         if(_lastOrdered!=null)
         RefreshNext(_lastOrdered);
@@ -139,21 +148,18 @@ public class TimeLineUI : MonoBehaviour
 
             battle.OnTimeLineOrdered -= HandleTimeLineOrdered;
             battle.OnTimeLineOrdered += HandleTimeLineOrdered;
-
+            BuildCache();
         }
     }
 
     private void HandleTimeLineOrdered(List<BaseController> ordered)
     {
-        if (ordered == null || ordered.Count == 0) return;
-        if (_map.Count == 0) BuildCache();
-
         _lastOrdered = ordered;
 
         RefreshNext(ordered);
 
-        var active= battle.CurrentActor; // 当前行动者（可能为 null） 
-        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active); 
+        var active= battle != null ? battle.CurrentActor : null;
+        var next = _lastNext;
 
         Debug.Log($"[NextHandler] active={(active ? active.data.Name : "null")} next={(next ? next.data.Name :"null")}");
     }
@@ -163,20 +169,21 @@ public class TimeLineUI : MonoBehaviour
         if (battle != null)
         {
             battle.OnActionChanged -= HandleActionChanged;
+            battle.OnTimeLineOrdered -= HandleTimeLineOrdered;
         }
     }
     private void RefreshNext(List<BaseController> ordered)
     {
-        if (ordered == null || ordered.Count == 0) return;
-        if (_map.Count == 0)
-            BuildCache();
+        SynchronizeCache();
+        if (battle == null) return;
 
         var active = battle.CurrentActor; // 当前行动者（可能为 null）
 
-        var next = ordered.FirstOrDefault(c => c != null && !c.data.isDead && c != active);
+        var next = ordered?.FirstOrDefault(c => IsVisibleActor(c) && c != active
+            && _map.TryGetValue(c, out var view) && view != null);
 
         //清旧 next  (只要不是 active)
-        if (_lastNext!=null&&_lastNext!=next&&_lastNext!=active&&_map.TryGetValue(_lastNext,out var oldNextView))
+        if (_lastNext!=null&&_lastNext!=next&&_lastNext!=active&&_map.TryGetValue(_lastNext,out var oldNextView)&&oldNextView!=null)
         {
             oldNextView.SetState(TimeLineState.Normal, Color.white);
         }
@@ -186,5 +193,42 @@ public class TimeLineUI : MonoBehaviour
             nextView.SetState(TimeLineState.Next, GetNextGlowColor(next));
         }
         _lastNext = next;
+    }
+
+    private static bool IsVisibleActor(BaseController actor)
+    {
+        return actor != null && actor.data != null && actor.data.isOnField
+            && !actor.isDead && !actor.data.isDead && actor.data.Hp > 0;
+    }
+
+    private void SynchronizeCache()
+    {
+        if (battle == null)
+        {
+            _map.Clear();
+            _lastActive = null;
+            _lastNext = null;
+            return;
+        }
+
+        _staleControllers.Clear();
+        foreach (var pair in _map)
+        {
+            if (!IsVisibleActor(pair.Key) || pair.Value == null
+                || !battle.TimeLineIcons.TryGetValue(pair.Key, out var icon) || icon == null
+                || pair.Value.gameObject != icon.gameObject)
+                _staleControllers.Add(pair.Key);
+        }
+        foreach (var controller in _staleControllers) _map.Remove(controller);
+
+        // Synchronize references without resetting live views' active/next/danger states.
+        foreach (var pair in battle.TimeLineIcons)
+        {
+            if (!IsVisibleActor(pair.Key) || pair.Value == null || _map.ContainsKey(pair.Key)) continue;
+            var view = pair.Value.GetComponent<TimelineIconView>();
+            if (view != null) _map[pair.Key] = view;
+        }
+        if (_lastActive == null || !_map.ContainsKey(_lastActive)) _lastActive = null;
+        if (_lastNext == null || !_map.ContainsKey(_lastNext)) _lastNext = null;
     }
 }

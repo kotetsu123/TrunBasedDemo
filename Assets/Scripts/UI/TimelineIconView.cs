@@ -66,6 +66,7 @@ public class TimelineIconView : MonoBehaviour
     }
     public void SetActive(bool active)
     {
+        if (this == null) return;
                if (_active == active) return;
         _active = active;
 
@@ -93,6 +94,7 @@ public class TimelineIconView : MonoBehaviour
     }
     public void ForceInactive(TimeLineState state)
     {
+        if (this == null) return;
         _tween?.Kill();
         _tween = null;
         _state = state;
@@ -110,6 +112,7 @@ public class TimelineIconView : MonoBehaviour
     }
     public void SetDangerous(bool dangerous)
     {
+        if (this == null) return;
         if (_dangerous == dangerous) return;
         _dangerous = dangerous;
         ApplyState(_state, _nextGlowColor, true);
@@ -122,6 +125,7 @@ public class TimelineIconView : MonoBehaviour
 
     private void ApplyState(TimeLineState state, Color nextGlowColor, bool intentChanged)
     {
+        if (this == null) return;
         //Debug.Log($"[SetState] f={Time.frameCount} t={Time.time:F3} id={GetInstanceID()} state={state}");
 
         //Debug.Log($"[iconView]{name}#{GetInstanceID()}=>{state} glowAlpha={(glow?glow.alpha:-1f)}");

@@ -122,7 +122,6 @@ public class BattleManager : MonoBehaviour
     private bool _battleStartSequencePlayed=false;
 
     private bool _timelineInitialized = false;
-    private Tween _moveTween;//防止重入
 
     
 
@@ -687,24 +686,44 @@ public class BattleManager : MonoBehaviour
     }
     private IEnumerator PlayAttackSequence(BaseController actor,BaseController target)
     {
-        if (actor == null || target == null)
+        if (!CanResolveAttack(actor, target))
             yield break;
 
-        //摄像头锁定
         cameraDirector?.LockCamera();
+        try
+        {
+            cameraDirector?.FocusPlayerSideInteractionShot(actor, target, attackCameraLeadTime);
+            yield return new WaitForSeconds(attackCameraLeadTime);
+            if (cameraDirector != null)
+                yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+            if (!CanResolveAttack(actor, target)) yield break;
 
-        yield return new WaitForSeconds(attackCameraLeadTime);
+            ShowSkillName("Attack");
+            Action impact = () =>
+            {
+                if (!CanResolveAttack(actor, target)) return;
+                target.TakeDamage(actor.data.Attack);
+                CheckBattleEnd(actor, target);
+            };
+            var feedback = actor.GetComponent<BattleAttackFeedback>();
+            if (feedback != null && feedback.isActiveAndEnabled)
+                yield return feedback.Play(target.transform, impact);
+            else
+                impact();
 
-        ShowSkillName("Attack");
-        //造成伤害
-        target.TakeDamage(actor.data.Attack);
+            yield return new WaitForSeconds(attackImpactHoldTime);
+        }
+        finally
+        {
+            cameraDirector?.UnlockCamera();
+        }
+    }
 
-        CheckBattleEnd(actor, target);
-        //给镜头一点时间看伤害结果
-        yield return new WaitForSeconds(attackImpactHoldTime);
-
-        cameraDirector?.UnlockCamera();
-
+    private bool CanResolveAttack(BaseController actor, BaseController target)
+    {
+        return !battleEnded && actor != null && actor.data != null
+            && !actor.isDead && actor.data.Hp > 0 && target != null && target.data != null
+            && !target.isDead && target.data.Hp > 0 && actor.data.Team != target.data.Team;
     }
     private IEnumerator PlaySkillSequence(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
     {
@@ -759,10 +778,22 @@ public class BattleManager : MonoBehaviour
         //给镜头一点时间
         yield return new WaitForSeconds(skillCameraLeadTime);
 
-        yield return new WaitForSeconds(0.5f);
-
-        actor.UseSkill(skill, target);
-        CheckBattleEnd(actor, target);
+        var attackFeedback = actor.GetComponent<BattleAttackFeedback>();
+        if (attackFeedback != null && attackFeedback.isActiveAndEnabled && attackFeedback.MatchesSkill(skill))
+        {
+            yield return attackFeedback.Play(target.transform, () =>
+            {
+                if (!CanResolveAttack(actor, target)) return;
+                actor.UseSkill(skill, target);
+                CheckBattleEnd(actor, target);
+            });
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.5f);
+            actor.UseSkill(skill, target);
+            CheckBattleEnd(actor, target);
+        }
 
         //给镜头一点时间看结果
         yield return new WaitForSeconds(skilllimpactHoldTime);
@@ -1328,13 +1359,6 @@ public class BattleManager : MonoBehaviour
             _timelineInitialized = true;
             return;
         }
-        //如果上一次还在移动，先杀掉（避免重入）
-        _moveTween?.Kill();
-        _moveTween = null;
-
-    //创建新的动画序列
-        var seq=DOTween.Sequence();
-
         for(int i = 0; i < ordered.Count; i++)
         {
             var c=ordered[i];
@@ -1349,10 +1373,8 @@ public class BattleManager : MonoBehaviour
 
             Vector2 targetPos = _slots[i].anchoredPosition;
 
-            rt.DOKill(false);
-            seq.Join(rt.DOAnchorPos(targetPos, timelineMoveTime).SetEase(Ease.OutSine));
+            icon.MoveToSlot(targetPos, timelineMoveTime);
         }
-        _moveTween= seq;      
     }
    /* void UpdateTimeLineUI(List<BaseController> ordered)
     {

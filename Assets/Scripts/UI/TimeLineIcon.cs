@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 
 public class TimeLineIcon : MonoBehaviour
@@ -23,6 +24,7 @@ public class TimeLineIcon : MonoBehaviour
     private TMP_Text intentText;
     private TMP_Text debuffText;
     private float barHeight ;//ActionbarPanel µÄ¸ß¶È
+    private Tween moveTween;
 
 
     private void Awake()
@@ -116,8 +118,28 @@ public class TimeLineIcon : MonoBehaviour
         debuffText.gameObject.SetActive(active);
     }
 
+    public void MoveToSlot(Vector2 position, float duration)
+    {
+        StopMove();
+        if (this == null || !isActiveAndEnabled || rect == null) return;
+        moveTween = rect.DOAnchorPos(position, duration).SetEase(Ease.OutSine)
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+    }
+
+    private void StopMove()
+    {
+        moveTween?.Kill();
+        moveTween = null;
+    }
+
+    private void OnDisable()
+    {
+        StopMove();
+    }
+
     private void OnDestroy()
     {
+        StopMove();
         if (owner != null) owner.OnDebuffChanged -= RefreshDebuff;
     }
 
