@@ -172,6 +172,8 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;//如果战斗结束，跳过本次更新
         if (isActing) return;//正在行动中，跳过本次更新
         if (!isBattleReady) return;//战斗未准备好，跳过本次更新
+        if (IsWaitingForLastEnemyDeath())
+            return;
 
         updateActionValues(Time.deltaTime);
 
@@ -397,7 +399,11 @@ public class BattleManager : MonoBehaviour
         
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
-        if (actor == null || actor.data == null || actor.data.isDead)
+        while (!battleEnded && IsWaitingForLastEnemyDeath())
+        {
+            yield return null;
+        }
+        if (battleEnded||actor == null || actor.data == null || actor.data.isDead)
         {
             isActing = false;
             if (actor != null && actor.data != null)
@@ -476,7 +482,7 @@ public class BattleManager : MonoBehaviour
 
         if (commandPanel != null)
         {
-            commandPanel.Show();
+            TryShowCommandPanel();
         }
         while (!actionChosen)
         {
@@ -760,44 +766,63 @@ public class BattleManager : MonoBehaviour
         bool isEnemyToEnemySkill=actor.data.Team == Team.Enemy && target.data.Team==Team.Enemy;
 
         cameraDirector?.LockCamera();
-
-        if (isEnemyToEnemySkill)
+        try
         {
-            cameraDirector?.FocusEnemyGroup();
-        }
-        //自身技能看自己
-        else if (isSelfSkill)
-        {
-            cameraDirector?.FocusActorTurnShot(actor);
-        }
-        else
-        {
-            cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
-        }
-
-        //给镜头一点时间
-        yield return new WaitForSeconds(skillCameraLeadTime);
-
-        var attackFeedback = actor.GetComponent<BattleAttackFeedback>();
-        if (attackFeedback != null && attackFeedback.isActiveAndEnabled && attackFeedback.MatchesSkill(skill))
-        {
-            yield return attackFeedback.Play(target.transform, () =>
+            if (isEnemyToEnemySkill)
             {
-                if (!CanResolveAttack(actor, target)) return;
+                cameraDirector?.FocusEnemyGroup();
+            }
+            //自身技能看自己
+            else if (isSelfSkill)
+            {
+                cameraDirector?.FocusActorTurnShot(actor);
+            }
+            else
+            {
+                cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
+            }
+
+            //给镜头一点时间
+            yield return new WaitForSeconds(skillCameraLeadTime);
+            if (actor == null || target == null) yield break;
+
+            var attackFeedback = actor.GetComponent<BattleAttackFeedback>();
+            var fireFeedback = actor.GetComponent<BattleFireFeedback>();
+            if (attackFeedback != null && attackFeedback.isActiveAndEnabled && attackFeedback.MatchesSkill(skill))
+            {
+                yield return attackFeedback.Play(target.transform, () =>
+                {
+                    if (!CanResolveAttack(actor, target)) return;
+                    actor.UseSkill(skill, target);
+                    CheckBattleEnd(actor, target);
+                });
+            }
+            else if (fireFeedback != null && fireFeedback.isActiveAndEnabled && fireFeedback.MatchesSkill(skill))
+            {
+                if (cameraDirector != null)
+                    yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+                if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost) yield break;
+                yield return fireFeedback.Play(target, () =>
+                {
+                    if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost) return;
+                    actor.UseSkill(skill, target);
+                    CheckBattleEnd(actor, target);
+                });
+            }
+            else
+            {
+                yield return new WaitForSeconds(0.5f);
                 actor.UseSkill(skill, target);
                 CheckBattleEnd(actor, target);
-            });
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.5f);
-            actor.UseSkill(skill, target);
-            CheckBattleEnd(actor, target);
-        }
+            }
 
-        //给镜头一点时间看结果
-        yield return new WaitForSeconds(skilllimpactHoldTime);
-        cameraDirector?.UnlockCamera();
+            //给镜头一点时间看结果
+            yield return new WaitForSeconds(skilllimpactHoldTime);
+        }
+        finally
+        {
+            cameraDirector?.UnlockCamera();
+        }
     }
     /// <summary>
     /// 敌方对全部存活对手使用群体技能的行动流程。
@@ -1145,6 +1170,11 @@ public class BattleManager : MonoBehaviour
         if (battleEnded) return;
 
          battleEnded = true;
+        commandPanel?.Hide();
+        skillPanel?.Hide();
+        itemPanel?.Hide();
+
+        
         ClearBattleStatuses();
         //强制关闭输入
         OnInputStateChanged?.Invoke(false);
@@ -1982,6 +2012,7 @@ public class BattleManager : MonoBehaviour
         _currentCommand = CommandType.Skill;
         NotifyInputState();
     }
+    
     private void HandleSkillCancel()
     {
         if(skillPanel==null||commandPanel==null) return;
@@ -2079,7 +2110,7 @@ public class BattleManager : MonoBehaviour
             _currentCommand = CommandType.None;
             NotifyInputState();
 
-            commandPanel.Show();
+            TryShowCommandPanel();
             return;
         }
         if (_currentCommand == CommandType.Item)
@@ -2176,6 +2207,38 @@ public class BattleManager : MonoBehaviour
 
         ShowBattleEventPopup($"Group Encounter x{groupCount}");
     }
+    private bool IsWaitingForLastEnemyDeath()
+    {
+        if (_dyingEnemies.Count == 0)
+            return false;
+
+        return !controllers.Any(c=>
+        c!=null
+        &&c.data!=null
+        &&c.data.Team==Team.Enemy
+        &&!c.isDead
+        &&!c.data.isDead
+        &&c.data.Hp>0);
+    }
+    private bool CanShowCommandPanel()
+    {
+        if (battleEnded || IsWaitingForLastEnemyDeath()||!isActing || actionChosen)
+            return false;
+        var actor= _currentActor;
+
+        return actor != null
+            && actor.data != null
+            && actor.data.Team == Team.Player
+            && !actor.isDead
+            && actor.data.Hp > 0;
+    }
+    private void TryShowCommandPanel()
+    {
+        if(!CanShowCommandPanel())
+            return;
+
+        commandPanel?.Show();
+    }
     public void CancelSkillSelection()
     {
         //浏览镜头返回
@@ -2184,7 +2247,7 @@ public class BattleManager : MonoBehaviour
             ReturnToBattlePreviewCamera();
 
         skillPanel.Hide();
-        commandPanel.Show();
+       TryShowCommandPanel();
 
         _currentCommand = CommandType.None;
         NotifyInputState();
@@ -2197,7 +2260,7 @@ public class BattleManager : MonoBehaviour
             ReturnToBattlePreviewCamera();
 
         itemPanel.Hide();
-        commandPanel.Show();
+        TryShowCommandPanel();
 
         _currentCommand = CommandType.None;
         NotifyInputState();
