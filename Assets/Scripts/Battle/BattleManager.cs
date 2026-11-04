@@ -735,25 +735,44 @@ public class BattleManager : MonoBehaviour
     {
         if(actor==null||target==null||skill==null)
             yield break;
-        //摄像头锁定
+        var fireFeedback = actor.GetComponent<BattleFireFeedback>();
+        bool playFire = fireFeedback != null && fireFeedback.isActiveAndEnabled && fireFeedback.MatchesSkill(skill);
+
         cameraDirector?.LockCamera();
+        try
+        {
+            if (playFire)
+                cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
+            else
+                PlaySkillCamera(actor, target, skill, targetType);
 
-        //根据确认时的targettype 决定镜头
-        /*  if(_selectedSkill.targetType == SkillTargetType.Self||target==actor)
-              cameraDirector?.FocusActorTurnShot(actor);
-          else
-              cameraDirector?.FocusTargetHitShot(target);*/
-        PlaySkillCamera(actor, target, skill, targetType);
+            yield return new WaitForSeconds(skillCameraLeadTime);
+            if (actor == null || target == null) yield break;
 
-        //给镜头一点时间
-        yield return new WaitForSeconds(skillCameraLeadTime);
-
-        //yield return new WaitForSeconds(0.5f); //假装动画时间是0.5秒
-
-        actor.UseSkill(skill, target);
-        CheckBattleEnd(actor, target);
-        yield return new WaitForSeconds(skilllimpactHoldTime);
-        cameraDirector?.UnlockCamera();
+            if (playFire)
+            {
+                if (cameraDirector != null)
+                    yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+                if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost || fireFeedback == null)
+                    yield break;
+                yield return fireFeedback.Play(target, () =>
+                {
+                    if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost) return;
+                    actor.UseSkill(skill, target);
+                    CheckBattleEnd(actor, target);
+                });
+            }
+            else
+            {
+                actor.UseSkill(skill, target);
+                CheckBattleEnd(actor, target);
+            }
+            yield return new WaitForSeconds(skilllimpactHoldTime);
+        }
+        finally
+        {
+            cameraDirector?.UnlockCamera();
+        }
     }
     private IEnumerator PlayEnemyActionSequence(BaseController actor, BaseController target,SkillData skill)
     {

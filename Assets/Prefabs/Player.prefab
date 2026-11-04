@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3601771321397286948}
   - component: {fileID: 910000000000000103}
   - component: {fileID: 910000000000000203}
+  - component: {fileID: 910000000000000204}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -342,6 +343,24 @@ MonoBehaviour:
   forwardTime: 0.14
   impactHoldTime: 0.06
   returnTime: 0.2
+--- !u!114 &910000000000000204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154685258426240943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907b2f12c439427fa27788f8f5e282e3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  controller: {fileID: 8011914668998644558}
+  fireSkill: {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
+  particleMaterial: {fileID: 2100000, guid: e7ce102ce90c4493bc2f6294fce9b5d2, type: 2}
+  flightTime: 0.5
+  impactTime: 0.3
+  projectileSize: 0.65
 --- !u!1 &4244201632595124308
 GameObject:
   m_ObjectHideFlags: 0
