@@ -11,6 +11,7 @@ public abstract class BaseController : MonoBehaviour
 
     public event Action OnDebuffChanged;
     public event Action<int> OnDamageTaken;
+    public event Action<int> OnHealed;
     private readonly DebuffState _activeDebuff = new DebuffState();
     public DebuffState ActiveDebuff => _activeDebuff;
 
@@ -90,6 +91,7 @@ public abstract class BaseController : MonoBehaviour
         if (actualHeal > 0)
         {
             ShowFloatingText($"+{actualHeal}",Color.green);
+            OnHealed?.Invoke(actualHeal);
         }
 
         data.NotifyHpChange(prevHp, data.Hp);
