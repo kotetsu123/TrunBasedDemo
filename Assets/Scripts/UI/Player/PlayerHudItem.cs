@@ -22,6 +22,7 @@ public class PlayerHudItem : MonoBehaviour
     
     [SerializeField] private Image Portrait;
     [SerializeField] private Image BG;
+    [SerializeField] private BattleDebuffHud debuffHud;
     [SerializeField] private Color _hpFillDefaultColor;
     private Tween _hpTween;
     private Tween _mpTween;
@@ -48,6 +49,7 @@ public class PlayerHudItem : MonoBehaviour
     {
         if (_ctrl == ctrl && _ctrl != null && _ctrl.data != null)
         {
+            if (debuffHud != null) debuffHud.Bind(ctrl);
             gameObject.SetActive(false);
             Refresh();
             return;
@@ -57,6 +59,7 @@ public class PlayerHudItem : MonoBehaviour
         Unbind();
 
         _ctrl = ctrl;
+        if (debuffHud != null) debuffHud.Bind(ctrl);
 
         //没有角色/没有数据时，隐藏这个HudItem
         if (_ctrl == null || _ctrl.data == null)
@@ -166,6 +169,7 @@ public class PlayerHudItem : MonoBehaviour
 
     private void Unbind()
     {
+        if (debuffHud != null) debuffHud.Bind(null);
         if (_boundData == null)
             return;
         _boundData.OnHpChanged -= HandleHpChanged;

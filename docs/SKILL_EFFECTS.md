@@ -23,12 +23,14 @@ These values are not final balance. The general DOT behavior also supports `Enem
 
 ### State Management and Compatibility
 
-Each controller owns one `DebuffState`. It snapshots the effect, display name,
-power, and remaining duration. Its shared `Refresh`, `TryAdvanceTurn`, and
+Each controller owns one `DebuffState`. It snapshots the source skill, effect,
+display name, power, and remaining duration. Its shared `Refresh`, `TryAdvanceTurn`, and
 `Clear` operations manage lifetime without dealing damage themselves.
 `BaseController.TickDebuffAtTurnEnd()` dispatches the concrete effect; only the
 `DamageOverTime` branch calls `TakeDamage`. Expiration preserves the final tick.
-`OnDebuffChanged` updates the timeline label without coupling UI to DOT fields.
+`OnDebuffChanged` refreshes the actor's HUD status without coupling UI to DOT fields.
+`OnDebuffTicked(sourceSkill, actualDamage)` notifies independent presentation
+components after damage. The source is captured before expiration or death clears it.
 
 The Burn GUID, damage, duration and target scope are preserved; its current MP cost is 0.
 `debuffDurationTurns` has `[FormerlySerializedAs("dotDurationTurns")]` so older
@@ -45,13 +47,17 @@ C# method/property names have been replaced; project callers use the Debuff API.
   including an enemy charging action. Other units' actions do not advance it.
 - One debuff is supported per unit. Reapplication replaces its name/effect/power and
   refreshes its duration; effects do not stack or share mutable state.
-- A timeline label shows the effect name and remaining ticks, separately from
-  the boss charge warning.
+- Burn displays a flame and remaining ticks below the affected actor's battle
+  HUD. Its own action-end damage briefly emits sparks. The initial timeline
+  debuff text has been removed; boss charging text and dangerous color remain.
 - Healing restores HP without removing the DOT. Death, revival, initialization,
   victory, defeat, and escape clear the effect. DOT state is battle-only and is
   not written to shared skill assets, party data, or field saves.
 - Lethal ticks use normal death and battle-result handling. DOTs do not tick
   after the battle has ended.
+
+Current presentation wiring and verification are documented in
+[Burn Feedback](BATTLE_BURN_FEEDBACK.md).
 
 ### Party Healing and Group Skills
 
@@ -116,11 +122,13 @@ Burn 已确认是 Boss 专属技能，位于该目录的 `Enemy` 子目录，并
 
 ### 状态管理与兼容
 
-每个角色 Controller 独立持有一个 `DebuffState`，记录效果、显示名、强度和剩余次数。
+每个角色 Controller 独立持有一个 `DebuffState`，记录来源技能、效果、显示名、强度和剩余次数。
 状态对象通过通用的 `Refresh`、`TryAdvanceTurn`、`Clear` 管理生命周期，本身不直接伤害角色。
 `BaseController.TickDebuffAtTurnEnd()` 根据效果类型执行逻辑，只有 `DamageOverTime` 分支扣血。
 最后一次效果先取出再清除状态，避免到期时漏掉最后一次伤害。
-UI 监听 `OnDebuffChanged`，不再依赖 DOT 专用字段。
+UI 监听 `OnDebuffChanged` 刷新角色 HUD 状态，不再依赖 DOT 专用字段。
+`OnDebuffTicked(sourceSkill, actualDamage)` 在扣血后通知独立表现组件；
+来源技能在到期或死亡清除状态之前取出。
 
 Burn 的 GUID、伤害、持续次数和目标范围保留，当前 MP 消耗为 0。
 新字段 `debuffDurationTurns` 使用 `[FormerlySerializedAs("dotDurationTurns")]`，
@@ -135,10 +143,13 @@ Burn 的 GUID、伤害、持续次数和目标范围保留，当前 MP 消耗为
   其他角色行动不会消耗它的持续次数。
 - 每个单位暂时只保留一个 Debuff。再次施加时覆盖名称、效果和强度，并刷新持续次数，
   不叠层，各角色状态独立。
-- 行动顺序头像旁显示效果名和剩余次数，与 Boss 的蓄力提示分开。
+- Burn 在受影响角色的战斗 HUD 下显示火焰和剩余次数；自身行动结束扣血时短暂闪过火星。
+  初版时间轴 Debuff 文字已移除，Boss 蓄力文字和危险技能变色仍保留。
 - 治疗只恢复 HP，不解除 DOT。死亡、复活、初始化、胜利、失败和逃跑时清除。
   DOT 只存在于本场战斗，不写入共享 SO、队伍数据或探索存档。
 - DOT 致死沿用正常死亡及战斗结算。战斗结束后不再追加 DOT 扣血。
+
+当前表现接线和验证记录见 [灼烧反馈](BATTLE_BURN_FEEDBACK.md)。
 
 ### 群体治疗与群体技能
 

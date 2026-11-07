@@ -49,6 +49,7 @@ GameObject:
   - component: {fileID: 910000000000000203}
   - component: {fileID: 910000000000000204}
   - component: {fileID: 910000000000000205}
+  - component: {fileID: 910000000000000206}
   m_Layer: 6
   m_Name: Enemy
   m_TagString: Enemy
@@ -406,6 +407,23 @@ MonoBehaviour:
   duration: 0.95
   starCount: 8
   starSize: 0.24
+--- !u!114 &910000000000000206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3653005007927200776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd19951cba2c4326b8791a38e1edc745, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  controller: {fileID: 7958136867823104485}
+  burnSkill: {fileID: 11400000, guid: 0eb4ed56dccf4b3ba39db54d1605da10, type: 2}
+  particleMaterial: {fileID: 2100000, guid: e7ce102ce90c4493bc2f6294fce9b5d2, type: 2}
+  duration: 0.45
+  sparkCount: 18
 --- !u!1 &6433487233234149186
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,7 +22,6 @@ public class TimeLineIcon : MonoBehaviour
     private RectTransform rect;
     private BaseController owner;//对应角色
     private TMP_Text intentText;
-    private TMP_Text debuffText;
     private float barHeight ;//ActionbarPanel 的高度
     private Tween moveTween;
 
@@ -34,16 +33,13 @@ public class TimeLineIcon : MonoBehaviour
     }
     public void Bind(BaseController character)
     {
-        if (owner != null) owner.OnDebuffChanged -= RefreshDebuff;
         owner = character;
-        if (owner != null) owner.OnDebuffChanged += RefreshDebuff;
         if (portImage!=null)
         {
             // Character data is the main portrait source. The controller/prefab portrait only stays as a fallback.
             portImage.sprite = owner.data.Portrait != null ? owner.data.Portrait : owner.portrait;
             portImage.enabled = portImage.sprite != null;
         }
-        RefreshDebuff();
         RefreshIntentColor();
     }
    public void SetHighLight(bool on)
@@ -88,36 +84,6 @@ public class TimeLineIcon : MonoBehaviour
             && owner.data.intent == ActionIntent.SkillDanerous);
     }
 
-    private void RefreshDebuff()
-    {
-        bool active = owner != null && owner.ActiveDebuff.IsActive;
-        if (debuffText == null && active)
-        {
-            var label = new GameObject("DebuffStatus", typeof(RectTransform), typeof(TextMeshProUGUI));
-            label.transform.SetParent(transform, false);
-            var labelRect = (RectTransform)label.transform;
-            labelRect.anchorMin = new Vector2(1f, 0.5f);
-            labelRect.anchorMax = new Vector2(1f, 0.5f);
-            labelRect.pivot = new Vector2(0f, 0.5f);
-            labelRect.anchoredPosition = new Vector2(8f, -22f);
-            labelRect.sizeDelta = new Vector2(190f, 18f);
-            debuffText = label.GetComponent<TMP_Text>();
-            debuffText.color = new Color(1f, 0.45f, 0.3f);
-            debuffText.alignment = TextAlignmentOptions.Left;
-            debuffText.fontSize = 14f;
-            debuffText.enableWordWrapping = false;
-            debuffText.enableAutoSizing = true;
-            debuffText.fontSizeMin = 10f;
-            debuffText.fontSizeMax = 14f;
-            debuffText.raycastTarget = false;
-        }
-        if (debuffText == null) return;
-        debuffText.text = active
-            ? $"{owner.ActiveDebuff.DisplayName} ({owner.ActiveDebuff.RemainingTurns})"
-            : string.Empty;
-        debuffText.gameObject.SetActive(active);
-    }
-
     public void MoveToSlot(Vector2 position, float duration)
     {
         StopMove();
@@ -140,7 +106,6 @@ public class TimeLineIcon : MonoBehaviour
     private void OnDestroy()
     {
         StopMove();
-        if (owner != null) owner.OnDebuffChanged -= RefreshDebuff;
     }
 
     // Update is called once per frame

@@ -10,6 +10,7 @@ public abstract class BaseController : MonoBehaviour
     public Character data;
 
     public event Action OnDebuffChanged;
+    public event Action<SkillData, int> OnDebuffTicked;
     public event Action<int> OnDamageTaken;
     public event Action<int> OnHealed;
     private readonly DebuffState _activeDebuff = new DebuffState();
@@ -270,7 +271,7 @@ public abstract class BaseController : MonoBehaviour
             || !skill.HasValidDebuff)
             return;
 
-        _activeDebuff.Refresh(skill.debuffEffect, skill.skillName, skill.power, skill.debuffDurationTurns);
+        _activeDebuff.Refresh(skill.debuffEffect, skill.skillName, skill.power, skill.debuffDurationTurns, skill);
         OnDebuffChanged?.Invoke();
     }
 
@@ -283,12 +284,17 @@ public abstract class BaseController : MonoBehaviour
             return;
         }
 
+        // Keep the source even when the final tick or death clears the active state.
+        SkillData sourceSkill = _activeDebuff.SourceSkill;
         if (_activeDebuff.TryAdvanceTurn(out DebuffEffectType effectType, out int power))
         {
             switch (effectType)
             {
                 case DebuffEffectType.DamageOverTime:
+                    int previousHp = data.Hp;
                     TakeDamage(power);
+                    int actualDamage = previousHp - data.Hp;
+                    if (actualDamage > 0) OnDebuffTicked?.Invoke(sourceSkill, actualDamage);
                     break;
             }
             OnDebuffChanged?.Invoke();

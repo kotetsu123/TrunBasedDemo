@@ -654,6 +654,7 @@ GameObject:
   - component: {fileID: 2763725896592503674}
   - component: {fileID: -991276840666952158}
   - component: {fileID: 4911640332588552471}
+  - component: {fileID: 910000000000000401}
   m_Layer: 5
   m_Name: Playerhud
   m_TagString: Untagged
@@ -708,6 +709,7 @@ MonoBehaviour:
   mpFill: {fileID: 3835983772418355859}
   Portrait: {fileID: 4374161057773591697}
   BG: {fileID: 1661667164778343361}
+  debuffHud: {fileID: 910000000000000401}
   _hpFillDefaultColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &4911640332588552471
 MonoBehaviour:
@@ -729,3 +731,20 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &910000000000000401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9074583117423401948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39b586d6d4a34799ba621e2df9c63e2b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  burnSkill: {fileID: 11400000, guid: 0eb4ed56dccf4b3ba39db54d1605da10, type: 2}
+  burnIcon: {fileID: 21300000, guid: 8ac78e05021a454da76a2ebcecf28e64, type: 3}
+  anchor: {x: 0, y: 0}
+  offset: {x: 105, y: -4}
+  iconSize: 36

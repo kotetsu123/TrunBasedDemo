@@ -17,6 +17,7 @@ public class HpBar : MonoBehaviour
     private Camera mainCam;
     private BaseController owner;
     private TMP_Text intentText;
+    [SerializeField] private BattleDebuffHud debuffHud;
 
 
     private void Start()
@@ -36,6 +37,7 @@ public class HpBar : MonoBehaviour
         UnBind();
 
         owner = character;
+        if (debuffHud != null) debuffHud.Bind(character);
         if (owner != null&&owner.data!=null) {
             owner.data.OnHpChanged += HandleHpChanged;
         }
@@ -61,6 +63,7 @@ public class HpBar : MonoBehaviour
     }
     private void UnBind()
     {
+        if (debuffHud != null) debuffHud.Bind(null);
         if (owner != null && owner.data != null)
         {
             owner.data.OnHpChanged -= HandleHpChanged;

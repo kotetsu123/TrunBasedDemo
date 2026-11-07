@@ -1,14 +1,16 @@
 public sealed class DebuffState
 {
     public DebuffEffectType EffectType { get; private set; }
+    public SkillData SourceSkill { get; private set; }
     public string DisplayName { get; private set; }
     public int Power { get; private set; }
     public int RemainingTurns { get; private set; }
     public bool IsActive => RemainingTurns > 0;
 
-    internal void Refresh(DebuffEffectType effectType, string displayName, int power, int durationTurns)
+    internal void Refresh(DebuffEffectType effectType, string displayName, int power, int durationTurns, SkillData sourceSkill = null)
     {
         EffectType = effectType;
+        SourceSkill = sourceSkill;
         DisplayName = displayName;
         Power = power;
         RemainingTurns = durationTurns;
@@ -29,6 +31,7 @@ public sealed class DebuffState
     internal void Clear()
     {
         EffectType = default;
+        SourceSkill = null;
         DisplayName = null;
         Power = 0;
         RemainingTurns = 0;
