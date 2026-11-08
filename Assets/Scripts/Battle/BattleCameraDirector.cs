@@ -245,6 +245,30 @@ public class BattleCameraDirector : MonoBehaviour
     {
         MoveToShot(playerGroupShot);
     }
+    public void FocusGroupEffectShot(Bounds bounds)
+    {
+        if (targetCamera == null || interactionShotPoint == null || bounds.size == Vector3.zero)
+        {
+            FocusPlayerGroup();
+            return;
+        }
+        Quaternion rotation = playerGroupShot != null ? playerGroupShot.rotation : targetCamera.transform.rotation;
+        Vector3 right = rotation * Vector3.right, up = rotation * Vector3.up, forward = rotation * Vector3.forward;
+        float tanY = Mathf.Tan(targetCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float tanX = tanY * Mathf.Max(0.1f, targetCamera.aspect);
+        float distance = 2f;
+        for (int x = -1; x <= 1; x += 2)
+            for (int y = -1; y <= 1; y += 2)
+                for (int z = -1; z <= 1; z += 2)
+                {
+                    Vector3 offset = Vector3.Scale(bounds.extents, new Vector3(x, y, z));
+                    float depth = Vector3.Dot(offset, forward);
+                    distance = Mathf.Max(distance, Mathf.Abs(Vector3.Dot(offset, right)) / tanX - depth,
+                        Mathf.Abs(Vector3.Dot(offset, up)) / tanY - depth, targetCamera.nearClipPlane - depth);
+                }
+        interactionShotPoint.SetPositionAndRotation(bounds.center - forward * (distance * 1.2f), rotation);
+        MoveToShot(interactionShotPoint);
+    }
     public void FocusEnemyGroup()
     {
         MoveToShot(enemyGroupShot);

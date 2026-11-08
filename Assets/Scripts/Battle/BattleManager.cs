@@ -859,35 +859,55 @@ public class BattleManager : MonoBehaviour
         if (targets.Count == 0)
             yield break;
 
+        var magmaFeedback = actor.GetComponent<BattleMagmaFeedback>();
+        bool playMagma = magmaFeedback != null && magmaFeedback.isActiveAndEnabled && magmaFeedback.MatchesSkill(skill);
         cameraDirector?.LockCamera();
-        if (cameraDirector != null)
+        try
         {
-            cameraDirector.FocusActorTurnShot(actor);
-            yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+            if (cameraDirector != null)
+            {
+                cameraDirector.FocusActorTurnShot(actor);
+                yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
 
-            //给施法者一个短暂的停顿，模拟施法动作
-            yield return new WaitForSeconds(0.25f);
-            //群体技能镜头聚焦玩家组
-            FocusSkillGroup(actor, skill);
-            yield return new WaitUntil(()=> cameraDirector == null || !cameraDirector.IsMoving);
+                //给施法者一个短暂的停顿，模拟施法动作
+                yield return new WaitForSeconds(0.25f);
+                //群体技能镜头聚焦玩家组
+                if (playMagma)
+                    cameraDirector.FocusGroupEffectShot(magmaFeedback.GetPresentationBounds(targets));
+                else
+                    FocusSkillGroup(actor, skill);
+                yield return new WaitUntil(()=> cameraDirector == null || !cameraDirector.IsMoving);
+            }
+            // 镜头到达玩家全队后稍微停顿，再结算伤害。
+            yield return new WaitForSeconds(skillCameraLeadTime);
+
+            if (battleEnded || actor == null || actor.data == null || actor.isDead
+                || actor.data.Hp <= 0 || actor.data.Mp < skill.mpCost) yield break;
+            targets = GetGroupSkillTargets(actor, skill);
+            if (targets.Count == 0) yield break;
+            System.Action<IReadOnlyList<BaseController>> resolve = impacted =>
+            {
+                if (battleEnded || actor == null || actor.data == null || actor.isDead
+                    || actor.data.Hp <= 0 || actor.data.Mp < skill.mpCost) return;
+                actor.UseSkillOnTargets(skill, impacted);
+                foreach (BaseController target in impacted)
+                {
+                    if (battleEnded) break;
+                    CheckBattleEnd(actor, target);
+                }
+            };
+            if (playMagma && magmaFeedback != null && magmaFeedback.isActiveAndEnabled)
+                yield return magmaFeedback.Play(targets, resolve);
+            else
+                resolve(targets);
+
+            // 保留伤害结果的展示时间。
+            yield return new WaitForSeconds(skilllimpactHoldTime);
         }
-        // 镜头到达玩家全队后稍微停顿，再结算伤害。
-        yield return new WaitForSeconds(skillCameraLeadTime);
-
-       
-        targets = GetGroupSkillTargets(actor, skill);
-        actor.UseSkillOnTargets(skill, targets);
-        //检查所有目标是否死亡
-        foreach(BaseController target in targets)
+        finally
         {
-            if (battleEnded)
-                break;
-            CheckBattleEnd(actor, target);
+            cameraDirector?.UnlockCamera();
         }
-        // 保留伤害结果的展示时间。
-        yield return new WaitForSeconds(skilllimpactHoldTime);
-
-        cameraDirector?.UnlockCamera();
     }
 
     private void PlaySkillCamera(BaseController actor,BaseController target,SkillData skill,SkillTargetType targetType)
