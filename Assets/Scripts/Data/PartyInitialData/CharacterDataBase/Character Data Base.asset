@@ -27,10 +27,23 @@ MonoBehaviour:
     ActionValue: 0
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
+    skills:
+    - {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
+    - {fileID: 11400000, guid: 9e95882b9ebb1e443b8b228246d4b802, type: 2}
+    - {fileID: 11400000, guid: f79225a73c1c10049be0285b1a59256c, type: 2}
+    - {fileID: 11400000, guid: ae857f616d12444aa9de706591e91510, type: 2}
+    - {fileID: 11400000, guid: 1fc1b5791aa80474a9044361c8911bb3, type: 2}
+    enemySkillWeights: []
+    bossPhaseTwoHpRatio: 0.5
+    bossPhaseTwoAoeSkill: {fileID: 0}
+    bossPhaseTwoSingleSkill: {fileID: 0}
+    bossPhaseTwoDebuffSkill: {fileID: 0}
+    bossChargeDamageMultiplier: 1.5
     isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 1
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   - characterId: Argo_002
@@ -47,10 +60,21 @@ MonoBehaviour:
     ActionValue: 0
     MaxActionValue: 200
     Portrait: {fileID: 21300000, guid: 96d63b07219cf034ebaf0294e2ef3a4d, type: 3}
+    skills:
+    - {fileID: 11400000, guid: 3b97c1dae742d15428e739b9347c7105, type: 2}
+    - {fileID: 11400000, guid: f79225a73c1c10049be0285b1a59256c, type: 2}
+    - {fileID: 0}
+    enemySkillWeights: []
+    bossPhaseTwoHpRatio: 0.5
+    bossPhaseTwoAoeSkill: {fileID: 0}
+    bossPhaseTwoSingleSkill: {fileID: 0}
+    bossPhaseTwoDebuffSkill: {fileID: 0}
+    bossChargeDamageMultiplier: 1.5
     isOnField: 0
     isActing: 0
     isDead: 0
     isPlayer: 1
+    enemyAiType: 0
     battleEnded: 0
     intent: 0
   partyInitialData: {fileID: 11400000, guid: 5331caa83fdc2374ea75639f7c104dce, type: 2}
