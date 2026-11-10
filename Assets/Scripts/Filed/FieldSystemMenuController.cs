@@ -5,14 +5,16 @@ using UnityEngine.UI;
 
 public sealed class FieldSystemMenuController : BasePanel
 {
-    public enum Page { Status, Item, SaveLoad }
+    public enum Page { Status, Item, SaveLoad, Skill }
 
     [SerializeField] private FieldStatusPanelController statusPanel;
     [SerializeField] private FieldInventoryPanelController inventoryPanel;
     [SerializeField] private SaveLoadPanelController saveLoadPanel;
+    [SerializeField] private FieldSkillPanelController skillPanel;
     [SerializeField] private Toggle statusTab;
     [SerializeField] private Toggle itemTab;
     [SerializeField] private Toggle saveLoadTab;
+    [SerializeField] private Toggle skillTab;
     [SerializeField] private Button closeButton;
 
     private FieldEscMenuPanelController returnMenu;
@@ -31,9 +33,11 @@ public sealed class FieldSystemMenuController : BasePanel
         statusPanel?.BindSystemMenu(this);
         inventoryPanel?.GetComponent<FieldInventoryInputController>()?.BindSystemMenu(this);
         saveLoadPanel?.BindSystemMenu(this);
+        skillPanel?.BindSystemMenu(this, statusPanel != null ? statusPanel.GetComponent<FieldCharacterStatsController>() : null);
         statusTab.onValueChanged.AddListener(OnStatusTabChanged);
         itemTab.onValueChanged.AddListener(OnItemTabChanged);
         if (saveLoadTab != null) saveLoadTab.onValueChanged.AddListener(OnSaveLoadTabChanged);
+        if (skillTab != null) skillTab.onValueChanged.AddListener(OnSkillTabChanged);
         closeButton.onClick.AddListener(Close);
         HideImmediate();
     }
@@ -43,6 +47,7 @@ public sealed class FieldSystemMenuController : BasePanel
         statusTab.onValueChanged.RemoveListener(OnStatusTabChanged);
         itemTab.onValueChanged.RemoveListener(OnItemTabChanged);
         if (saveLoadTab != null) saveLoadTab.onValueChanged.RemoveListener(OnSaveLoadTabChanged);
+        if (skillTab != null) skillTab.onValueChanged.RemoveListener(OnSkillTabChanged);
         closeButton.onClick.RemoveListener(Close);
         currentTween?.Kill();
     }
@@ -56,6 +61,7 @@ public sealed class FieldSystemMenuController : BasePanel
     public void OpenStatus() { Open(Page.Status); }
     public void OpenItems() { Open(Page.Item); }
     public void OpenSaveLoad() { Open(Page.SaveLoad); }
+    public void OpenSkills() { Open(Page.Skill); }
     public void OpenFromMenu(FieldEscMenuPanelController menu) { Open(Page.Status, menu); }
     public void OpenSaveLoadFromMenu(FieldEscMenuPanelController menu, bool save)
     {
@@ -76,6 +82,7 @@ public sealed class FieldSystemMenuController : BasePanel
             TutorialPanelController.IsTutorialActive) return;
         if (saveLoadPanel != null && saveLoadPanel.IsConfirming) return;
         if (page == Page.SaveLoad && saveLoadPanel == null) return;
+        if (page == Page.Skill && skillPanel == null) return;
 
         if (!isShowing)
         {
@@ -92,13 +99,16 @@ public sealed class FieldSystemMenuController : BasePanel
         statusPanel.HideImmediate();
         inventoryPanel.HideImmediate();
         saveLoadPanel?.HideImmediate();
+        skillPanel?.HideImmediate();
         CurrentPage = page;
         if (page == Page.Status) statusPanel.ShowPage();
         else if (page == Page.Item) inventoryPanel.Show();
+        else if (page == Page.Skill) skillPanel.ShowPage();
         else saveLoadPanel.ShowPage(saveMode);
         statusTab.SetIsOnWithoutNotify(page == Page.Status);
         itemTab.SetIsOnWithoutNotify(page == Page.Item);
         if (saveLoadTab != null) saveLoadTab.SetIsOnWithoutNotify(page == Page.SaveLoad);
+        if (skillTab != null) skillTab.SetIsOnWithoutNotify(page == Page.Skill);
         base.Show();
     }
 
@@ -109,6 +119,7 @@ public sealed class FieldSystemMenuController : BasePanel
         lastBackFrame = Time.frameCount;
         if (CurrentPage == Page.SaveLoad && saveLoadPanel.TryCancelConfirmation()) return true;
         if (CurrentPage == Page.Item && inventoryPanel.TryCancelTargetSelection()) return true;
+        if (CurrentPage == Page.Skill && skillPanel != null && skillPanel.TryCancelTargetSelection()) return true;
         Close();
         return true;
     }
@@ -117,11 +128,13 @@ public sealed class FieldSystemMenuController : BasePanel
     {
         if (!isShowing) return;
         if (saveLoadPanel != null && saveLoadPanel.TryCancelConfirmation()) return;
+        if (CurrentPage == Page.Skill && skillPanel != null && skillPanel.TryCancelTargetSelection()) return;
         isShowing = false;
         lastCloseFrame = Time.frameCount;
         statusPanel.HideImmediate();
         inventoryPanel.HideImmediate();
         saveLoadPanel?.HideImmediate();
+        skillPanel?.HideImmediate();
         base.HideImmediate();
         ClearSelection();
         var menu = returnMenu;
@@ -141,11 +154,13 @@ public sealed class FieldSystemMenuController : BasePanel
         if (selected != null && (selected.transform.IsChildOf(transform) ||
             selected.transform.IsChildOf(statusPanel.transform) ||
             selected.transform.IsChildOf(inventoryPanel.transform) ||
-            (saveLoadPanel != null && selected.transform.IsChildOf(saveLoadPanel.transform))))
+            (saveLoadPanel != null && selected.transform.IsChildOf(saveLoadPanel.transform)) ||
+            (skillPanel != null && selected.transform.IsChildOf(skillPanel.transform))))
             events.SetSelectedGameObject(null);
     }
 
     private void OnStatusTabChanged(bool selected) { if (selected) OpenStatus(); }
     private void OnItemTabChanged(bool selected) { if (selected) OpenItems(); }
     private void OnSaveLoadTabChanged(bool selected) { if (selected) OpenSaveLoad(); }
+    private void OnSkillTabChanged(bool selected) { if (selected) OpenSkills(); }
 }

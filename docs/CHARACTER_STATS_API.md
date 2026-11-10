@@ -99,3 +99,18 @@ Item 沿用现有运行时背包、槽位顺序、拖放与道具效果。格子
 ## Save / Load 菜单（2026-10-22）
 
 系统菜单新增 Save / Load 页，两个探索场景和标题页共用存档列表 Prefab。原 ESC 菜单的 Save、Load 按钮现在打开对应模式，不再直接覆盖或读取单一文件。多槽位格式、旧档兼容和接口见 [Save / Load UI](SAVE_LOAD_UI.md)。
+
+## Skill Page / 技能页（2026-11-10）
+
+The system menu now also contains Skill. It shares the Status selection controller,
+lists each runtime member's configured skills, and shows effect, cost, target and
+availability. Attack/Debuff rows are gray and read-only; Heal/SelfHeal/PartyHeal and
+Revive support exploration use with separate caster/target handling. Existing
+HP/MP notifications refresh Status and the portrait HUD. Both field scenes are
+wired without changing other canvas scalers. Behavior and verification are fully
+documented in [Field Skill UI](FIELD_SKILL_UI.md).
+
+系统菜单现已加入 Skill，共用 Status 的角色选择接口，显示各运行时队员的配招、效果、
+消耗、目标和可用性。攻击/Debuff 置灰仅查看，Heal/SelfHeal/PartyHeal 和 Revive 支持探索使用，
+区分施法者与受益目标，沿用 HP/MP 通知刷新 Status 和头像 HUD。两个探索场景已接线，
+没有修改其他面板的 CanvasScaler。完整行为与验证见 [探索技能页](FIELD_SKILL_UI.md)。
