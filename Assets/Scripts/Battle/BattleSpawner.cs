@@ -14,10 +14,18 @@ public class SpawnRequest
 
 public class BattleSpawner : MonoBehaviour
 {
+    [Serializable]
+    private sealed class PlayerPrefabOverride
+    {
+        public string characterId = string.Empty;
+        public GameObject prefab = null;
+    }
+
     [SerializeField] private BattleFormation formation;
     [SerializeField] private BattleManager battle;
     [SerializeField] private List<SpawnRequest> initialEnemies = new();
     [SerializeField] private List<SpawnRequest> initialPlayers = new();
+    [SerializeField] private List<PlayerPrefabOverride> playerPrefabOverrides = new();
     [SerializeField] private bool spawnOnStart = true;
     [SerializeField] private Canvas worldUICanvas;
 
@@ -223,13 +231,24 @@ public class BattleSpawner : MonoBehaviour
             SpawnRequest req = new SpawnRequest
             {
                 team = Team.Player,
-                prefabs = initialPlayers[i].prefabs,
+                prefabs = ResolvePlayerPrefab(sourceCharacter, initialPlayers[i].prefabs),
                 characterData = battleCharacter
             };
 
             SpawnInToSlot(req, i);
         }
 
+    }
+    public GameObject ResolvePlayerPrefab(Character character, GameObject fallback)
+    {
+        if (character == null || string.IsNullOrEmpty(character.characterId)) return fallback;
+        foreach (var entry in playerPrefabOverrides)
+        {
+            if (entry != null && entry.prefab != null
+                && string.Equals(entry.characterId, character.characterId, StringComparison.OrdinalIgnoreCase))
+                return entry.prefab;
+        }
+        return fallback;
     }
     /* public void SpawnPlayerInitial(List<SpawnRequest> playerTeam)
      {
