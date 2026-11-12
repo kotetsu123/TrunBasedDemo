@@ -3330,6 +3330,9 @@ MonoBehaviour:
       isPlayer: 0
       battleEnded: 0
       intent: 0
+  playerPrefabOverrides:
+  - characterId: Argo_002
+    prefab: {fileID: 1886010246550237098, guid: 7ec4d9d52188b4b44bce0877aaaf0b9d, type: 3}
   spawnOnStart: 1
   worldUICanvas: {fileID: 364944995}
   encounterDatabase: {fileID: 11400000, guid: 9201cc78d47f18d45bf670e77b37561e, type: 2}
