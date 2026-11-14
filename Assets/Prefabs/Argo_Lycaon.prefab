@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Argo_Lycaon
       objectReference: {fileID: 0}
+    - target: {fileID: 910000000000000203, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      propertyPath: meleeFeedback
+      value:
+      objectReference: {fileID: 8792020416829140824}
     - target: {fileID: 2055821088294449597, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.9
@@ -88,13 +92,52 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 910000000000000202, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6429448128253736759}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8792020416829140824}
   m_SourcePrefab: {fileID: 100100000, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
 --- !u!4 &1488722330081878223 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 910000000000000202, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
   m_PrefabInstance: {fileID: 1732189584640696325}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1886010246550237098 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+  m_PrefabInstance: {fileID: 1732189584640696325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8792020416829140824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886010246550237098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3258ce323c138bf4982413ad87b89d77, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  controller: {fileID: 8591162534495793995}
+  animator: {fileID: 1142174699969637709}
+  motionRoot: {fileID: 1488722330081878223}
+  attackClip: {fileID: 7400000, guid: 71710bc555dc06045bf11c9bac4154d7, type: 2}
+  blinkTime: 0.06
+  contactGap: 0.15
+  impactNormalizedTime: 0.13333334
+  blendTime: 0.06
+--- !u!114 &8591162534495793995 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+  m_PrefabInstance: {fileID: 1732189584640696325}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886010246550237098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b8c09e4c39efc2459584cfa6539f021, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1001 &6823873174608826588
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -212,6 +255,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff9ce6619dcfc3e499514f6cb9583117, type: 3}
+--- !u!95 &1142174699969637709 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: ff9ce6619dcfc3e499514f6cb9583117, type: 3}
+  m_PrefabInstance: {fileID: 6823873174608826588}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6429448128253736759 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ff9ce6619dcfc3e499514f6cb9583117, type: 3}

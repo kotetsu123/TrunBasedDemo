@@ -9,6 +9,7 @@ public sealed class BattleAttackFeedback : MonoBehaviour
     [SerializeField] private BaseController controller;
     [SerializeField] private Transform motionRoot;
     [SerializeField] private SkillData attackSkill;
+    [SerializeField] private BattleMeleeFeedback meleeFeedback;
     [SerializeField, Min(0f)] private float lungeDistance = 0.45f;
     [SerializeField, Min(0.01f)] private float forwardTime = 0.14f;
     [SerializeField, Min(0f)] private float impactHoldTime = 0.06f;
@@ -19,11 +20,17 @@ public sealed class BattleAttackFeedback : MonoBehaviour
     private bool _playing;
 
     public bool MatchesSkill(SkillData skill) => skill != null && skill == attackSkill;
+    public bool UsesMeleeAnimation => isActiveAndEnabled && meleeFeedback != null && meleeFeedback.IsReady;
 
-    public IEnumerator Play(Transform target, Action onImpact)
+    public IEnumerator Play(Transform target, Action onImpact, Action onApproachComplete = null, Action onReturnStart = null)
     {
         if (_playing) yield break;
         if (controller == null) controller = GetComponent<BaseController>();
+        if (UsesMeleeAnimation)
+        {
+            yield return meleeFeedback.Play(target, onImpact, onApproachComplete, onReturnStart);
+            yield break;
+        }
         if (!isActiveAndEnabled || motionRoot == null || controller == null
             || motionRoot == controller.transform || !motionRoot.IsChildOf(controller.transform)
             || motionRoot.GetComponentInChildren<Collider>(true) != null)
@@ -94,6 +101,7 @@ public sealed class BattleAttackFeedback : MonoBehaviour
 
     private void StopAndRestore()
     {
+        if (meleeFeedback != null) meleeFeedback.Cancel();
         var sequence = _sequence;
         _sequence = null;
         sequence?.Kill();

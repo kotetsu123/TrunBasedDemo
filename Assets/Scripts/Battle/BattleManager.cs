@@ -30,6 +30,7 @@ public class BattleManager : MonoBehaviour
     // public List<Character> characters = new List<BaseController>();
     public List<BaseController> controllers = new List<BaseController>();
     private readonly HashSet<BaseController> _dyingEnemies = new HashSet<BaseController>();
+    private bool _meleeRecoveryPending;
     
     public bool isActing = false;
     public bool battleEnded = false;
@@ -695,10 +696,16 @@ public class BattleManager : MonoBehaviour
         if (!CanResolveAttack(actor, target))
             yield break;
 
+        var feedback = actor.GetComponent<BattleAttackFeedback>();
+        bool animatedMelee = feedback != null && feedback.UsesMeleeAnimation;
+        if (animatedMelee) _meleeRecoveryPending = true;
         cameraDirector?.LockCamera();
         try
         {
-            cameraDirector?.FocusPlayerSideInteractionShot(actor, target, attackCameraLeadTime);
+            if (animatedMelee)
+                cameraDirector?.FocusMeleeAttackShot(actor, target, attackCameraLeadTime);
+            else
+                cameraDirector?.FocusPlayerSideInteractionShot(actor, target, attackCameraLeadTime);
             yield return new WaitForSeconds(attackCameraLeadTime);
             if (cameraDirector != null)
                 yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
@@ -711,9 +718,10 @@ public class BattleManager : MonoBehaviour
                 target.TakeDamage(actor.data.Attack);
                 CheckBattleEnd(actor, target);
             };
-            var feedback = actor.GetComponent<BattleAttackFeedback>();
             if (feedback != null && feedback.isActiveAndEnabled)
-                yield return feedback.Play(target.transform, impact);
+                yield return feedback.Play(target.transform, impact,
+                    () => { if (cameraDirector != null) cameraDirector.FocusMeleeContactShot(actor, target); },
+                    () => { if (cameraDirector != null) cameraDirector.RestoreMeleeTravelShot(); });
             else
                 impact();
 
@@ -721,7 +729,10 @@ public class BattleManager : MonoBehaviour
         }
         finally
         {
+            if (animatedMelee) _meleeRecoveryPending = false;
             cameraDirector?.UnlockCamera();
+            if (animatedMelee && this != null && gameObject.activeInHierarchy && gameObject.scene.isLoaded)
+                CheckBattleEnd(null, null);
         }
     }
 
@@ -1195,7 +1206,7 @@ public class BattleManager : MonoBehaviour
         bool allyAlive = controllers.Any(c=>c!=null&&c.data!=null&&!c.data.isDead&&!c.isDead&&c.data.Team==Team.Player);
 
         // A dying enemy still owns its slot until the visual finishes and reserves can fill it.
-        if (!enemyAlive && allyAlive && _dyingEnemies.Count > 0) return;
+        if (!enemyAlive && allyAlive && (_dyingEnemies.Count > 0 || _meleeRecoveryPending)) return;
 
         if (!enemyAlive||!allyAlive)
         {

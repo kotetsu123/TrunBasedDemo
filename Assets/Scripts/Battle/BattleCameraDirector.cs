@@ -27,6 +27,9 @@ public class BattleCameraDirector : MonoBehaviour
 
     private Coroutine _cameraMoveRoutine;
     private bool _isLocked;
+    private Vector3 _meleeTravelPosition;
+    private Quaternion _meleeTravelRotation;
+    private bool _hasMeleeTravelShot;
 
     public bool IsLocked => _isLocked;
     public bool IsMoving => _cameraMoveRoutine != null;
@@ -240,6 +243,60 @@ public class BattleCameraDirector : MonoBehaviour
 
             
         FocusPlayerSideTargetPreviewShot(actor, target);
+    }
+    public void FocusMeleeAttackShot(BaseController actor, BaseController target, float? duration = null)
+    {
+        if (actor == null || target == null || targetCamera == null || interactionShotPoint == null) return;
+        var actorCollider = actor.GetComponent<Collider>();
+        var targetCollider = target.GetComponent<Collider>();
+        Bounds bounds = actorCollider != null ? actorCollider.bounds : new Bounds(actor.transform.position, Vector3.one * 2f);
+        bounds.Encapsulate(targetCollider != null ? targetCollider.bounds : new Bounds(target.transform.position, Vector3.one * 2f));
+        bounds.Expand(0.6f);
+        Vector3 direction = target.transform.position - actor.transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude < 0.001f) direction = actor.transform.forward;
+        direction.Normalize();
+        Vector3 side = Vector3.Cross(Vector3.up, direction);
+        Quaternion rotation = Quaternion.LookRotation(direction * 0.35f - side + Vector3.down * 0.3f);
+        MoveToMeleeBounds(bounds, rotation, duration);
+        _meleeTravelPosition = interactionShotPoint.position;
+        _meleeTravelRotation = rotation;
+        _hasMeleeTravelShot = true;
+    }
+    public void FocusMeleeContactShot(BaseController actor, BaseController target)
+    {
+        if (!_hasMeleeTravelShot || actor == null || target == null || targetCamera == null || interactionShotPoint == null) return;
+        var renderers = actor.GetComponentsInChildren<SkinnedMeshRenderer>();
+        Bounds bounds = renderers.Length > 0 ? renderers[0].bounds : new Bounds(actor.transform.position, Vector3.one * 2f);
+        for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
+        var collider = target.GetComponent<Collider>();
+        bounds.Encapsulate(collider != null ? collider.bounds : new Bounds(target.transform.position, Vector3.one * 2f));
+        bounds.Expand(0.6f);
+        MoveToMeleeBounds(bounds, _meleeTravelRotation, 0.12f);
+    }
+    public void RestoreMeleeTravelShot()
+    {
+        if (!_hasMeleeTravelShot || targetCamera == null || interactionShotPoint == null) return;
+        interactionShotPoint.SetPositionAndRotation(_meleeTravelPosition, _meleeTravelRotation);
+        MoveToShot(interactionShotPoint, 0.16f);
+    }
+    private void MoveToMeleeBounds(Bounds bounds, Quaternion rotation, float? duration)
+    {
+        Vector3 right = rotation * Vector3.right, up = rotation * Vector3.up, forward = rotation * Vector3.forward;
+        float tanY = Mathf.Tan(targetCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        float tanX = tanY * Mathf.Max(0.1f, targetCamera.aspect);
+        float distance = 3f;
+        for (int x = -1; x <= 1; x += 2)
+            for (int y = -1; y <= 1; y += 2)
+                for (int z = -1; z <= 1; z += 2)
+                {
+                    Vector3 offset = Vector3.Scale(bounds.extents, new Vector3(x, y, z));
+                    float depth = Vector3.Dot(offset, forward);
+                    distance = Mathf.Max(distance, Mathf.Abs(Vector3.Dot(offset, right)) / tanX - depth,
+                        Mathf.Abs(Vector3.Dot(offset, up)) / tanY - depth, targetCamera.nearClipPlane - depth);
+                }
+        interactionShotPoint.SetPositionAndRotation(bounds.center - forward * (distance * 1.15f), rotation);
+        MoveToShot(interactionShotPoint, duration);
     }
     public void FocusPlayerGroup()
     {

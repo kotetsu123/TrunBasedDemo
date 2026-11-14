@@ -2,6 +2,9 @@
 
 ## English
 
+This page records the model-only checkpoint `beb538b6`. The subsequent blink
+approach/strike/return implementation is documented in [BATTLE_MELEE_FEEDBACK.md](BATTLE_MELEE_FEEDBACK.md).
+
 ### Model-Only Checkpoint
 
 This checkpoint replaces only `Argo_002` in battle with the Lycaon model and
@@ -58,6 +61,9 @@ No license document was present in the supplied model folder. Confirm permission
 for public distribution before publishing the model, animation or textures.
 
 ## 中文翻译
+
+本页记录仅模型提交 `beb538b6` 的状态。后续瞬移接近、攻击、瞬移返回的实现见
+[BATTLE_MELEE_FEEDBACK.md](BATTLE_MELEE_FEEDBACK.md)。
 
 ### 仅模型的提交节点
 
