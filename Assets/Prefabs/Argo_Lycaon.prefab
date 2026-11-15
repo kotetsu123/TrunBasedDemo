@@ -96,6 +96,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8792020416829140824}
+    - targetCorrespondingSourceObject: {fileID: 154685258426240943, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8792020416829140825}
   m_SourcePrefab: {fileID: 100100000, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}
 --- !u!4 &1488722330081878223 stripped
 Transform:
@@ -123,10 +126,27 @@ MonoBehaviour:
   animator: {fileID: 1142174699969637709}
   motionRoot: {fileID: 1488722330081878223}
   attackClip: {fileID: 7400000, guid: 71710bc555dc06045bf11c9bac4154d7, type: 2}
+  blinkFeedback: {fileID: 8792020416829140825}
   blinkTime: 0.06
   contactGap: 0.15
   impactNormalizedTime: 0.13333334
   blendTime: 0.06
+--- !u!114 &8792020416829140825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886010246550237098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b9cfef51e5243fa9d8b07006c6fc575, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  effectMaterial: {fileID: 2100000, guid: 73658734bd54443b8825f0029d9e0daf, type: 2}
+  duration: 0.2
+  horizontalStretch: 0.65
+  streakCount: 18
 --- !u!114 &8591162534495793995 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8011914668998644558, guid: ba15f232e534dea47990e21a5bb5890d, type: 3}

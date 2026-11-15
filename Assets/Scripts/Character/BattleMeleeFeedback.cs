@@ -11,6 +11,7 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private Transform motionRoot;
     [SerializeField] private AnimationClip attackClip;
+    [SerializeField] private BattleBlinkFeedback blinkFeedback;
     [SerializeField, Min(0f)] private float blinkTime = 0.06f;
     [SerializeField, Min(0f)] private float contactGap = 0.15f;
     [SerializeField, Range(0f, 1f)] private float impactNormalizedTime = 0.6f;
@@ -93,6 +94,7 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
     private IEnumerator Blink(Vector3 destination, Transform requiredTarget)
     {
         if (Vector3.Distance(motionRoot.position, destination) < 0.02f) yield break;
+        if (blinkFeedback != null) blinkFeedback.Emit(motionRoot, false);
         HideRenderers();
         yield return Wait(Mathf.Max(0f, blinkTime));
         if (!CanContinue()) yield break;
@@ -102,7 +104,10 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
             destination = GetContactPosition(requiredTarget);
         }
         motionRoot.position = destination;
+        if (Phase == MeleePhase.Return) motionRoot.localRotation = _restRotation;
+        else Face(requiredTarget.position - motionRoot.position);
         RestoreRenderers();
+        if (blinkFeedback != null) blinkFeedback.Emit(motionRoot, true);
     }
 
     private void HideRenderers()
@@ -154,10 +159,15 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
         if (direction.sqrMagnitude > 0.0001f) motionRoot.rotation = Quaternion.LookRotation(direction);
     }
 
-    public void Cancel() => Restore();
+    public void Cancel()
+    {
+        if (blinkFeedback != null) blinkFeedback.Clear();
+        Restore();
+    }
 
     private void Restore()
     {
+        if (!CanAnimate() && blinkFeedback != null) blinkFeedback.Clear();
         RestoreRenderers();
         if (!_playing) return;
         if (motionRoot != null)

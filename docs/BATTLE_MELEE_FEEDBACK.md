@@ -93,13 +93,14 @@ final run. Run clip/controller, all three scenes, BattleManager and camera code
 were not edited for this revision. The check script, reports and captures are
 archived under ignored `Library/BlinkMeleeChecks`, not shipped as game assets.
 
-### Planned Visual Follow-up
+### Visual Follow-up
 
 The 2026-11-14 direction is a brief horizontal-streak afterimage with a softened,
 dissolving silhouette for departure and arrival, not a large portal or explosion.
-This is deferred to a separate change. The current checkpoint includes blink
-movement and attack animation only, without the new teleport effect or imported
-VFX packages.
+The core checkpoint `3bdf0c17` includes blink movement and attack animation only.
+The separate implementation is documented in
+[BATTLE_BLINK_FEEDBACK.md](BATTLE_BLINK_FEEDBACK.md). No downloaded VFX packages
+are imported for that follow-up.
 
 ## 中文翻译
 
@@ -175,5 +176,6 @@ FireBall 的原有行为，以及角色可见地归位后才结算胜利。已�
 ### 后续特效方向
 
 2026-11-14 确认的方向是：离开和出现时，带有短促的横向线条残影，人物轮廓虚化消散，
-而不是大型传送门或爆炸。该特效留作单独的后续改动。当前提交节点只包含瞬移位移和
-攻击动画，不包含新的瞬移特效，也没有导入第三方特效包。
+而不是大型传送门或爆炸。核心提交节点 `3bdf0c17` 只包含瞬移位移和攻击动画，单独的
+后续特效实现见 [BATTLE_BLINK_FEEDBACK.md](BATTLE_BLINK_FEEDBACK.md)，没有导入
+第三方特效包。
