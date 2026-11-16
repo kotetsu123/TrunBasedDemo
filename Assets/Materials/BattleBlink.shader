@@ -3,7 +3,7 @@ Shader "Battle/Blink Afterimage"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _TintColor ("Tint", Color) = (0.65, 0.83, 1, 0.6)
+        _TintColor ("Tint", Color) = (0, 0, 0, 0.6)
     }
     SubShader
     {
@@ -60,7 +60,7 @@ Shader "Battle/Blink Afterimage"
                 float dissolve = 1.0 - smoothstep(noise - 0.12, noise + 0.12, scatter);
                 float stripe = 0.45 + 0.55 * smoothstep(0.05, 0.3, frac(i.height * 32.0));
                 fixed4 source = tex2D(_MainTex, i.uv * _MainTex_ST.xy + _MainTex_ST.zw) * _SourceColor;
-                fixed3 color = lerp(source.rgb, _TintColor.rgb, 0.65);
+                fixed3 color = lerp(source.rgb, fixed3(1, 1, 1), 0.65) * _TintColor.rgb;
                 return fixed4(color, source.a * _TintColor.a * _CopyWeight * envelope * dissolve * stripe);
             }
             ENDCG

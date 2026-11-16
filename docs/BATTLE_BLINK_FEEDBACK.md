@@ -45,8 +45,9 @@ On Argo's `BattleBlinkFeedback`:
 | Horizontal Stretch | 0.65 | Horizontal scatter relative to model height |
 | Streak Count | 18 | Thin horizontal streaks per echo |
 
-Tint is editable on `Assets/Materials/BattleBlink.mat`. The default is a restrained
-pale blue-white. It does not emit a real light or modify environment lighting.
+Tint is editable on `Assets/Materials/BattleBlink.mat`. The default is black with
+alpha 0.6. Both the pose echo and streaks use this tint; black does not retain the
+source texture's bright colors. It does not emit a real light or modify environment lighting.
 The existing `blinkTime` stays at 0.06 s, and the hit callback is unchanged.
 
 Snapshot age uses scaled time, so pausing freezes the effect without hiding it.
@@ -108,8 +109,9 @@ Argo 的 `BattleBlinkFeedback` 配置：
 | Horizontal Stretch | 0.65 | 相对于模型高度的横向拉散幅度 |
 | Streak Count | 18 | 每次残影的横向细线数量 |
 
-颜色可在 `Assets/Materials/BattleBlink.mat` 中调整，默认为适量的浅蓝白色。不产生
-真实灯光，也不修改环境光。原来的 `blinkTime` 仍为 0.06 秒，命中回调保持不变。
+颜色可在 `Assets/Materials/BattleBlink.mat` 中调整，默认为黑色，Alpha 保持 0.6。
+人物残影和横线均使用该色调，黑色不会混入源贴图的亮色。不产生真实灯光，也不修改
+环境光。原来的 `blinkTime` 仍为 0.06 秒，命中回调保持不变。
 
 残影年龄使用受时间缩放影响的计时，暂停时冻结但不消失。最多保留四份快照，结束后
 释放生成的网格，连续触发时提前回收最旧的一份。取消或禁用近战、角色死亡或停用、
