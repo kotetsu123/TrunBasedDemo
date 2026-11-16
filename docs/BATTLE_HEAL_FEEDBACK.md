@@ -2,6 +2,26 @@
 
 ## English
 
+### Player Group Camera (2026-11-15)
+
+Player-cast `AllyAll` skills now go directly to the allied group shot, without the
+caster close-up or its 0.25-second hold. The rule is based on caster team and target
+scope, not the PartyHeal asset/name or Heal type, so future allied group buffs can
+share it without another camera branch. No buff logic is introduced here. Existing
+single-target, self-target, enemy group and player offensive group camera flows
+remain unchanged, as do healing effects, amounts, costs and target selection.
+The existing fixed allied-group shot is reused; its position and framing are not
+retuned in this change.
+
+Twenty-two focused Unity Play Mode assertions passed on 2026-11-15. Checks cover
+the complete player PartyHeal camera path, unchanged healing and single MP cost,
+another player caster, renamed and non-Heal group-scope camera probes, insufficient
+MP, cancellation/unlocking, and retained enemy/offensive caster shots. 1280x720
+and 800x600 captures were inspected. The pending black afterimage material/shader
+also compiled without error. Temporary checks are archived under ignored
+`Library/AllyGroupCameraChecks`, not shipped as game assets. No scene was saved and
+no full-demo playthrough is claimed.
+
 ### Scope and Trigger
 
 Successful HP healing now produces a soft green aura and small four-point green
@@ -76,6 +96,22 @@ damage, MP, hit/death cleanup, and result-menu behavior. The earlier standalone
 boss-rotation and timeline-lifecycle suites were not rerun for this effect.
 
 ## 中文
+
+### 玩家群体技能镜头（2026-11-15）
+
+玩家施放 `AllyAll` 技能时，直接使用己方全队镜头，不再先给施术者特写，也不保留该
+特写的 0.25 秒停顿。规则根据施法者阵营和目标范围判断，不绑定 PartyHeal 资源/名称
+或 Heal 类型，因此以后的己方群体 Buff 也能共用，不必再增加镜头分支。本次不实现
+Buff 逻辑。单体、自身、敌方群体及玩家进攻型群体技能的镜头流程保持原样；治疗
+特效、数值、费用和目标选择规则均不变。
+复用已有的固定己方全队镜头，本次不重新调整它的位置或取景范围。
+
+2026-11-15 有 22 项 Unity Play Mode 针对性断言通过，覆盖玩家 PartyHeal 全流程的
+镜头轨迹、原治疗量与单次扣蓝、另一位玩家施法者、技能改名及非 Heal 群体范围的镜头
+探测、MP 不足、取消与解锁，以及敌方/进攻型群体技能保留施术者特写。已检查
+1280x720 和 800x600 截图，待提交的黑色残影材质与 Shader 也编译正常。临时检查归档在
+忽略的 `Library/AllyGroupCameraChecks` 中，不作为游戏资源上传；没有保存场景，也不
+声称完成了整个 Demo 的完整游玩测试。
 
 ### 范围与触发
 

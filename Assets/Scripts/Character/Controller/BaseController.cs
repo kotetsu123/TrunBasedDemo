@@ -275,7 +275,7 @@ public abstract class BaseController : MonoBehaviour
         OnDebuffChanged?.Invoke();
     }
 
-    public void TickDebuffAtTurnEnd()
+    public void TickDebuffAtTurnStart()
     {
         if (!_activeDebuff.IsActive) return;
         if (data == null || data.isDead || data.Hp <= 0)

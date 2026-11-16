@@ -397,7 +397,30 @@ public class BattleManager : MonoBehaviour
         isActing = true;
         actor.data.isActing = true;
         Debug.Log($"{actor.data.Name}开始行动！");
-        
+        //轮到角色时，先处理持续伤害
+        if (!battleEnded && actor != null && actor.data != null && !actor.isDead)
+        {
+            int previousHp = actor.data.Hp;
+            actor.TickDebuffAtTurnStart();
+            if (actor.data.Hp < previousHp)
+            {
+                CheckBattleEnd(actor, actor);
+                yield return new WaitForSeconds(0.3f);
+            }
+        }
+        //被灼烧击倒或者战斗结束，直接跳过行动
+        if (battleEnded||actor==null||actor.data==null||actor.isDead||actor.data.isDead||actor.data.Hp<=0)
+
+        {
+            isActing = false;
+
+            if(actor!=null&&actor.data!=null)
+                actor.data.isActing = false;
+
+            yield break;
+        }
+
+
         //模拟执行动作
         yield return new WaitForSeconds(1.5f); //等待1秒，模拟行动时间
         while (!battleEnded && IsWaitingForLastEnemyDeath())
@@ -437,16 +460,7 @@ public class BattleManager : MonoBehaviour
                 yield break;
             }
         }
-        if (!battleEnded && actor != null && actor.data != null && !actor.isDead)
-        {
-            int previousHp = actor.data.Hp;
-            actor.TickDebuffAtTurnEnd();
-            if (actor.data.Hp < previousHp)
-            {
-                CheckBattleEnd(actor, actor);
-                yield return new WaitForSeconds(0.3f);
-            }
-        }
+        
         if (actor == null || actor.data == null)
         {
             isActing = false;
@@ -872,16 +886,19 @@ public class BattleManager : MonoBehaviour
 
         var magmaFeedback = actor.GetComponent<BattleMagmaFeedback>();
         bool playMagma = magmaFeedback != null && magmaFeedback.isActiveAndEnabled && magmaFeedback.MatchesSkill(skill);
+        bool playerAllyGroup = actor.data.Team == Team.Player && skill.targetType == SkillTargetType.AllyAll;
         cameraDirector?.LockCamera();
         try
         {
             if (cameraDirector != null)
             {
-                cameraDirector.FocusActorTurnShot(actor);
-                yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+                if (!playerAllyGroup)
+                {
+                    cameraDirector.FocusActorTurnShot(actor);
+                    yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
 
-                //给施法者一个短暂的停顿，模拟施法动作
-                yield return new WaitForSeconds(0.25f);
+                    yield return new WaitForSeconds(0.25f);
+                }
                 //群体技能镜头聚焦玩家组
                 if (playMagma)
                     cameraDirector.FocusGroupEffectShot(magmaFeedback.GetPresentationBounds(targets));
