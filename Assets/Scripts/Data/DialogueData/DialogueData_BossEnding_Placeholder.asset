@@ -16,7 +16,7 @@ MonoBehaviour:
   lines:
   - speakerId: Paul_001
     speakerName: Paul
-    portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
+    portrait: {fileID: 21300000, guid: ae0b4657cbb179e4f8e08870cb385e51, type: 3}
     portraitSide: 0
     text: The boss is to strong. we can't defeat it.At list...Ted! take Argo and
       run .As Far away as you can!
@@ -27,7 +27,7 @@ MonoBehaviour:
     text: What? Paul how can you doing that! I'm not letting you face this alone!
   - speakerId: Paul_001
     speakerName: Paul
-    portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
+    portrait: {fileID: 21300000, guid: ae0b4657cbb179e4f8e08870cb385e51, type: 3}
     portraitSide: 0
     text: Sorry,but.. it's time to go.Ted!
   - speakerId: 
@@ -42,7 +42,7 @@ MonoBehaviour:
     text: Ted ! You can't do it. Paul ! Paul !  You idiot !
   - speakerId: Paul_001
     speakerName: Paul
-    portrait: {fileID: 21300000, guid: 8bffb6c5b9fc959469ec958c555af0e1, type: 3}
+    portrait: {fileID: 21300000, guid: ae0b4657cbb179e4f8e08870cb385e51, type: 3}
     portraitSide: 0
     text: I am so happy to meat you guys.Thank you ,all of you.I gusee this is goodbye
   - speakerId: Argo_002
