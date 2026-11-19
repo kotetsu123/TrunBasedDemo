@@ -202,6 +202,12 @@ public class VNDialoguePanelController : BasePanel
         // 每份 DialogueData 可以选择自己的 VN 背景；没有配置时隐藏背景图。
         backgroundImage.sprite = currentDialogue.Background;
         backgroundImage.enabled = currentDialogue.Background != null;
+        if (currentDialogue.Background != null
+            && backgroundImage.TryGetComponent(out AspectRatioFitter fitter))
+        {
+            Rect rect = currentDialogue.Background.rect;
+            fitter.aspectRatio = rect.width / rect.height;
+        }
     }
 
     private void ResetBackground()

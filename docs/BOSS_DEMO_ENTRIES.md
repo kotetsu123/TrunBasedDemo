@@ -63,6 +63,26 @@ The victory check uses a scripted lethal hit to exercise settlement, not a claim
 that the unmodified fight has been strategically balanced or manually completed.
 Temporary checks and captures are archived in ignored `Library/BossDemoChecks`.
 
+### VN Presentation (2026-11-19)
+
+The boss ending uses `vocanovnBG` as its full-screen background. A local
+aspect-ratio fitter covers the viewport without stretching, and the VN renderer
+updates its ratio from each dialogue's selected image. The background remains
+optional for other dialogue assets.
+
+Only the Boss Field VN subtree was restyled: portraits are contained and aligned
+to the dialogue band, the speaker/name and body use separate responsive regions,
+and a local canvas renders the VN above exploration HUD. The shared CanvasScaler,
+tutorial, ordinary dialogue panel, menu sizes, dialogue content and battle flow
+were not changed. Existing Argo/Ted placeholder art remains unchanged.
+
+243 focused Unity Play Mode assertions passed. All seven lines were checked at
+1280x720, 800x600 and 1920x1080; the opening line was also checked at 960x540.
+Checks include rectangle bounds, text overflow, image aspect and viewport coverage,
+background replacement/absence, replay, ending callback, unchanged gameplay state,
+and return to title. Captures were inspected. Temporary checks and images are
+archived under ignored `Library/BossVnLayoutChecks`.
+
 ## 中文
 
 ### 本次范围（2026-11-18）
@@ -111,3 +131,17 @@ Paul 新头像、暂停与防重复点击、VN 完成与重复预览、缺失引
 胜利检查用测试脚本造成致死伤害来驱动结算，不表示本次已经手动打赢原数值 Boss，
 也不声称完成了战斗平衡验收。临时检查和截图归档于忽略的 `Library/BossDemoChecks`，
 不作为正式游戏资源上传。
+
+### VN 画面（2026-11-19）
+
+Boss 结尾已接入 `vocanovnBG` 全屏背景，按原图比例覆盖屏幕，不拉伸；切换对话背景时
+同步比例，没有配置背景的其他对话仍沿用原回退行为。
+
+只整理 Boss Field 的 VN 子层级：立绘保持比例、完整显示并底部对齐对话框；姓名和正文
+分区自适应布局；VN 独立排序到探索 HUD 之上。没有改全局 CanvasScaler、教程、普通
+对话框、其他菜单尺寸、对白文本和战斗流程；Argo/Ted 的原占位美术也未替换。
+
+通过 243 项 Unity Play Mode 针对性断言，检查全部 7 句对白在 1280x720、800x600、
+1920x1080 下的边界、文字溢出、图片比例和全屏覆盖，并额外检查 960x540 的首句长文本。
+还覆盖换背景、无背景、重复预览、结束回调、玩法数据不变和返回标题。已检查截图，
+临时检查与图片归档在忽略的 `Library/BossVnLayoutChecks`，不作为正式游戏资源上传。
