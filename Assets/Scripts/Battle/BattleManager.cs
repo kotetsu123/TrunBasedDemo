@@ -762,11 +762,13 @@ public class BattleManager : MonoBehaviour
             yield break;
         var fireFeedback = actor.GetComponent<BattleFireFeedback>();
         bool playFire = fireFeedback != null && fireFeedback.isActiveAndEnabled && fireFeedback.MatchesSkill(skill);
+        var swordFeedback = actor.GetComponent<BattleHolySwordFeedback>();
+        bool playSword = swordFeedback != null && swordFeedback.isActiveAndEnabled && swordFeedback.MatchesSkill(skill);
 
         cameraDirector?.LockCamera();
         try
         {
-            if (playFire)
+            if (playFire || playSword)
                 cameraDirector?.FocusPlayerSideInteractionShot(actor, target);
             else
                 PlaySkillCamera(actor, target, skill, targetType);
@@ -781,6 +783,19 @@ public class BattleManager : MonoBehaviour
                 if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost || fireFeedback == null)
                     yield break;
                 yield return fireFeedback.Play(target, () =>
+                {
+                    if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost) return;
+                    actor.UseSkill(skill, target);
+                    CheckBattleEnd(actor, target);
+                });
+            }
+            else if (playSword)
+            {
+                if (cameraDirector != null)
+                    yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
+                if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost || swordFeedback == null)
+                    yield break;
+                yield return swordFeedback.Play(target, () =>
                 {
                     if (!CanResolveAttack(actor, target) || actor.data.Mp < skill.mpCost) return;
                     actor.UseSkill(skill, target);

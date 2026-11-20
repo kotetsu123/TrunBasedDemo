@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 910000000000000204}
   - component: {fileID: 910000000000000205}
   - component: {fileID: 910000000000000206}
+  - component: {fileID: 965153931621407417}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -462,3 +463,23 @@ Transform:
   - {fileID: 1381937604341077637}
   m_Father: {fileID: 6492541482423702865}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &965153931621407417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154685258426240943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cc05f2cbd74e60a6551b46976cf96c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  controller: {fileID: 8011914668998644558}
+  holySwordSkill: {fileID: 11400000, guid: e58f56258f2e4d5da78e80115f7d2a14, type: 2}
+  swordMaterial: {fileID: 2100000, guid: 16cdee41cd86fc245bc7cc4be42b304d, type: 2}
+  particleMaterial: {fileID: 2100000, guid: e7ce102ce90c4493bc2f6294fce9b5d2, type: 2}
+  summonTime: 0.28
+  flightTime: 0.09
+  impactTime: 0.3
+  swordScale: 0.65
