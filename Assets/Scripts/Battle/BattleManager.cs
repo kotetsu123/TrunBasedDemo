@@ -707,35 +707,47 @@ public class BattleManager : MonoBehaviour
     }
     private IEnumerator PlayAttackSequence(BaseController actor,BaseController target)
     {
-        if (!CanResolveAttack(actor, target))
+        return PlayMeleeSequence(actor, target, null, null);
+    }
+
+    private IEnumerator PlayMeleeSequence(BaseController actor, BaseController target, SkillData skill, BattleMeleeFeedback backstab)
+    {
+        if (!CanResolveAttack(actor, target) || (skill != null && actor.data.Mp < skill.mpCost))
             yield break;
 
         var feedback = actor.GetComponent<BattleAttackFeedback>();
-        bool animatedMelee = feedback != null && feedback.UsesMeleeAnimation;
+        bool animatedMelee = skill != null ? backstab != null && backstab.IsReady
+            : feedback != null && feedback.UsesMeleeAnimation;
         if (animatedMelee) _meleeRecoveryPending = true;
         cameraDirector?.LockCamera();
         try
         {
             if (animatedMelee)
-                cameraDirector?.FocusMeleeAttackShot(actor, target, attackCameraLeadTime);
+            {
+                Vector3? arrival = backstab != null ? backstab.GetContactPosition(target.transform, fromBehind: true) : (Vector3?)null;
+                cameraDirector?.FocusMeleeAttackShot(actor, target, attackCameraLeadTime, arrival);
+            }
             else
                 cameraDirector?.FocusPlayerSideInteractionShot(actor, target, attackCameraLeadTime);
             yield return new WaitForSeconds(attackCameraLeadTime);
             if (cameraDirector != null)
                 yield return new WaitUntil(() => cameraDirector == null || !cameraDirector.IsMoving);
-            if (!CanResolveAttack(actor, target)) yield break;
+            if (!CanResolveAttack(actor, target) || (skill != null && actor.data.Mp < skill.mpCost)) yield break;
 
-            ShowSkillName("Attack");
+            if (skill == null) ShowSkillName("Attack");
             Action impact = () =>
             {
                 if (!CanResolveAttack(actor, target)) return;
-                target.TakeDamage(actor.data.Attack);
+                if (skill == null) target.TakeDamage(actor.data.Attack);
+                else actor.UseSkill(skill, target);
                 CheckBattleEnd(actor, target);
             };
-            if (feedback != null && feedback.isActiveAndEnabled)
-                yield return feedback.Play(target.transform, impact,
-                    () => { if (cameraDirector != null) cameraDirector.FocusMeleeContactShot(actor, target); },
-                    () => { if (cameraDirector != null) cameraDirector.RestoreMeleeTravelShot(); });
+            Action focusContact = () => { if (cameraDirector != null) cameraDirector.FocusMeleeContactShot(actor, target); };
+            Action focusReturn = () => { if (cameraDirector != null) cameraDirector.RestoreMeleeTravelShot(); };
+            if (skill != null && animatedMelee && backstab != null)
+                yield return backstab.Play(target.transform, impact, focusContact, focusReturn, fromBehind: true);
+            else if (skill == null && feedback != null && feedback.isActiveAndEnabled)
+                yield return feedback.Play(target.transform, impact, focusContact, focusReturn);
             else
                 impact();
 
@@ -760,6 +772,12 @@ public class BattleManager : MonoBehaviour
     {
         if(actor==null||target==null||skill==null)
             yield break;
+        var melee = actor.GetComponent<BattleMeleeFeedback>();
+        if (melee != null && melee.MatchesBackstab(skill))
+        {
+            yield return PlayMeleeSequence(actor, target, skill, melee);
+            yield break;
+        }
         var fireFeedback = actor.GetComponent<BattleFireFeedback>();
         bool playFire = fireFeedback != null && fireFeedback.isActiveAndEnabled && fireFeedback.MatchesSkill(skill);
         var swordFeedback = actor.GetComponent<BattleHolySwordFeedback>();

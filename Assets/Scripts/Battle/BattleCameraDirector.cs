@@ -244,12 +244,19 @@ public class BattleCameraDirector : MonoBehaviour
             
         FocusPlayerSideTargetPreviewShot(actor, target);
     }
-    public void FocusMeleeAttackShot(BaseController actor, BaseController target, float? duration = null)
+    public void FocusMeleeAttackShot(BaseController actor, BaseController target, float? duration = null,
+        Vector3? approachPosition = null)
     {
         if (actor == null || target == null || targetCamera == null || interactionShotPoint == null) return;
         var actorCollider = actor.GetComponent<Collider>();
         var targetCollider = target.GetComponent<Collider>();
         Bounds bounds = actorCollider != null ? actorCollider.bounds : new Bounds(actor.transform.position, Vector3.one * 2f);
+        if (approachPosition.HasValue)
+        {
+            var arrival = bounds;
+            arrival.center += approachPosition.Value - actor.transform.position;
+            bounds.Encapsulate(arrival);
+        }
         bounds.Encapsulate(targetCollider != null ? targetCollider.bounds : new Bounds(target.transform.position, Vector3.one * 2f));
         bounds.Expand(0.6f);
         Vector3 direction = target.transform.position - actor.transform.position;

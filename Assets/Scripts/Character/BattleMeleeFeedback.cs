@@ -12,6 +12,8 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
     [SerializeField] private Transform motionRoot;
     [SerializeField] private AnimationClip attackClip;
     [SerializeField] private BattleBlinkFeedback blinkFeedback;
+    [SerializeField] private SkillData backstabSkill;
+    [SerializeField] private BattleBackstabSlashFeedback backstabSlash;
     [SerializeField, Min(0f)] private float blinkTime = 0.06f;
     [SerializeField, Min(0f)] private float contactGap = 0.15f;
     [SerializeField, Range(0f, 1f)] private float impactNormalizedTime = 0.6f;
@@ -28,13 +30,14 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
     public MeleePhase Phase { get; private set; }
     public bool IsPlaying => _playing;
     public Transform MotionRoot => motionRoot;
+    public bool MatchesBackstab(SkillData skill) => skill != null && skill == backstabSkill;
     public bool IsReady => isActiveAndEnabled && controller != null && animator != null
         && animator.isActiveAndEnabled && animator.runtimeAnimatorController != null
         && attackClip != null && motionRoot != null && motionRoot != controller.transform
         && motionRoot.IsChildOf(controller.transform)
         && motionRoot.GetComponentInChildren<Collider>(true) == null;
 
-    public Vector3 GetContactPosition(Transform target)
+    public Vector3 GetContactPosition(Transform target, bool fromBehind = false)
     {
         Vector3 home = motionRoot.position;
         Vector3 direction = target.position - home;
@@ -42,18 +45,27 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
         if (direction.sqrMagnitude < 0.0001f) return home;
         direction.Normalize();
         var targetCollider = target.GetComponent<Collider>();
-        Vector3 surface = targetCollider != null && targetCollider.enabled
-            ? targetCollider.ClosestPoint(new Vector3(home.x, targetCollider.bounds.center.y, home.z))
-            : target.position - direction * 0.5f;
+        Vector3 outward = fromBehind ? direction : -direction;
+        Vector3 surface = target.position + outward * 0.5f;
+        if (targetCollider != null && targetCollider.enabled)
+        {
+            Bounds bounds = targetCollider.bounds;
+            // The current enemy cubes have no authored facing; use the far side from the caster.
+            Vector3 probe = fromBehind
+                ? bounds.center + outward * (bounds.extents.magnitude + 1f)
+                : new Vector3(home.x, bounds.center.y, home.z);
+            surface = targetCollider.ClosestPoint(probe);
+        }
         var body = controller.GetComponent<Collider>();
         float radius = body != null ? Mathf.Max(body.bounds.extents.x, body.bounds.extents.z) : 0.4f;
-        Vector3 contact = surface - direction * (radius + Mathf.Max(0f, contactGap));
+        Vector3 contact = surface + outward * (radius + Mathf.Max(0f, contactGap));
         contact.y = home.y;
         // Already-close targets should not make the actor move backwards before attacking.
-        return Vector3.Dot(contact - home, direction) > 0f ? contact : home;
+        return fromBehind || Vector3.Dot(contact - home, direction) > 0f ? contact : home;
     }
 
-    public IEnumerator Play(Transform target, Action onImpact, Action onApproachComplete = null, Action onReturnStart = null)
+    public IEnumerator Play(Transform target, Action onImpact, Action onApproachComplete = null,
+        Action onReturnStart = null, bool fromBehind = false)
     {
         if (_playing || !CanAnimate() || !CanStrike(target)) yield break;
         _restPosition = motionRoot.localPosition;
@@ -61,10 +73,10 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
         _playing = true;
         try
         {
-            Vector3 contact = GetContactPosition(target);
+            Vector3 contact = GetContactPosition(target, fromBehind);
             Face(target.position - motionRoot.position);
             Phase = MeleePhase.Approach;
-            yield return Blink(contact, target);
+            yield return Blink(contact, target, fromBehind);
             if (!CanContinue()) yield break;
 
             if (CanStrike(target))
@@ -77,7 +89,7 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
                 float hitTime = duration * Mathf.Clamp01(impactNormalizedTime);
                 yield return Wait(hitTime);
                 if (!CanContinue()) yield break;
-                if (CanStrike(target)) onImpact?.Invoke();
+                if (CanStrike(target)) ResolveImpact(target, onImpact, fromBehind);
                 yield return Wait(duration - hitTime);
                 if (!CanContinue()) yield break;
             }
@@ -91,7 +103,24 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
         finally { Restore(); }
     }
 
-    private IEnumerator Blink(Vector3 destination, Transform requiredTarget)
+    private void ResolveImpact(Transform target, Action onImpact, bool fromBehind)
+    {
+        if (!fromBehind || backstabSlash == null)
+        {
+            onImpact?.Invoke();
+            return;
+        }
+
+        var targetData = target.GetComponent<BaseController>().data;
+        int previousHp = targetData.Hp;
+        var collider = target.GetComponent<Collider>();
+        Bounds bounds = collider != null && collider.enabled ? collider.bounds : new Bounds(target.position, Vector3.one);
+        onImpact?.Invoke();
+        if (targetData.Hp < previousHp && backstabSlash != null)
+            backstabSlash.Emit(bounds);
+    }
+
+    private IEnumerator Blink(Vector3 destination, Transform requiredTarget, bool fromBehind = false)
     {
         if (Vector3.Distance(motionRoot.position, destination) < 0.02f) yield break;
         if (blinkFeedback != null) blinkFeedback.Emit(motionRoot, false);
@@ -101,7 +130,7 @@ public sealed class BattleMeleeFeedback : MonoBehaviour
         if (Phase == MeleePhase.Approach)
         {
             if (!CanStrike(requiredTarget)) yield break;
-            destination = GetContactPosition(requiredTarget);
+            destination = GetContactPosition(requiredTarget, fromBehind);
         }
         motionRoot.position = destination;
         if (Phase == MeleePhase.Return) motionRoot.localRotation = _restRotation;
