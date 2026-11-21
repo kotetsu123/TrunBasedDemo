@@ -22,7 +22,7 @@ public sealed class FieldSkillItemView : MonoBehaviour
         select = callback;
         bool field = FieldSkillService.IsFieldSkill(value);
         bool ready = string.IsNullOrEmpty(FieldSkillService.UnavailableReason(caster, value));
-        nameText.text = value.skillName;
+        nameText.text = caster.GetSkillDisplayName(value);
         costText.text = value.mpCost + " MP";
         scopeText.text = field ? FieldSkillService.TargetLabel(value) : "Battle only";
         nameText.color = ready ? new Color(.89f, .93f, .91f) : new Color(.46f, .5f, .49f);

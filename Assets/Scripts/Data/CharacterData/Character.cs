@@ -57,6 +57,7 @@ public class Character
 
     [Header("Battle skills")]
     [SerializeField]private List<SkillData> skills = new List<SkillData>();
+    [SerializeField]private List<SkillData> copiedSkills=new List<SkillData>();
 
     public IReadOnlyList<SkillData> Skills => skills;
 
@@ -176,6 +177,11 @@ public class Character
     {
         return Level * 100;
     }
+    public string GetSkillDisplayName(SkillData skill)
+    {
+        if (skill == null) return string.Empty;
+        return copiedSkills != null && copiedSkills.Contains(skill) ? $"Copy: {skill.skillName}" : skill.skillName;
+    }
     //这个是为了使用copy在battle 当中的数据。
     public Character Copy()
     {
@@ -204,6 +210,7 @@ public class Character
             Portrait = this.Portrait,
 
             skills = this.skills != null ? new List<SkillData>(this.skills) : new List<SkillData>(),
+            copiedSkills=this.copiedSkills!=null?new List<SkillData>(this.copiedSkills):new List<SkillData>(),
 
             enemySkillWeights = this.enemySkillWeights != null
             ? this.enemySkillWeights.ConvertAll(entry => entry != null ? entry.Copy() : null)

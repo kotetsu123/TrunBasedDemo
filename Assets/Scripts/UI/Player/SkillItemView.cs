@@ -15,12 +15,12 @@ public class SkillItemView : MonoBehaviour
     private SkillData _skill;
     private Action<SkillData> _onClick;
 
-    public void Bind(SkillData skill,int currentMp,Action<SkillData> onClick,bool canSelect = true)
+    public void Bind(SkillData skill,string displayName,int currentMp,Action<SkillData> onClick,bool canSelect = true)
     {
         _skill = skill;
         _onClick = onClick;
 
-        skillNameTxt.text=skill.skillName;
+        skillNameTxt.text=displayName;
         mpCostTxt.text = $"MP{skill.mpCost}";
 
         bool canUse=currentMp>=skill.mpCost && canSelect;

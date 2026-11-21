@@ -81,7 +81,7 @@ public static class FieldSkillService
             }
             caster.NotifyMpChange(previousMp, caster.Mp);
             for (int i = 0; i < targets.Count; i++) targets[i].NotifyHpChange(previousHp[i], targets[i].Hp);
-            message = skill.skillName + " used.";
+            message = caster.GetSkillDisplayName(skill) + " used.";
             return true;
         }
         finally { applying = false; }

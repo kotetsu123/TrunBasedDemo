@@ -320,7 +320,7 @@ public abstract class BaseController : MonoBehaviour
             Debug.Log("Not enough MP");
             return false;
         }
-        BattleManager.Instance?.ShowSkillName(skill.skillName);
+        BattleManager.Instance?.ShowSkillName(data.GetSkillDisplayName(skill));
 
         int prevMp = data.Mp;
         data.Mp = Mathf.Max(0, data.Mp - skill.mpCost);

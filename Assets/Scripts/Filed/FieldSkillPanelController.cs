@@ -141,7 +141,7 @@ public sealed class FieldSkillPanelController : BasePanel
         useButton.interactable = false;
         if (selectedSkill != null)
         {
-            skillNameText.text = selectedSkill.skillName;
+            skillNameText.text = caster.GetSkillDisplayName(selectedSkill);
             descriptionText.text = FieldSkillService.Description(caster, selectedSkill);
             costText.text = selectedSkill.mpCost + " MP";
             targetText.text = FieldSkillService.TargetLabel(selectedSkill);
@@ -179,7 +179,7 @@ public sealed class FieldSkillPanelController : BasePanel
         {
             selectingTarget = true;
             targetOverlay.SetActive(true);
-            targetTitle.text = selectedSkill.skillName + "  /  " + FieldSkillService.TargetLabel(selectedSkill);
+            targetTitle.text = SelectedMember.GetSkillDisplayName(selectedSkill) + "  /  " + FieldSkillService.TargetLabel(selectedSkill);
             targetMessage.text = string.Empty;
             Render(selection.CurrentStats);
         }

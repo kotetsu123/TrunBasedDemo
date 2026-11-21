@@ -54,7 +54,8 @@ public class SkillPanelController : BasePanel
             Debug.Log($"[SkillPanel] create item for {skill.skillName}");
             var item = Instantiate(skillItemPrefab, contentRoot);
             bool canSelect = battle != null && battle.CanSelectSkill(actor, skill);
-            item.Bind(skill, actor.data.Mp, OnClickSkill, canSelect);
+            string displayName = actor.data.GetSkillDisplayName(skill);
+            item.Bind(skill, displayName,actor.data.Mp, OnClickSkill, canSelect);
             _items.Add(item);
         }
     }
