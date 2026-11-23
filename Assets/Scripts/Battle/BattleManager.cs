@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
@@ -174,6 +175,8 @@ public class BattleManager : MonoBehaviour
         if (isActing) return;//正在行动中，跳过本次更新
         if (!isBattleReady) return;//战斗未准备好，跳过本次更新
         if (IsWaitingForLastEnemyDeath())
+            return;
+        if (TryStartBossStoryRetreat())
             return;
 
         updateActionValues(Time.deltaTime);
@@ -406,6 +409,7 @@ public class BattleManager : MonoBehaviour
             {
                 CheckBattleEnd(actor, actor);
                 yield return new WaitForSeconds(0.3f);
+                TryStartBossStoryRetreat();
             }
         }
         //被灼烧击倒或者战斗结束，直接跳过行动
@@ -1265,6 +1269,39 @@ public class BattleManager : MonoBehaviour
         }
     }
     //战斗结束后的处理
+    private bool TryStartBossStoryRetreat()
+    {
+        if (battleEnded || !FieldBattleContext.IsBossStoryBattle)
+            return false;
+
+        bool bossAtRetreatHp = controllers.Any(unit => unit != null && !unit.isDead
+            && FieldBattleContext.IsBossStoryRetreatTarget(unit.data)
+            && unit.data.Hp > 0 && unit.data.Hp <= FieldBattleContext.BossStoryRetreatHp);
+        if (!bossAtRetreatHp || !controllers.Any(unit => unit != null && unit.data != null
+            && unit.data.Team == Team.Player && !unit.isDead && unit.data.Hp > 0))
+            return false;
+
+        battleEnded = true;
+        actionChosen = true;
+        commandPanel?.Hide();
+        skillPanel?.Hide();
+        itemPanel?.Hide();
+        SetCurrentTarget(null);
+        ClearBattleStatuses();
+        OnInputStateChanged?.Invoke(false);
+        PartyRuntimeState.UpdateFromBattleController(controllers);
+        ShowBattleEventPopup("Retreat!");
+        StartCoroutine(ReturnForBossStoryRetreat());
+        return true;
+    }
+
+    private IEnumerator ReturnForBossStoryRetreat()
+    {
+        yield return new WaitForSeconds(0.8f);
+        FieldBattleContext.QueueBossStoryRetreat();
+        SceneManager.LoadScene(FieldBattleContext.LastFieldSceneName);
+    }
+
     private void HandleBattleEnd(BattleResult result)
     {
         if (battleEnded) return;

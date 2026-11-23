@@ -13,7 +13,7 @@ public class BossDemoDebugController : MonoBehaviour
     [SerializeField] private string battleSceneName = "BattleScene";
     [SerializeField] private SceneTransitionController transitionController;
 
-    [Header("Story Preview")]
+    [Header("Story Retreat")]
     [SerializeField] private DialogueData endingDialogue;
     [SerializeField] private VNDialoguePanelController dialoguePanel;
     [SerializeField] private DemoEndController demoEnd;
@@ -28,6 +28,12 @@ public class BossDemoDebugController : MonoBehaviour
 
     private void OnEnable()
     {
+        // Consume on scene entry, before FieldCreator clears the battle return data in Start.
+        if (FieldBattleContext.TryConsumeBossStoryRetreat(gameObject.scene.name))
+        {
+            playingStory = true;
+            pendingStory = StartCoroutine(OpenStoryNextFrame());
+        }
         RefreshControls();
     }
 
@@ -50,6 +56,16 @@ public class BossDemoDebugController : MonoBehaviour
 
     public void StartBattleDemo()
     {
+        StartDemo(bossStoryBattle: false);
+    }
+
+    public void PlayStoryDemo()
+    {
+        StartDemo(bossStoryBattle: true);
+    }
+
+    private void StartDemo(bool bossStoryBattle)
+    {
         if (!CanStart)
             return;
 
@@ -57,6 +73,12 @@ public class BossDemoDebugController : MonoBehaviour
             || !Application.CanStreamedLevelBeLoaded(battleSceneName))
         {
             Debug.LogWarning("[BossDemo] Battle demo needs a player, a valid encounter and a built battle scene.");
+            return;
+        }
+
+        if (bossStoryBattle && !CanPlayEnding())
+        {
+            Debug.LogWarning("[BossDemo] Story battle needs a non-empty dialogue, VN panel and demo ending.");
             return;
         }
 
@@ -78,7 +100,7 @@ public class BossDemoDebugController : MonoBehaviour
         // Empty spawn IDs keep demo wins from clearing the real boss or starting its ending event.
         FieldBattleContext.SaveFieldReturnData(
             gameObject.scene.name, player.position, player.rotation,
-            new string[0], new[] { bossEncounter.EncounterId });
+            System.Array.Empty<string>(), new[] { bossEncounter.EncounterId }, bossStoryBattle);
 
         startingBattle = true;
         FieldPauseState.SetPaused(true);
@@ -95,31 +117,18 @@ public class BossDemoDebugController : MonoBehaviour
             SceneManager.LoadScene(battleSceneName);
     }
 
-    public void PlayStoryDemo()
+    private bool CanPlayEnding()
     {
-        if (!CanStart)
-            return;
-
-        if (endingDialogue == null || endingDialogue.Lines == null || endingDialogue.Lines.Count == 0
-            || dialoguePanel == null || !dialoguePanel.isActiveAndEnabled
-            || demoEnd == null || !demoEnd.isActiveAndEnabled)
-        {
-            Debug.LogWarning("[BossDemo] Story preview needs a non-empty dialogue, VN panel and demo ending.");
-            return;
-        }
-
-        playingStory = true;
-        FieldPauseState.SetPaused(true);
-        RefreshControls();
-        pendingStory = StartCoroutine(OpenStoryNextFrame());
+        return endingDialogue != null && endingDialogue.Lines != null && endingDialogue.Lines.Count > 0
+            && dialoguePanel != null && dialoguePanel.isActiveAndEnabled && demoEnd != null && demoEnd.isActiveAndEnabled;
     }
 
     private IEnumerator OpenStoryNextFrame()
     {
-        // Do not let the button's opening click also advance the first VN line.
+        // Let the returning field finish initializing before the VN takes over.
         yield return null;
         pendingStory = null;
-        if (dialoguePanel == null || demoEnd == null)
+        if (!CanPlayEnding())
         {
             playingStory = false;
             FieldPauseState.SetPaused(false);

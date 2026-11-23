@@ -139,6 +139,8 @@ public class EnemyController : BaseController
     }
     public override void TakeDamage(int damage)
     {
+        if (damage > 0 && FieldBattleContext.IsBossStoryRetreatTarget(data))
+            damage = Mathf.Min(damage, Mathf.Max(0, data.Hp - FieldBattleContext.BossStoryRetreatHp));
         // BaseController owns death handling, including lethal DOT ticks.
         base.TakeDamage(damage);
         if (hpBarInstance != null)

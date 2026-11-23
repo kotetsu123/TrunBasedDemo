@@ -6,6 +6,10 @@ using UnityEngine;
 public static class FieldBattleContext 
 {
     private const float DefaultEncounterCooldownSeconds = 1.5f;
+    private const string BossStoryEnemyId = "boss_001";
+    public const int BossStoryRetreatHp = 50;
+    public static bool IsBossStoryBattle { get; private set; }
+    private static bool bossStoryRetreatQueued;
 
     public static string LastFieldSceneName { get; private set; }
     public static Vector3 PlayerPositionBeforeBattle { get; private set; }
@@ -55,12 +59,15 @@ public static class FieldBattleContext
         Vector3 playerPos,
         Quaternion playerRot,
         IReadOnlyList<string> newTriggeredSpawnIds,
-        IReadOnlyList<string> newEncounterIds)
+        IReadOnlyList<string> newEncounterIds,
+        bool bossStoryBattle = false)
     {
         LastFieldSceneName = fieldSceneName;
         PlayerPositionBeforeBattle = playerPos;
         PlayerRotationBeforeBattle = playerRot;
         HasFieldReturnData = true;
+        IsBossStoryBattle = bossStoryBattle;
+        bossStoryRetreatQueued = false;
 
         triggeredSpawnIds.Clear();
         currentEncounterIds.Clear();
@@ -92,6 +99,25 @@ public static class FieldBattleContext
 
         Debug.Log($"[FieldBattleContext] Saved return data: Scene={fieldSceneName}, spawnCount={triggeredSpawnIds.Count}, encounterCount={currentEncounterIds.Count}");
     }
+    public static bool IsBossStoryRetreatTarget(Character character)
+    {
+        return IsBossStoryBattle && character != null
+            && character.Team == Team.Enemy && character.characterId == BossStoryEnemyId;
+    }
+
+    public static void QueueBossStoryRetreat()
+    {
+        bossStoryRetreatQueued = IsBossStoryBattle;
+    }
+
+    public static bool TryConsumeBossStoryRetreat(string sceneName)
+    {
+        if (!bossStoryRetreatQueued || sceneName != LastFieldSceneName)
+            return false;
+        bossStoryRetreatQueued = false;
+        return true;
+    }
+
     public static void StartEncounterCooldown(float seconds = DefaultEncounterCooldownSeconds)
     {
         EncounterCooldownUntilTime = Time.time + Mathf.Max(0f, seconds);
@@ -196,6 +222,8 @@ public static class FieldBattleContext
         PlayerRotationBeforeBattle = Quaternion.identity;
         TriggeredSpawnId = null;
         HasFieldReturnData = false;
+        IsBossStoryBattle = false;
+        bossStoryRetreatQueued = false;
         CurrentEncounterId = null;
         triggeredSpawnIds.Clear();
         currentEncounterIds.Clear();

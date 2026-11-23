@@ -28,13 +28,16 @@ VN panel and Demo End controller.
   retry/title/load choices. Retry keeps the selected encounter via the existing
   battle context.
 
-### Story Demo
+### Story Demo (2026-11-23)
 
-- Directly previews the existing ending VN, then calls `DemoEndController.ShowDemoEnd`.
-- Does not require a boss victory or modify HP/MP, inventory, cleared-spawn IDs or
-  automatic-event completion flags. The preview can be repeated.
-- Pauses the field before opening the VN. Opening is deferred one frame so the
-  button click cannot also advance the first dialogue line.
+- Starts the same boss encounter in story mode. Retreat triggers at **50 HP
+  remaining**, not 50%. An overshooting hit stops the boss at 50 HP.
+- After the current attack recovers, shows `Retreat!`, then returns to Boss Field
+  and opens the existing VN. The VN still leads to Demo End.
+- Retreat grants no victory rewards and does not clear the field boss or mark
+  its automatic ending complete. Spent HP, MP and items are retained.
+- Defeat and manual Run retain their normal results. Retry retains story mode;
+  the return to the field consumes the story context and allows replay.
 - Closing the Demo End panel restores the field controls; its existing return-to-title
   button is retained.
 
@@ -45,15 +48,19 @@ debug entries.
 
 ### Deliberately Deferred
 
-These are two showcase entry points, not two implemented playthroughs. The future
-first-playthrough ending is an authored forced retreat, not ordinary party KO.
-The battle-time story takeover condition, forced-retreat sequence, final dialogue
-and second-playthrough design are not implemented here. The pre-existing automatic
-boss-clear ending and ordinary physical encounter triggers are unchanged.
+These are two showcase entry points, not two implemented playthroughs. The story
+route uses the existing ending dialogue rather than a new in-battle cutscene.
+The full first- and second-playthrough flows, final dialogue and ordinary
+physical encounter triggers are outside this change.
 
 ### Validation
 
-48 focused Unity Play Mode assertions passed on 2026-11-18. They cover scene
+The 50 HP story route passed 52 Play Mode assertions on 2026-11-23, including
+threshold overkill, melee recovery, turn-start damage, VN handoff, defeat and
+retry, manual escape and normal victory. Tests are archived in ignored
+`Library/BossStoryRetreatChecks`.
+
+The original direct-VN version passed 48 focused Unity Play Mode assertions on 2026-11-18. They cover scene
 wiring, the original Argo recruit action, the new Paul portrait, pause and
 double-start guards, VN completion and replay, missing references, cancelling a
 pending preview, the actual Boss battle entry, normal victory/reward settlement,
@@ -104,12 +111,13 @@ archived under ignored `Library/BossVnLayoutChecks`.
   演示胜利不会清除 `boss_spawn_001`，也不会因此解锁自动结尾剧情。
 - 胜利、逃跑走原返回流程；失败仍有重试、标题和读取选项。重试沿用现有遭遇上下文。
 
-### 剧情演示
+### 剧情演示（2026-11-23）
 
-- 直接预览现有结尾 VN，结束后打开 Demo End 面板。
-- 不要求先击败 Boss，不修改角色 HP/MP、背包、Boss 清除记录或自动剧情完成标记，
-  可以反复预览。
-- 立即暂停探索，延后一帧打开 VN，避免打开按钮的点击同时跳过第一句。
+- 进入同一场 Boss 战，但在 Boss **剩余 50 点 HP** 时触发剧情撤退，不是半血。
+  如果一击会打过阈值，Boss 的 HP 停在 50。
+- 当前动作和归位收尾后显示 `Retreat!`，返回 Boss Field，播放现有结尾 VN，再打开 Demo End。
+- 不发胜利奖励、不清除地图上的 Boss、不写自动剧情完成标记；战斗内消耗的 HP、MP 和道具保留。
+- 普通团灭和手动逃跑仍走原结算。重试保留剧情战模式；回到探索后清除临时战斗模式，可再次演示。
 - 关闭 Demo End 后恢复探索，也保留原来的返回标题功能。
 
 探索暂停、转场、VN 和结束面板期间，整组调试按钮隐藏且不接收点击。原有教程和
@@ -117,13 +125,15 @@ archived under ignored `Library/BossVnLayoutChecks`.
 
 ### 暂未实现
 
-这两个按钮只是 Demo 展示入口，不是已经实现了两个周目。一周目的设定是剧情杀后
-被迫撤离，不等于普通全员阵亡。本次没有接战斗内剧情接管条件、强制撤离演出、
-最终台词和二周目逻辑。原有的 Boss 清除后自动剧情及地图接触遇敌逻辑保持不变。
+这两个按钮只是 Demo 展示入口，不是已经实现了两个周目。撤退沿用现有结尾 VN，
+暂不增加战斗内动画和新台词。原有的 Boss 清除后自动剧情及地图接触遇敌逻辑保持不变。
 
 ### 验证记录
 
-2026-11-18 通过 48 项 Unity Play Mode 针对性断言，覆盖场景绑定、原 Argo 入队、
+50 HP 剧情路线于 2026-11-23 通过 52 项 Play Mode 断言，覆盖越过阈值、背刺归位、
+回合开始扣血、衔接 VN、团灭重试、手动逃跑和正常胜利。测试归档于忽略的 `Library/BossStoryRetreatChecks`。
+
+直接预览 VN 的原版于 2026-11-18 通过 48 项 Unity Play Mode 断言，覆盖场景绑定、原 Argo 入队、
 Paul 新头像、暂停与防重复点击、VN 完成与重复预览、缺失引用保护、待打开剧情的
 取消、真实 Boss 战入口、正常胜利奖励结算、返回位置、Boss/剧情标记不变及回标题。
 已检查 1280x720 和 800x600 截图，未观察到运行错误或异常。
