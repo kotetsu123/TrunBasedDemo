@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
@@ -1290,16 +1289,8 @@ public class BattleManager : MonoBehaviour
         ClearBattleStatuses();
         OnInputStateChanged?.Invoke(false);
         PartyRuntimeState.UpdateFromBattleController(controllers);
-        ShowBattleEventPopup("Retreat!");
-        StartCoroutine(ReturnForBossStoryRetreat());
+        BossStoryRetreatFade.Begin(FieldBattleContext.LastFieldSceneName);
         return true;
-    }
-
-    private IEnumerator ReturnForBossStoryRetreat()
-    {
-        yield return new WaitForSeconds(0.8f);
-        FieldBattleContext.QueueBossStoryRetreat();
-        SceneManager.LoadScene(FieldBattleContext.LastFieldSceneName);
     }
 
     private void HandleBattleEnd(BattleResult result)

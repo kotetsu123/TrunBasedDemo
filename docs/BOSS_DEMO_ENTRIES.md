@@ -32,8 +32,9 @@ VN panel and Demo End controller.
 
 - Starts the same boss encounter in story mode. Retreat triggers at **50 HP
   remaining**, not 50%. An overshooting hit stops the boss at 50 HP.
-- After the current attack recovers, shows `Retreat!`, then returns to Boss Field
-  and opens the existing VN. The VN still leads to Demo End.
+- After the current attack recovers, the screen fades to black without a popup.
+  The screen stays black during the return to Boss Field and fades in once the
+  existing VN is ready. The VN still leads to Demo End.
 - Retreat grants no victory rewards and does not clear the field boss or mark
   its automatic ending complete. Spent HP, MP and items are retained.
 - Defeat and manual Run retain their normal results. Retry retains story mode;
@@ -54,6 +55,10 @@ The full first- and second-playthrough flows, final dialogue and ordinary
 physical encounter triggers are outside this change.
 
 ### Validation
+
+The fade version passed 67 Play Mode assertions, including a rendered black
+frame before loading, the opaque cover at scene activation and restored VN
+input after reveal. Test output is in ignored `Library/BossStoryFadeChecks`.
 
 The 50 HP story route passed 52 Play Mode assertions on 2026-11-23, including
 threshold overkill, melee recovery, turn-start damage, VN handoff, defeat and
@@ -115,7 +120,7 @@ archived under ignored `Library/BossVnLayoutChecks`.
 
 - 进入同一场 Boss 战，但在 Boss **剩余 50 点 HP** 时触发剧情撤退，不是半血。
   如果一击会打过阈值，Boss 的 HP 停在 50。
-- 当前动作和归位收尾后显示 `Retreat!`，返回 Boss Field，播放现有结尾 VN，再打开 Demo End。
+- 当前动作和归位收尾后缓缓淡到黑屏，不弹文字。在全黑时返回 Boss Field，等现有结尾 VN 准备好再淡入，播完后打开 Demo End。
 - 不发胜利奖励、不清除地图上的 Boss、不写自动剧情完成标记；战斗内消耗的 HP、MP 和道具保留。
 - 普通团灭和手动逃跑仍走原结算。重试保留剧情战模式；回到探索后清除临时战斗模式，可再次演示。
 - 关闭 Demo End 后恢复探索，也保留原来的返回标题功能。
@@ -129,6 +134,9 @@ archived under ignored `Library/BossVnLayoutChecks`.
 暂不增加战斗内动画和新台词。原有的 Boss 清除后自动剧情及地图接触遇敌逻辑保持不变。
 
 ### 验证记录
+
+黑幕转场版通过 67 项 Play Mode 断言，验证了切场景前实际画面完全黑屏、跨场景保持黑幕、
+VN 淡入后恢复输入。测试归档于忽略的 `Library/BossStoryFadeChecks`。
 
 50 HP 剧情路线于 2026-11-23 通过 52 项 Play Mode 断言，覆盖越过阈值、背刺归位、
 回合开始扣血、衔接 VN、团灭重试、手动逃跑和正常胜利。测试归档于忽略的 `Library/BossStoryRetreatChecks`。

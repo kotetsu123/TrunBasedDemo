@@ -31,6 +31,7 @@ public class VNDialoguePanelController : BasePanel
     private Coroutine typewriterRoutine;
 
     public static VNDialoguePanelController Current { get; private set; }
+    public bool TransitionInputBlocked { get; set; }
 
     protected override void Awake()
     {
@@ -47,7 +48,7 @@ public class VNDialoguePanelController : BasePanel
 
     private void Update()
     {
-        if (!IsOpen)
+        if (!IsOpen || TransitionInputBlocked)
             return;
 
         // VN first version keeps the same input rhythm as the normal dialogue panel.
@@ -81,7 +82,7 @@ public class VNDialoguePanelController : BasePanel
 
     public void Advance()
     {
-        if (currentDialogue == null)
+        if (currentDialogue == null || TransitionInputBlocked)
             return;
 
         // The first input completes the current sentence; the next input advances.
