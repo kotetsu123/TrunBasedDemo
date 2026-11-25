@@ -1,0 +1,1265 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" modified="2026-11-16T00:00:00.000Z" agent="Project documentation" version="24.7.17" type="device">
+  <diagram id="module-0" name="01 项目主干">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1415" pageHeight="842">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="01 项目主干&lt;br&gt;从标题到探索、遭遇、战斗和存档" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1335.1" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="TitleMenuController" value="&lt;b&gt;TitleMenuController&lt;/b&gt;&lt;br&gt;标题与新游戏入口&lt;hr&gt;- fildSceneName&lt;br&gt;- settingPanel&lt;hr&gt;+ OnNewGameClicked()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TitleMenuController.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="279.12" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldCreator" value="&lt;b&gt;FieldCreator&lt;/b&gt;&lt;br&gt;探索场景初始化&lt;hr&gt;- fieldData&lt;br&gt;- initialPartyData&lt;hr&gt;- SetupPlayer()&lt;br&gt;- SpwanEnemies()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldCreator.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="487.12" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.12" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="InventoryRuntimeState" value="&lt;b&gt;InventoryRuntimeState&lt;/b&gt;&lt;br&gt;跨场景背包状态&lt;hr&gt;+ DefaultCapacity&lt;br&gt;+ Slots&lt;hr&gt;+ AddItem()&lt;br&gt;+ ConsumeItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;InventoryRuntimeState.cs:34&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="487.12" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EncounterTrigger" value="&lt;b&gt;EncounterTrigger&lt;/b&gt;&lt;br&gt;接触遇敌与联战收集&lt;hr&gt;- battleSceneName&lt;br&gt;- transitionController&lt;hr&gt;- CollectEncounterEnemies()&lt;br&gt;- OnTriggerEnter()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EncounterTrigger.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="903.12" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldBattleContext" value="&lt;b&gt;FieldBattleContext&lt;/b&gt;&lt;br&gt;遭遇、返回与探索记录&lt;hr&gt;+ LastFieldSceneName&lt;br&gt;+ PlayerPositionBeforeBattle&lt;hr&gt;+ SaveFieldReturnData()&lt;br&gt;+ MarkTriggerdEnemyCleared()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldBattleContext.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="977.1" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleSpawner" value="&lt;b&gt;BattleSpawner&lt;/b&gt;&lt;br&gt;战斗双方生成&lt;hr&gt;- playerPrefabOverrides&lt;br&gt;- _enemyReserve&lt;hr&gt;- SpawnPlayers()&lt;br&gt;+ SpawnInitial()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleSpawner.cs:15&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="71.12" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleManager" value="&lt;b&gt;BattleManager&lt;/b&gt;&lt;br&gt;回合与战斗流程编排&lt;hr&gt;+ isActing&lt;br&gt;+ battleEnded&lt;hr&gt;- PerformTrun()&lt;br&gt;- CheckBattleEnd()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleManager.cs:14&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="71.12" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="ResultCharacterPanelController" value="&lt;b&gt;ResultCharacterPanelController&lt;/b&gt;&lt;br&gt;胜负结算与返回探索&lt;hr&gt;- endPanel&lt;br&gt;- buttonRoot&lt;hr&gt;- ReturnToField()&lt;br&gt;+ OnClickRetry()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ResultCharacterPanelController.cs:9&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1192.1" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveSystem" value="&lt;b&gt;SaveSystem&lt;/b&gt;&lt;br&gt;JSON 存档校验与文件操作&lt;hr&gt;+ SlotCount&lt;hr&gt;+ SaveSlot()&lt;br&gt;+ LoadSlot()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveSystem.cs:19&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="695.12" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="Clear()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="TitleMenuController" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330.57" y="445.0" />
+              <mxPoint x="330.57" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="Clear()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="TitleMenuController" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="476.12" y="445.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="InitializeIfEmpty()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCreator" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="472.12" y="420.0" />
+              <mxPoint x="392.44" y="445.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="InitializeIfEmpty()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCreator" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="574.44" y="445.0" />
+              <mxPoint x="574.44" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="SaveFieldReturnData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterTrigger" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1015.86" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1096.12" y="296.0" />
+              <mxPoint x="1121.12" y="445.0" />
+              <mxPoint x="1121.12" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="35.0" y="296.0" />
+              <mxPoint x="35.0" y="420.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="RegisterController()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="BattleManager">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="UpdateFromBattleControll..." style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="199.18" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="ClearReturnData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="ResultCharacterPanelController" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="654.12" y="457.0" />
+              <mxPoint x="472.12" y="482.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-11" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="751.12" y="457.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-12" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="这是依赖总览，不是顺序图。跨场景保留的是 RuntimeState / Context，不是整张场景对象。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="636.0" width="1335.1" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-1" name="02 数据的四个位置">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1714" pageHeight="932">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="02 数据的四个位置&lt;br&gt;配置模板 / 运行状态 / 战斗副本 / 存档" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1634.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyInitialData" value="&lt;b&gt;PartyInitialData&lt;/b&gt;&lt;br&gt;新游戏队伍配置&lt;hr&gt;- members&lt;br&gt;+ Members&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyInitialData.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1283.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="CharacterDataBase" value="&lt;b&gt;CharacterDataBase&lt;/b&gt;&lt;br&gt;玩家模板与 ID 查找&lt;hr&gt;- characters&lt;br&gt;- partyInitialData&lt;hr&gt;+ FindById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;CharacterDataBase.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemyCharacterDataBase" value="&lt;b&gt;EnemyCharacterDataBase&lt;/b&gt;&lt;br&gt;敌人模板与 ID 查找&lt;hr&gt;- enemies&lt;hr&gt;+ FindByEnemyId()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemyCharacterDataBase.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="311.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="Character" value="&lt;b&gt;Character&lt;/b&gt;&lt;br&gt;可序列化角色数据&lt;hr&gt;+ Hp&lt;br&gt;+ Mp&lt;br&gt;+ Skills&lt;hr&gt;+ Copy()&lt;br&gt;+ GainExp()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;Character.cs:30&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="399.0" y="482.0" width="178" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="SkillData" value="&lt;b&gt;SkillData&lt;/b&gt;&lt;br&gt;技能配置资源&lt;hr&gt;+ skillType&lt;br&gt;+ targetType&lt;br&gt;+ power&lt;br&gt;+ mpCost&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SkillData.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="123.0" y="683.0" width="178" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="ItemData" value="&lt;b&gt;ItemData&lt;/b&gt;&lt;br&gt;道具配置资源&lt;hr&gt;+ itemtype&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ItemData.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1491.0" y="311.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="ItemDataBase" value="&lt;b&gt;ItemDataBase&lt;/b&gt;&lt;br&gt;道具 ID 数据库&lt;hr&gt;- items&lt;hr&gt;+ FindById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ItemDataBase.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="311.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1075.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="InventoryRuntimeState" value="&lt;b&gt;InventoryRuntimeState&lt;/b&gt;&lt;br&gt;跨场景背包状态&lt;hr&gt;+ DefaultCapacity&lt;br&gt;+ Slots&lt;hr&gt;+ AddItem()&lt;br&gt;+ ConsumeItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;InventoryRuntimeState.cs:34&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1491.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BaseController" value="&lt;b&gt;BaseController&lt;/b&gt;&lt;br&gt;角色战斗效果基类&lt;hr&gt;+ data&lt;br&gt;- _activeDebuff&lt;hr&gt;+ UseSkill()&lt;br&gt;+ TickDebuffAtTurnStart()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BaseController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveSystem" value="&lt;b&gt;SaveSystem&lt;/b&gt;&lt;br&gt;JSON 存档校验与文件操作&lt;hr&gt;+ SlotCount&lt;hr&gt;+ SaveSlot()&lt;br&gt;+ LoadSlot()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveSystem.cs:19&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="117.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="GameSaveData" value="&lt;b&gt;GameSaveData&lt;/b&gt;&lt;br&gt;保存状态的 DTO 容器&lt;hr&gt;+ version&lt;br&gt;+ savedAtUtc&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;GameSaveData.cs:1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="867.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="members" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="PartyInitialData" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1268.0" y="420.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="characters" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="CharacterDataBase" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="enemies" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="EnemyCharacterDataBase" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="skills" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="Character" target="SkillData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="Copy()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="PartyRuntimeState" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1060.0" y="420.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="NotifyHpChange()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="420.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="skills" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="SkillData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="InventoryRuntimeState" target="ItemData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="GameSaveData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="FindById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="CharacterDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="436.0" y="296.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="FindById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="ItemDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="Character 是普通序列化类。SO 技能引用可共享；当前 HP、MP、阶段和 Debuff 等临时状态不应写进共享模板。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="852.0" width="1634.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-2" name="03 探索遇敌与战斗生成">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1604" pageHeight="887">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="03 探索遇敌与战斗生成&lt;br&gt;地图出生点、联战收集、编成和后备补位" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1524.2" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldData" value="&lt;b&gt;FieldData&lt;/b&gt;&lt;br&gt;探索生成配置&lt;hr&gt;- fieldId&lt;br&gt;- spawnPoints&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldData.cs:75&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldCreator" value="&lt;b&gt;FieldCreator&lt;/b&gt;&lt;br&gt;探索场景初始化&lt;hr&gt;- fieldData&lt;br&gt;- initialPartyData&lt;hr&gt;- SetupPlayer()&lt;br&gt;- SpwanEnemies()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldCreator.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="72.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemyDataBase" value="&lt;b&gt;EnemyDataBase&lt;/b&gt;&lt;br&gt;探索敌人表现配置&lt;hr&gt;- enemies&lt;hr&gt;+ FindById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemyDataBase.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="497.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemySpawnPoint" value="&lt;b&gt;EnemySpawnPoint&lt;/b&gt;&lt;br&gt;地图敌人出生点&lt;hr&gt;- spawnId&lt;br&gt;- encounterId&lt;hr&gt;+ Configure()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemySpawnPoint.cs:11&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="489.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemySpawnManager" value="&lt;b&gt;EnemySpawnManager&lt;/b&gt;&lt;br&gt;敌人生成与重生&lt;hr&gt;- spawnPoints&lt;br&gt;- enemyDataBase&lt;hr&gt;+ SpawnAll()&lt;br&gt;- CheckLiveRespawn()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemySpawnManager.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemyFieldController" value="&lt;b&gt;EnemyFieldController&lt;/b&gt;&lt;br&gt;探索敌人游荡和追逐&lt;hr&gt;- moveSpeed&lt;br&gt;- waitTime&lt;hr&gt;+ SetWanderCenter()&lt;br&gt;+ Init()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemyFieldController.cs:9&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EncounterTrigger" value="&lt;b&gt;EncounterTrigger&lt;/b&gt;&lt;br&gt;接触遇敌与联战收集&lt;hr&gt;- battleSceneName&lt;br&gt;- transitionController&lt;hr&gt;- CollectEncounterEnemies()&lt;br&gt;- OnTriggerEnter()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EncounterTrigger.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldBattleContext" value="&lt;b&gt;FieldBattleContext&lt;/b&gt;&lt;br&gt;遭遇、返回与探索记录&lt;hr&gt;+ LastFieldSceneName&lt;br&gt;+ PlayerPositionBeforeBattle&lt;hr&gt;+ SaveFieldReturnData()&lt;br&gt;+ MarkTriggerdEnemyCleared()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldBattleContext.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="867.0" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SceneTransitionController" value="&lt;b&gt;SceneTransitionController&lt;/b&gt;&lt;br&gt;淡出、暂停与切场景&lt;hr&gt;- fadeCanvasGroup&lt;br&gt;- fadeDuration&lt;hr&gt;+ StartBattleTransition()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SceneTransitionController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="489.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="EncounterDataBase" value="&lt;b&gt;EncounterDataBase&lt;/b&gt;&lt;br&gt;遭遇 ID 数据库&lt;hr&gt;- encounters&lt;hr&gt;+ FindeById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EncounterDataBase.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1283.0" y="497.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="EncounterData" value="&lt;b&gt;EncounterData&lt;/b&gt;&lt;br&gt;战斗编成与奖励配置&lt;hr&gt;- encounterId&lt;br&gt;- enemyEntries&lt;hr&gt;+ ValidateConfig()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EncounterData.cs:70&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1357.0" y="668.0" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleSpawner" value="&lt;b&gt;BattleSpawner&lt;/b&gt;&lt;br&gt;战斗双方生成&lt;hr&gt;- playerPrefabOverrides&lt;br&gt;- _enemyReserve&lt;hr&gt;- SpawnPlayers()&lt;br&gt;+ SpawnInitial()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleSpawner.cs:15&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1179.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleFormation" value="&lt;b&gt;BattleFormation&lt;/b&gt;&lt;br&gt;战斗槽位与锚点&lt;hr&gt;+ OnSlotChanged [event]&lt;hr&gt;+ DebugDumpEnemySlots()&lt;br&gt;+ FindFirstEmpty()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleFormation.cs:16&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1075.0" y="489.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="fieldData" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCreator" target="FieldData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="SpawnAll()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCreator" target="EnemySpawnManager">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="FindById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EnemySpawnManager" target="EnemyDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="spawnPoints" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="EnemySpawnManager" target="EnemySpawnPoint">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="Init()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EnemySpawnManager" target="EnemyFieldController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="ResetToWander()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterTrigger" target="EnemyFieldController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="SaveFieldReturnData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterTrigger" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="852.0" y="445.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="StartBattleTransition()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterTrigger" target="SceneTransitionController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="FindeById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="EncounterDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="ValidateConfig()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterDataBase" target="EncounterData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-11" value="ValidateConfig()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="EncounterData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1476.0" y="482.0" />
+              <mxPoint x="1490.0" y="631.0" />
+              <mxPoint x="1490.0" y="643.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-12" value="FindFirstEmpty()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleSpawner" target="BattleFormation">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-13" value="OnSlotChanged" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleFormation" target="BattleSpawner">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1268.0" y="482.0" />
+              <mxPoint x="1382.0" y="457.0" />
+              <mxPoint x="1382.0" y="445.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="spawnId 是地图出生点，encounterId 是编成配置；后备敌人等站位释放后补位。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="807.0" width="1524.2" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-3" name="04 回合、命令和目标">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1464" pageHeight="1010">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="04 回合、命令和目标&lt;br&gt;管理器决定流程，面板和目标器处理输入，时间轴观察排序" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1384.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleManager" value="&lt;b&gt;BattleManager&lt;/b&gt;&lt;br&gt;回合与战斗流程编排&lt;hr&gt;+ isActing&lt;br&gt;+ battleEnded&lt;hr&gt;- PerformTrun()&lt;br&gt;- CheckBattleEnd()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleManager.cs:14&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleCommandPanel" value="&lt;b&gt;BattleCommandPanel&lt;/b&gt;&lt;br&gt;攻击、技能和道具命令&lt;hr&gt;- canvasGroup&lt;hr&gt;+ Show()&lt;br&gt;+ Hide()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleCommandPanel.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="396.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="SkillPanelController" value="&lt;b&gt;SkillPanelController&lt;/b&gt;&lt;br&gt;战斗技能列表&lt;hr&gt;- contentRoot&lt;br&gt;- skillItemPrefab&lt;hr&gt;+ Show()&lt;br&gt;+ OnClickSkill()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SkillPanelController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1033.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="ItemPanelController" value="&lt;b&gt;ItemPanelController&lt;/b&gt;&lt;br&gt;战斗道具列表&lt;hr&gt;- contentRoot&lt;br&gt;- itemViewPrefab&lt;hr&gt;+ Show()&lt;br&gt;+ Refresh()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ItemPanelController.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1241.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleTargetSelector" value="&lt;b&gt;BattleTargetSelector&lt;/b&gt;&lt;br&gt;键鼠目标选择&lt;hr&gt;- mainCamera&lt;br&gt;- enemyClickMask&lt;hr&gt;+ HandleTargetSelectionInput()&lt;br&gt;- SelectAllyLeftRight()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleTargetSelector.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="389.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BaseController" value="&lt;b&gt;BaseController&lt;/b&gt;&lt;br&gt;角色战斗效果基类&lt;hr&gt;+ data&lt;br&gt;- _activeDebuff&lt;hr&gt;+ UseSkill()&lt;br&gt;+ TickDebuffAtTurnStart()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BaseController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="318.0" y="575.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="Character" value="&lt;b&gt;Character&lt;/b&gt;&lt;br&gt;可序列化角色数据&lt;hr&gt;+ Hp&lt;br&gt;+ Mp&lt;br&gt;+ Skills&lt;hr&gt;+ Copy()&lt;br&gt;+ GainExp()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;Character.cs:30&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="318.0" y="761.0" width="178" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="TimeLineUI" value="&lt;b&gt;TimeLineUI&lt;/b&gt;&lt;br&gt;时间轴排序与视图维护&lt;hr&gt;- battle&lt;hr&gt;- RefreshNext()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TimeLineUI.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="617.0" y="218.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="TimelineIconView" value="&lt;b&gt;TimelineIconView&lt;/b&gt;&lt;br&gt;时间轴颜色与状态显示&lt;hr&gt;- layoutElement&lt;br&gt;- visualRoot&lt;hr&gt;+ SetState()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TimelineIconView.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="617.0" y="396.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="TargetCircleController" value="&lt;b&gt;TargetCircleController&lt;/b&gt;&lt;br&gt;目标圈表现&lt;hr&gt;- battle&lt;br&gt;- targetCirclePrefab&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TargetCircleController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="825.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="OnCommandSelected" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleCommandPanel" target="BattleManager">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="389.0" />
+              <mxPoint x="455.0" y="364.0" />
+              <mxPoint x="455.0" y="352.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="OnSkillSelected" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="SkillPanelController" target="BattleManager">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1018.0" y="203.0" />
+              <mxPoint x="576.3" y="181.5" />
+              <mxPoint x="505.7" y="181.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="OnItemSelected" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="ItemPanelController" target="BattleManager">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1226.0" y="203.0" />
+              <mxPoint x="679.85" y="181.5" />
+              <mxPoint x="608.15" y="181.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="Hide()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleCommandPanel">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="AutoPickTargetIfNeeded()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleTargetSelector">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleTargetSelector" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="TickDebuffAtTurnStart()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="455.0" y="352.0" />
+              <mxPoint x="455.0" y="364.0" />
+              <mxPoint x="436.0" y="513.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="NotifyHpChange()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="OnTimeLineOrdered" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleManager" target="TimeLineUI">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="ForceInactive()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="TimeLineUI" target="TimelineIconView">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="OnTargetChanged" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleManager" target="TargetCircleController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="602.0" y="203.0" />
+              <mxPoint x="698.58" y="181.5" />
+              <mxPoint x="781.42" y="181.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="每次到达行动时先结算 Debuff。结算阶段的面板入口应走 TryShowCommandPanel 的状态检查。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="930.0" width="1384.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-4" name="05 技能、Boss 与灼烧">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1338" pageHeight="1010">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="05 技能、Boss 与灼烧&lt;br&gt;技能配置、实际效果和状态图标分别由不同对象负责" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1258.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleManager" value="&lt;b&gt;BattleManager&lt;/b&gt;&lt;br&gt;回合与战斗流程编排&lt;hr&gt;+ isActing&lt;br&gt;+ battleEnded&lt;hr&gt;- PerformTrun()&lt;br&gt;- CheckBattleEnd()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleManager.cs:14&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="136.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EnemyController" value="&lt;b&gt;EnemyController&lt;/b&gt;&lt;br&gt;敌人行为与 Boss 状态&lt;hr&gt;+ IsBossPhaseTwo&lt;br&gt;+ IsBossCharging&lt;hr&gt;+ TryEnterBossPhaseTwo()&lt;br&gt;# CalculateSkillDamage()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EnemyController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="58.0" y="389.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="PlayerController" value="&lt;b&gt;PlayerController&lt;/b&gt;&lt;br&gt;玩家角色行为&lt;hr&gt;+ playerHud&lt;br&gt;+ isPlayer&lt;hr&gt;+ TakeDamage()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PlayerController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="432.0" y="396.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BaseController" value="&lt;b&gt;BaseController&lt;/b&gt;&lt;br&gt;角色战斗效果基类&lt;hr&gt;+ data&lt;br&gt;- _activeDebuff&lt;hr&gt;+ UseSkill()&lt;br&gt;+ TickDebuffAtTurnStart()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BaseController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="236.0" y="575.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="Character" value="&lt;b&gt;Character&lt;/b&gt;&lt;br&gt;可序列化角色数据&lt;hr&gt;+ Hp&lt;br&gt;+ Mp&lt;br&gt;+ Skills&lt;hr&gt;+ Copy()&lt;br&gt;+ GainExp()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;Character.cs:30&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="761.0" width="178" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="SkillData" value="&lt;b&gt;SkillData&lt;/b&gt;&lt;br&gt;技能配置资源&lt;hr&gt;+ skillType&lt;br&gt;+ targetType&lt;br&gt;+ power&lt;br&gt;+ mpCost&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SkillData.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="761.0" width="178" height="139" as="geometry" />
+        </mxCell>
+        <mxCell id="DebuffState" value="&lt;b&gt;DebuffState&lt;/b&gt;&lt;br&gt;单槽负面状态&lt;hr&gt;+ EffectType&lt;br&gt;+ SourceSkill&lt;hr&gt;- Refresh()&lt;br&gt;- TryAdvanceTurn()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;DebuffState.cs:1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="768.5" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleBurnFeedback" value="&lt;b&gt;BattleBurnFeedback&lt;/b&gt;&lt;br&gt;灼烧结算时的小火花&lt;hr&gt;- controller&lt;br&gt;- burnSkill&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleBurnFeedback.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="583.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleDebuffHud" value="&lt;b&gt;BattleDebuffHud&lt;/b&gt;&lt;br&gt;HUD 下方状态图标&lt;hr&gt;- burnSkill&lt;br&gt;- burnIcon&lt;hr&gt;+ Bind()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleDebuffHud.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="868.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="TimeLineUI" value="&lt;b&gt;TimeLineUI&lt;/b&gt;&lt;br&gt;时间轴排序与视图维护&lt;hr&gt;- battle&lt;hr&gt;- RefreshNext()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TimeLineUI.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1115.0" y="218.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="TimelineIconView" value="&lt;b&gt;TimelineIconView&lt;/b&gt;&lt;br&gt;时间轴颜色与状态显示&lt;hr&gt;- layoutElement&lt;br&gt;- visualRoot&lt;hr&gt;+ SetState()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TimelineIconView.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1115.0" y="396.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="inherits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#444f53;endArrow=block;endFill=0;" edge="1" parent="1" source="EnemyController" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240.76" y="550.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="inherits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#444f53;endArrow=block;endFill=0;" edge="1" parent="1" source="PlayerController" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="NotifyHpChange()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="Character">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="skills" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="SkillData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="Refresh()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BaseController" target="DebuffState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="TryEnterBossPhaseTwo()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="EnemyController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="158.51999999999998" y="352.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="TickDebuffAtTurnStart()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="276.0" y="352.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="EnemyController" target="SkillData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="OnDebuffTicked" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BaseController" target="BattleBurnFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="422.0" y="538.0" />
+              <mxPoint x="625.0" y="513.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="OnDebuffChanged" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BaseController" target="BattleDebuffHud">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="465.0" y="538.0" />
+              <mxPoint x="728.0" y="513.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="OnTimeLineOrdered" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleManager" target="TimeLineUI">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="568.42" y="181.5" />
+              <mxPoint x="659.58" y="181.5" />
+              <mxPoint x="1061.0" y="203.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-11" value="ForceInactive()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="TimeLineUI" target="TimelineIconView">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="Burn：目标自身回合开始扣血，单槽刷新/替换；蓄力与下一次指定群攻是两次行动。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="930.0" width="1258.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-5" name="06 动作、镜头和战斗反馈">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1619" pageHeight="995">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="06 动作、镜头和战斗反馈&lt;br&gt;效果逻辑与视觉分开；近战命中回调只结算一次" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1539.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleManager" value="&lt;b&gt;BattleManager&lt;/b&gt;&lt;br&gt;回合与战斗流程编排&lt;hr&gt;+ isActing&lt;br&gt;+ battleEnded&lt;hr&gt;- PerformTrun()&lt;br&gt;- CheckBattleEnd()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleManager.cs:14&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="474.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BaseController" value="&lt;b&gt;BaseController&lt;/b&gt;&lt;br&gt;角色战斗效果基类&lt;hr&gt;+ data&lt;br&gt;- _activeDebuff&lt;hr&gt;+ UseSkill()&lt;br&gt;+ TickDebuffAtTurnStart()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BaseController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="761.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleAttackFeedback" value="&lt;b&gt;BattleAttackFeedback&lt;/b&gt;&lt;br&gt;普通攻击表现入口&lt;hr&gt;- controller&lt;br&gt;- motionRoot&lt;hr&gt;+ MatchesSkill()&lt;br&gt;+ Play()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleAttackFeedback.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="181.0" y="389.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleMeleeFeedback" value="&lt;b&gt;BattleMeleeFeedback&lt;/b&gt;&lt;br&gt;瞬移、命中和归位&lt;hr&gt;- motionRoot&lt;br&gt;- impactNormalizedTime&lt;hr&gt;+ Play()&lt;br&gt;+ Cancel()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleMeleeFeedback.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="181.0" y="575.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleBlinkFeedback" value="&lt;b&gt;BattleBlinkFeedback&lt;/b&gt;&lt;br&gt;黑色横线残影&lt;hr&gt;- effectMaterial&lt;br&gt;- duration&lt;hr&gt;+ Emit()&lt;br&gt;+ Clear()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleBlinkFeedback.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="761.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleHitFeedback" value="&lt;b&gt;BattleHitFeedback&lt;/b&gt;&lt;br&gt;受击位移与恢复&lt;hr&gt;- controller&lt;br&gt;- visualRoot&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleHitFeedback.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="742.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleHealFeedback" value="&lt;b&gt;BattleHealFeedback&lt;/b&gt;&lt;br&gt;实际回血的绿色星光&lt;hr&gt;- controller&lt;br&gt;- glowMaterial&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleHealFeedback.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="980.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleBurnFeedback" value="&lt;b&gt;BattleBurnFeedback&lt;/b&gt;&lt;br&gt;灼烧结算时的小火花&lt;hr&gt;- controller&lt;br&gt;- burnSkill&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleBurnFeedback.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1188.0" y="210.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleDeathFeedback" value="&lt;b&gt;BattleDeathFeedback&lt;/b&gt;&lt;br&gt;死亡停顿、透明和粒子&lt;hr&gt;- visualRoot&lt;br&gt;- hitFeedback&lt;hr&gt;+ Play()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleDeathFeedback.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="389.0" y="396.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleFireFeedback" value="&lt;b&gt;BattleFireFeedback&lt;/b&gt;&lt;br&gt;Fire / FireBall 表现&lt;hr&gt;- controller&lt;br&gt;- fireSkill&lt;hr&gt;+ MatchesSkill()&lt;br&gt;+ Play()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleFireFeedback.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="597.0" y="389.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleMagmaFeedback" value="&lt;b&gt;BattleMagmaFeedback&lt;/b&gt;&lt;br&gt;裂痕与火柱表现&lt;hr&gt;- controller&lt;br&gt;- magmaSkill&lt;hr&gt;+ MatchesSkill()&lt;br&gt;+ GetPresentationBounds()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleMagmaFeedback.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="805.0" y="389.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleCameraDirector" value="&lt;b&gt;BattleCameraDirector&lt;/b&gt;&lt;br&gt;回合、近战和群体镜头&lt;hr&gt;- targetCamera&lt;br&gt;- battle&lt;hr&gt;+ FocusGroupEffectShot()&lt;br&gt;+ FocusDefault()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleCameraDirector.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1396.0" y="203.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleAttackFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleAttackFeedback" target="BattleMeleeFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="269.89" y="538.0" />
+              <mxPoint x="269.89" y="550.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="Emit()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleMeleeFeedback" target="BattleBlinkFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="controller" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleMeleeFeedback" target="BaseController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="OnDamageTaken" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BaseController" target="BattleHitFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="761.0" />
+              <mxPoint x="337.0" y="736.0" />
+              <mxPoint x="374.0" y="699.0" />
+              <mxPoint x="374.0" y="575.0" />
+              <mxPoint x="332.07" y="550.0" />
+              <mxPoint x="332.07" y="538.0" />
+              <mxPoint x="998.0" y="513.0" />
+              <mxPoint x="998.0" y="389.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="OnHealed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BaseController" target="BattleHealFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="761.0" />
+              <mxPoint x="366.0" y="736.0" />
+              <mxPoint x="397.0" y="699.0" />
+              <mxPoint x="445.97" y="538.0" />
+              <mxPoint x="1021.0" y="513.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="OnDebuffTicked" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BaseController" target="BattleBurnFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="761.0" />
+              <mxPoint x="394.0" y="736.0" />
+              <mxPoint x="1056.0" y="513.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleDeathFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="MatchesSkill()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleFireFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="MatchesSkill()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="BattleMagmaFeedback">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="790.0" y="389.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="OnCurrentActorChanged" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleManager" target="BattleCameraDirector">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="727.0" y="203.0" />
+              <mxPoint x="923.69" y="181.5" />
+              <mxPoint x="1034.31" y="181.5" />
+              <mxPoint x="1381.0" y="203.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="Argo：瞬移到接触点、攻击、瞬移归位。玩家 AllyAll 直接使用友方群体镜头；当前残影默认黑色。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="915.0" width="1539.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-6" name="07 探索头像与系统菜单">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1190" pageHeight="902">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="07 探索头像与系统菜单&lt;br&gt;角色选择共享，Status / Skill / Item / SaveLoad 分页" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1031.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldPortraitHudController" value="&lt;b&gt;FieldPortraitHudController&lt;/b&gt;&lt;br&gt;头像周围 HP / MP 弧条&lt;hr&gt;- hudGroup&lt;br&gt;- portraitButton&lt;hr&gt;+ OpenStatus()&lt;br&gt;+ Refresh()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldPortraitHudController.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldSystemMenuController" value="&lt;b&gt;FieldSystemMenuController&lt;/b&gt;&lt;br&gt;探索菜单与暂停会话&lt;hr&gt;- statusPanel&lt;br&gt;- skillPanel&lt;hr&gt;+ OpenStatus()&lt;br&gt;+ OpenSkills()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldSystemMenuController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BasePanel" value="&lt;b&gt;BasePanel&lt;/b&gt;&lt;br&gt;CanvasGroup 面板基类&lt;hr&gt;# canvasGroup&lt;br&gt;# fadeDuration&lt;hr&gt;+ Show()&lt;br&gt;+ Hide()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BasePanel.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldStatusPanelController" value="&lt;b&gt;FieldStatusPanelController&lt;/b&gt;&lt;br&gt;Status 展示页&lt;hr&gt;- statsController&lt;hr&gt;+ Refresh()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldStatusPanelController.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="311.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldCharacterStatsController" value="&lt;b&gt;FieldCharacterStatsController&lt;/b&gt;&lt;br&gt;队员选择与属性快照&lt;hr&gt;+ CurrentStats&lt;br&gt;+ OnStatsChanged [event]&lt;hr&gt;+ SelectMember()&lt;br&gt;+ Refresh()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldCharacterStatsController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="222.0" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="CharacterStatsSnapshot" value="&lt;b&gt;CharacterStatsSnapshot&lt;/b&gt;&lt;br&gt;只读展示数据快照&lt;hr&gt;+ CharacterId&lt;br&gt;+ Name&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;CharacterStatsSnapshot.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="222.0" y="675.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldSkillPanelController" value="&lt;b&gt;FieldSkillPanelController&lt;/b&gt;&lt;br&gt;技能列表与选人 UI&lt;hr&gt;- memberRoot&lt;br&gt;- memberPrefab&lt;hr&gt;+ Refresh()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldSkillPanelController.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldSkillService" value="&lt;b&gt;FieldSkillService&lt;/b&gt;&lt;br&gt;探索技能规则与执行&lt;hr&gt;(无关键字段展开)&lt;hr&gt;+ IsFieldSkill()&lt;br&gt;+ TryUse()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldSkillService.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="430.0" y="489.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldInventoryPanelController" value="&lt;b&gt;FieldInventoryPanelController&lt;/b&gt;&lt;br&gt;探索背包与道具使用&lt;hr&gt;- contentRoot&lt;br&gt;- itemViewPrefab&lt;hr&gt;+ Show()&lt;br&gt;+ Hide()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldInventoryPanelController.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldInventoryPartyTargetPanelController" value="&lt;b&gt;FieldInventoryPartyTargetPanelController&lt;/b&gt;&lt;br&gt;道具队友目标页&lt;hr&gt;- items&lt;hr&gt;+ Show()&lt;br&gt;+ ShowForItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldInventoryPartyTargetPanelController.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="638.25" y="489.5" width="219.5" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="430.0" y="668.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="InventoryRuntimeState" value="&lt;b&gt;InventoryRuntimeState&lt;/b&gt;&lt;br&gt;跨场景背包状态&lt;hr&gt;+ DefaultCapacity&lt;br&gt;+ Slots&lt;hr&gt;+ AddItem()&lt;br&gt;+ ConsumeItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;InventoryRuntimeState.cs:34&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="888.0" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveLoadPanelController" value="&lt;b&gt;SaveLoadPanelController&lt;/b&gt;&lt;br&gt;存读档列表与确认&lt;hr&gt;- itemDataBase&lt;br&gt;- characterDataBase&lt;hr&gt;+ BindSystemMenu()&lt;br&gt;+ OpenFromTitle()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveLoadPanelController.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="867.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="Show()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldPortraitHudController" target="FieldStatusPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="inherits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#444f53;endArrow=block;endFill=0;" edge="1" parent="1" source="FieldSystemMenuController" target="BasePanel">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="BindSystemMenu()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSystemMenuController" target="FieldStatusPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="228.0" y="296.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="BindSystemMenu()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSystemMenuController" target="FieldSkillPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="HideImmediate()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSystemMenuController" target="FieldInventoryPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="BindSystemMenu()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSystemMenuController" target="SaveLoadPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="852.0" y="296.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="Refresh()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldStatusPanelController" target="FieldCharacterStatsController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="Refresh()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSkillPanelController" target="FieldCharacterStatsController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCharacterStatsController" target="CharacterStatsSnapshot">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCharacterStatsController" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="OwnsSkill()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSkillPanelController" target="FieldSkillService">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-11" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldSkillService" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-12" value="CanUseItem()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldInventoryPanelController" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-13" value="ShowForItem()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldInventoryPanelController" target="FieldInventoryPartyTargetPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="头像先进入状态页入口，再由已绑定的菜单统一管理。当前是场景内 UI 实例，不是全局常驻 UI。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="822.0" width="1031.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-7" name="08 五槽存读档">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1932" pageHeight="842">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="08 五槽存读档&lt;br&gt;UI 管交互，SaveSystem 管校验和文件，RuntimeState 管恢复" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1852.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveLoadPanelController" value="&lt;b&gt;SaveLoadPanelController&lt;/b&gt;&lt;br&gt;存读档列表与确认&lt;hr&gt;- itemDataBase&lt;br&gt;- characterDataBase&lt;hr&gt;+ BindSystemMenu()&lt;br&gt;+ OpenFromTitle()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveLoadPanelController.cs:7&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="695.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveSlotView" value="&lt;b&gt;SaveSlotView&lt;/b&gt;&lt;br&gt;单条存档显示&lt;hr&gt;- button&lt;br&gt;- background&lt;hr&gt;+ Bind()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveSlotView.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="664.0" y="296.0" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="SaveSystem" value="&lt;b&gt;SaveSystem&lt;/b&gt;&lt;br&gt;JSON 存档校验与文件操作&lt;hr&gt;+ SlotCount&lt;hr&gt;+ SaveSlot()&lt;br&gt;+ LoadSlot()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SaveSystem.cs:19&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="872.0" y="296.0" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="GameSaveData" value="&lt;b&gt;GameSaveData&lt;/b&gt;&lt;br&gt;保存状态的 DTO 容器&lt;hr&gt;+ version&lt;br&gt;+ savedAtUtc&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;GameSaveData.cs:1&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="474.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="467.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="InventoryRuntimeState" value="&lt;b&gt;InventoryRuntimeState&lt;/b&gt;&lt;br&gt;跨场景背包状态&lt;hr&gt;+ DefaultCapacity&lt;br&gt;+ Slots&lt;hr&gt;+ AddItem()&lt;br&gt;+ ConsumeItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;InventoryRuntimeState.cs:34&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="451.0" y="467.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldBattleContext" value="&lt;b&gt;FieldBattleContext&lt;/b&gt;&lt;br&gt;遭遇、返回与探索记录&lt;hr&gt;+ LastFieldSceneName&lt;br&gt;+ PlayerPositionBeforeBattle&lt;hr&gt;+ SaveFieldReturnData()&lt;br&gt;+ MarkTriggerdEnemyCleared()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldBattleContext.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="659.0" y="467.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldSaveContext" value="&lt;b&gt;FieldSaveContext&lt;/b&gt;&lt;br&gt;当前玩家位置存取&lt;hr&gt;+ Current&lt;br&gt;- player&lt;hr&gt;+ TryFillFieldSaveData()&lt;br&gt;+ TryApplySavedPlayerTransform()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldSaveContext.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="866.85" y="467.0" width="188.3" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="TutorialRuntimeState" value="&lt;b&gt;TutorialRuntimeState&lt;/b&gt;&lt;br&gt;教程完成记录&lt;hr&gt;(无关键字段展开)&lt;hr&gt;+ IsCompleted()&lt;br&gt;+ MarkCompleted()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;TutorialRuntimeState.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1085.0" y="474.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldAutoEventRuntimeState" value="&lt;b&gt;FieldAutoEventRuntimeState&lt;/b&gt;&lt;br&gt;自动剧情完成记录&lt;hr&gt;(无关键字段展开)&lt;hr&gt;+ IsCompleted()&lt;br&gt;+ MarkCompleted()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldAutoEventRuntimeState.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1293.0" y="474.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="CharacterDataBase" value="&lt;b&gt;CharacterDataBase&lt;/b&gt;&lt;br&gt;玩家模板与 ID 查找&lt;hr&gt;- characters&lt;br&gt;- partyInitialData&lt;hr&gt;+ FindById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;CharacterDataBase.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1501.0" y="474.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="ItemDataBase" value="&lt;b&gt;ItemDataBase&lt;/b&gt;&lt;br&gt;道具 ID 数据库&lt;hr&gt;- items&lt;hr&gt;+ FindById()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ItemDataBase.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1709.0" y="482.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="Bind()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveLoadPanelController" target="SaveSlotView">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="GetSlots()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveLoadPanelController" target="SaveSystem">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="GameSaveData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="857.0" y="405.0" />
+              <mxPoint x="560.88" y="430.0" />
+              <mxPoint x="228.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="857.0" y="405.0" />
+              <mxPoint x="661.75" y="430.0" />
+              <mxPoint x="436.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="857.0" y="405.0" />
+              <mxPoint x="644.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="TryFillFieldSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="FieldSaveContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="TutorialRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1067.0" y="430.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="ToSaveData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="FieldAutoEventRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1278.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="FindById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="CharacterDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1486.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="FindById()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="SaveSystem" target="ItemDataBase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1694.0" y="467.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="文件为 save_01.json 至 save_05.json；先验证再恢复，先写临时文件再替换。当前没有截图缩略图。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="621.0" width="1852.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-8" name="09 战斗收尾与 Demo 出口">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1759" pageHeight="842">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="09 战斗收尾与 Demo 出口&lt;br&gt;奖励、返回探索和清怪后剧情；不等同于已完成必败剧情" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1679.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleManager" value="&lt;b&gt;BattleManager&lt;/b&gt;&lt;br&gt;回合与战斗流程编排&lt;hr&gt;+ isActing&lt;br&gt;+ battleEnded&lt;hr&gt;- PerformTrun()&lt;br&gt;- CheckBattleEnd()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleManager.cs:14&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="140.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="BattleEndPanelController" value="&lt;b&gt;BattleEndPanelController&lt;/b&gt;&lt;br&gt;战斗结束提示&lt;hr&gt;- battle&lt;br&gt;- panelGourp&lt;hr&gt;+ Close()&lt;br&gt;+ CloseImmediate()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;BattleEndPanelController.cs:10&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="440.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="ResultCharacterPanelController" value="&lt;b&gt;ResultCharacterPanelController&lt;/b&gt;&lt;br&gt;胜负结算与返回探索&lt;hr&gt;- endPanel&lt;br&gt;- buttonRoot&lt;hr&gt;- ReturnToField()&lt;br&gt;+ OnClickRetry()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;ResultCharacterPanelController.cs:9&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="704.0" y="110.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="EncounterRewardService" value="&lt;b&gt;EncounterRewardService&lt;/b&gt;&lt;br&gt;遭遇奖励汇总&lt;hr&gt;(无关键字段展开)&lt;hr&gt;+ GrantRewards()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;EncounterData.cs:165&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="311.0" width="178" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="243.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="InventoryRuntimeState" value="&lt;b&gt;InventoryRuntimeState&lt;/b&gt;&lt;br&gt;跨场景背包状态&lt;hr&gt;+ DefaultCapacity&lt;br&gt;+ Slots&lt;hr&gt;+ AddItem()&lt;br&gt;+ ConsumeItem()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;InventoryRuntimeState.cs:34&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="482.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="RewardPopController" value="&lt;b&gt;RewardPopController&lt;/b&gt;&lt;br&gt;奖励弹窗&lt;hr&gt;- rewardText&lt;br&gt;- visibleDuration&lt;hr&gt;+ HasReward()&lt;br&gt;+ Play()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;RewardPopController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="496.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="LevelUpPopController" value="&lt;b&gt;LevelUpPopController&lt;/b&gt;&lt;br&gt;升级弹窗&lt;hr&gt;- nameTxt&lt;br&gt;- levelTxt&lt;hr&gt;+ Play()&lt;br&gt;+ GetTotalDuration()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;LevelUpPopController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="704.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldBattleContext" value="&lt;b&gt;FieldBattleContext&lt;/b&gt;&lt;br&gt;遭遇、返回与探索记录&lt;hr&gt;+ LastFieldSceneName&lt;br&gt;+ PlayerPositionBeforeBattle&lt;hr&gt;+ SaveFieldReturnData()&lt;br&gt;+ MarkTriggerdEnemyCleared()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldBattleContext.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="912.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldAutoDialogueEventController" value="&lt;b&gt;FieldAutoDialogueEventController&lt;/b&gt;&lt;br&gt;清怪后自动对话&lt;hr&gt;- requiredClearedSpawnId&lt;br&gt;- onDialogueFinished&lt;hr&gt;- TryStartAutoEvent()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldAutoDialogueEventController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1220.35" y="117.5" width="185.3" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="VNDialoguePanelController" value="&lt;b&gt;VNDialoguePanelController&lt;/b&gt;&lt;br&gt;VN 立绘和逐字对话&lt;hr&gt;- speakerNameText&lt;br&gt;- dialogueText&lt;hr&gt;+ Play()&lt;br&gt;+ Advance()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;VNDialoguePanelController.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1120.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="DemoEndController" value="&lt;b&gt;DemoEndController&lt;/b&gt;&lt;br&gt;Demo 结束与返回标题&lt;hr&gt;- endPanel&lt;br&gt;- backToTitleButton&lt;hr&gt;+ ShowDemoEnd()&lt;br&gt;+ BackToTitle()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;DemoEndController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1328.0" y="296.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="DialogueData" value="&lt;b&gt;DialogueData&lt;/b&gt;&lt;br&gt;台词、立绘和背景资源&lt;hr&gt;- dialogueId&lt;br&gt;- lines&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;DialogueData.cs:27&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="1536.0" y="303.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="OnBattleEnded" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleManager" target="BattleEndPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="OnClosed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#147b8d;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="BattleEndPanelController" target="ResultCharacterPanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="GrantRewards()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="EncounterRewardService">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="HasReward()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="ResultCharacterPanelController" target="RewardPopController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="ResultCharacterPanelController" target="LevelUpPopController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="ClearReturnData()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="ResultCharacterPanelController" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="AddItem()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="EncounterRewardService" target="InventoryRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="IsSpawnCleard()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="FieldBattleContext">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="VNDialoguePanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-9" value="dialogueData" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1480.0" y="259.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-10" value="UpdateFromBattleControll..." style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="BattleManager" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-11" value="ShowDemoEnd [scene]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#a44d22;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="DemoEndController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="场景额外绑定：Boss_FieldScene 中，boss_ending_001 的 onDialogueFinished 调用 ShowDemoEnd。失败后的 VN 逃走流程仍待接通。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="636.0" width="1679.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-9" name="10 对话与招募">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1190" pageHeight="842">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="10 对话与招募&lt;br&gt;基础对话与 VN 对话分开，入口决定何时播放" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="1041.0" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="DialogueData" value="&lt;b&gt;DialogueData&lt;/b&gt;&lt;br&gt;台词、立绘和背景资源&lt;hr&gt;- dialogueId&lt;br&gt;- lines&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;DialogueData.cs:27&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="304.0" y="474.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldDialogueController" value="&lt;b&gt;FieldDialogueController&lt;/b&gt;&lt;br&gt;地图交互对话&lt;hr&gt;- dialogueData&lt;br&gt;- interactKey&lt;hr&gt;+ StartDialogue()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldDialogueController.cs:3&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35.0" y="110.0" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="DialoguePanelController" value="&lt;b&gt;DialoguePanelController&lt;/b&gt;&lt;br&gt;基础对话面板&lt;hr&gt;- speakerNameText&lt;br&gt;- dialogueText&lt;hr&gt;+ Play()&lt;br&gt;+ Advance()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;DialoguePanelController.cs:6&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="155.0" y="281.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldRecruitController" value="&lt;b&gt;FieldRecruitController&lt;/b&gt;&lt;br&gt;招募与入队前对话&lt;hr&gt;- recruitId&lt;br&gt;- characterId&lt;hr&gt;+ Configure()&lt;br&gt;+ RefreshAllRecruitStates()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldRecruitController.cs:3&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="898.0" y="281.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="VNDialoguePanelController" value="&lt;b&gt;VNDialoguePanelController&lt;/b&gt;&lt;br&gt;VN 立绘和逐字对话&lt;hr&gt;- speakerNameText&lt;br&gt;- dialogueText&lt;hr&gt;+ Play()&lt;br&gt;+ Advance()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;VNDialoguePanelController.cs:8&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="690.0" y="281.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="PartyRuntimeState" value="&lt;b&gt;PartyRuntimeState&lt;/b&gt;&lt;br&gt;跨场景队伍状态&lt;hr&gt;+ PartyMembers&lt;br&gt;+ HasPartyData&lt;hr&gt;+ InitializeIfEmpty()&lt;br&gt;+ UpdateFromBattleController()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;PartyRuntimeState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="898.0" y="467.0" width="178" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldAutoEventRuntimeState" value="&lt;b&gt;FieldAutoEventRuntimeState&lt;/b&gt;&lt;br&gt;自动剧情完成记录&lt;hr&gt;(无关键字段展开)&lt;hr&gt;+ IsCompleted()&lt;br&gt;+ MarkCompleted()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldAutoEventRuntimeState.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="482.0" y="288.5" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldAutoDialogueEventController" value="&lt;b&gt;FieldAutoDialogueEventController&lt;/b&gt;&lt;br&gt;清怪后自动对话&lt;hr&gt;- requiredClearedSpawnId&lt;br&gt;- onDialogueFinished&lt;hr&gt;- TryStartAutoEvent()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldAutoDialogueEventController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="478.35" y="110.0" width="185.3" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="dialogueData" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldDialogueController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="81.06" y="281.0" />
+              <mxPoint x="81.06" y="405.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-1" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldDialogueController" target="DialoguePanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-2" value="HasMember()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldRecruitController" target="PartyRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-3" value="preRecruitDialogue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldRecruitController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="883.0" y="405.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-4" value="IsCompleted()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="FieldAutoEventRuntimeState">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-5" value="Play()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#4e5c62;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="VNDialoguePanelController">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-6" value="dialogueData" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldAutoDialogueEventController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="408.06" y="281.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-7" value="currentDialogue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="DialoguePanelController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="299.4" y="442.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-8" value="currentDialogue" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="VNDialoguePanelController" target="DialogueData">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="675.0" y="405.0" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="自动事件的完成标记会存档。场景 UnityEvent 的额外连线见上一页，不会被误画成类继承。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="621.0" width="1041.0" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="module-10" name="11 探索镜头与洞穴组件">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1190" pageHeight="842">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="11 探索镜头与洞穴组件&lt;br&gt;职责分解：跟随、暂停、相机避障、遮挡淡化和安全落点" style="text;html=1;align=left;verticalAlign=top;fontSize=22;fontFamily=Microsoft YaHei;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="35" y="20" width="870" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldCameraController" value="&lt;b&gt;FieldCameraController&lt;/b&gt;&lt;br&gt;探索跟随与旋转&lt;hr&gt;- cameraSettings&lt;br&gt;- target&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldCameraController.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35" y="181" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldCameraSettings" value="&lt;b&gt;FieldCameraSettings&lt;/b&gt;&lt;br&gt;探索镜头默认配置&lt;hr&gt;- distance&lt;br&gt;- height&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldCameraSettings.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="325" y="181" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="SimplePlayerMovement" value="&lt;b&gt;SimplePlayerMovement&lt;/b&gt;&lt;br&gt;探索玩家移动&lt;hr&gt;- moveSpeed&lt;br&gt;- cameraTransform&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;SimplePlayerMovement.cs:3&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="615" y="181" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="FieldPauseState" value="&lt;b&gt;FieldPauseState&lt;/b&gt;&lt;br&gt;探索共享暂停状态&lt;hr&gt;+ IsPaused&lt;hr&gt;+ SetPaused()&lt;br&gt;+ Clear()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;FieldPauseState.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35" y="376" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="CaveCameraConstraint" value="&lt;b&gt;CaveCameraConstraint&lt;/b&gt;&lt;br&gt;相机位置约束&lt;hr&gt;+ target&lt;br&gt;+ viewCamera&lt;hr&gt;+ ResolvePosition()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;CaveCameraConstraint.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="325" y="376" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="VolcanoCaveVisibility" value="&lt;b&gt;VolcanoCaveVisibility&lt;/b&gt;&lt;br&gt;视线遮挡物淡化&lt;hr&gt;+ occluders&lt;br&gt;+ target&lt;hr&gt;(方法见源码)&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;VolcanoCaveVisibility.cs:4&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="615" y="376" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="CaveSpawnRecovery" value="&lt;b&gt;CaveSpawnRecovery&lt;/b&gt;&lt;br&gt;洞穴落点恢复&lt;hr&gt;- safePositions&lt;hr&gt;+ Configure()&lt;br&gt;+ HasFloor()&lt;br&gt;&lt;font color=&quot;#68747d&quot; style=&quot;font-size:8px&quot;&gt;CaveSpawnRecovery.cs:5&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacing=8;fontSize=10;fontFamily=Microsoft YaHei;fillColor=#ffffff;strokeColor=#9aabad;" vertex="1" parent="1">
+          <mxGeometry x="35" y="571" width="178" height="109" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-0" value="cameraSettings" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCameraController" target="FieldCameraSettings">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-1" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="FieldCameraController" target="FieldPauseState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-2" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;fontFamily=Microsoft YaHei;labelBackgroundColor=#ffffff;strokeColor=#7b898d;endArrow=open;endFill=0;" edge="1" parent="1" source="SimplePlayerMovement" target="FieldPauseState">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="note" value="下方三个洞穴组件通过 Unity 生命周期、Camera / Transform 和场景配置协作；没有画出不存在的组件间直接调用。淡化不改变玩家碰撞。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff7ec;strokeColor=#c8ad8b;fontFamily=Microsoft YaHei;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="35" y="710" width="870" height="55" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
