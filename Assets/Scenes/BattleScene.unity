@@ -3333,6 +3333,8 @@ MonoBehaviour:
   playerPrefabOverrides:
   - characterId: Argo_002
     prefab: {fileID: 1886010246550237098, guid: 7ec4d9d52188b4b44bce0877aaaf0b9d, type: 3}
+  - characterId: Paul_001
+    prefab: {fileID: 4986215820453312788, guid: 6a2faaa3578b7474b8800b73b81d19aa, type: 3}
   spawnOnStart: 1
   worldUICanvas: {fileID: 364944995}
   encounterDatabase: {fileID: 11400000, guid: 9201cc78d47f18d45bf670e77b37561e, type: 2}
